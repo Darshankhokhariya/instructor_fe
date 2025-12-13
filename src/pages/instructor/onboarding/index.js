@@ -1,155 +1,39 @@
-import React, { useState, useCallback, useMemo } from 'react';
-// The external import below was causing the compilation error. It is now removed.
-// import { BiChevronLeft, BiChevronRight } from 'react-icons/bi'; 
+import Input from '@/components/common/Input';
+import Selector from '@/components/common/Selector';
+import SmartSelect from '@/components/common/SmartSelect';
+import TextArea from '@/components/common/TextArea';
+import PhoneInput from '@/components/common/PhoneInput';
 
-// --- MOCK ICONS (Replacing external 'react-icons' imports) ---
-// This mock ensures the application runs without external dependencies while preserving intended visual structure.
-const MockIcon = ({ icon, className = "", size = 14 }) => {
-    const IconMap = {
-        FaCheckCircle: '✓', FaUser: '👤', FaFileAlt: '📄', FaVideo: '📹',
-        FaCalendarAlt: '📅', FaDollarSign: '$', FaShieldAlt: '🛡️', FaIdCard: '🆔',
-        FaPlus: '+', FaTrash: '🗑️', FaInstagram: '📷', FaFacebook: '📘',
-        FaLinkedin: '🔗', FaFaYoutube: '▶️', FaRoad: '🛣️', FaSchool: '🏫',
-        FaMapMarkerAlt: '📍', FaHeartbeat: '❤️', FaGraduationCap: '🎓',
-        FaSignature: '✍️', MdChevronLeft: '<', MdChevronRight: '>', // Used for navigation arrows
-    };
-    const iconKey = icon.name || icon.displayName;
-    const symbol = IconMap[iconKey] || '•';
-
-    return <span className={`inline-block ${className}`} style={{ fontSize: `${size}px` }}>{symbol}</span>;
-};
-
-// Use the mock icons for local reference:
-const FaCheckCircle = MockIcon.bind(null, { icon: { displayName: 'FaCheckCircle' } });
-const FaUser = MockIcon.bind(null, { icon: { displayName: 'FaUser' } });
-const FaFileAlt = MockIcon.bind(null, { icon: { displayName: 'FaFileAlt' } });
-const FaVideo = MockIcon.bind(null, { icon: { displayName: 'FaVideo' } });
-const FaCalendarAlt = MockIcon.bind(null, { icon: { displayName: 'FaCalendarAlt' } });
-const FaDollarSign = MockIcon.bind(null, { icon: { displayName: 'FaDollarSign' } });
-const FaShieldAlt = MockIcon.bind(null, { icon: { displayName: 'FaShieldAlt' } });
-const FaIdCard = MockIcon.bind(null, { icon: { displayName: 'FaIdCard' } });
-const FaPlus = MockIcon.bind(null, { icon: { displayName: 'FaPlus' } });
-const FaTrash = MockIcon.bind(null, { icon: { displayName: 'FaTrash' } });
-const FaInstagram = MockIcon.bind(null, { icon: { displayName: 'FaInstagram' } });
-const FaFacebook = MockIcon.bind(null, { icon: { displayName: 'FaFacebook' } });
-const FaLinkedin = MockIcon.bind(null, { icon: { displayName: 'FaLinkedin' } });
-const FaYoutube = MockIcon.bind(null, { icon: { displayName: 'FaFaYoutube' } }); // Note: Corrected typo in key
-const FaRoad = MockIcon.bind(null, { icon: { displayName: 'FaRoad' } });
-const FaMapMarkerAlt = MockIcon.bind(null, { icon: { displayName: 'FaMapMarkerAlt' } });
-const FaHeartbeat = MockIcon.bind(null, { icon: { displayName: 'FaHeartbeat' } });
-const FaGraduationCap = MockIcon.bind(null, { icon: { displayName: 'FaGraduationCap' } });
-const FaSignature = MockIcon.bind(null, { icon: { displayName: 'FaSignature' } });
-
-// Correctly mocking BiChevronLeft and BiChevronRight using the MockIcon structure
-// We use the MdChevronLeft/Right display name to pull the '<' and '>' symbols from the IconMap
-const BiChevronLeft = MockIcon.bind(null, { icon: { displayName: 'MdChevronLeft' } });
-const BiChevronRight = MockIcon.bind(null, { icon: { displayName: 'MdChevronRight' } });
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+// These icons are kept here as they are directly imported from 'react-icons/bi' in your first prompt
+import { BiCalendar, BiFile, BiLogoFacebook, BiLogoInstagram, BiMaleSign, BiPlusCircle, BiShield, BiSolidIdCard, BiTrash, BiUser, BiVideo, BiSave, BiSolidGraduation, BiChevronLeft, BiChevronRight } from 'react-icons/bi';
 
 
-/* -------------------------------------------------------------------------- */
-/* MOCK COMPONENTS (for single-file execution)                                */
-/* -------------------------------------------------------------------------- */
 
-// Mock implementations for Input, Selector, TextArea
-const Input = ({ label, name, value, onChange, required = true, type = 'text', prefix, placeholder, ...rest }) => (
-    <div className="mt-4">
-        <Label required={required}>{label}</Label>
-        <div className="relative flex items-center">
-            {prefix && <span className="absolute left-3 text-slate-400">{prefix}</span>}
-            <input
-                type={type}
-                name={name}
-                value={value}
-                onChange={onChange}
-                required={required}
-                placeholder={placeholder}
-                className={`w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors placeholder-slate-400 text-slate-700 ${prefix ? 'pl-9' : 'pl-3'}`}
-                {...rest}
-            />
-        </div>
-    </div>
-);
 
-const Selector = ({ label, name, options, value, onChange, required = true }) => (
-    <div className="mt-4">
-        <Label required={required}>{label}</Label>
-        <select
-            name={name}
-            value={value}
-            onChange={onChange}
-            required={required}
-            className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors bg-white text-slate-700 appearance-none"
-        >
-            <option value="" disabled>Select {label}</option>
-            {options.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-            ))}
-        </select>
-    </div>
-);
+const FaCheckCircle = BiSave;
+const FaUser = BiUser;
+const FaFileAlt = BiFile;
+const FaVideo = BiVideo;
+const FaCalendarAlt = BiCalendar;
+const FaDollarSign = BiCalendar;
+const FaShieldAlt = BiShield;
+const FaIdCard = BiSolidIdCard;
+const FaPlus = BiPlusCircle;
+const FaTrash = BiTrash;
+const FaInstagram = BiLogoInstagram;
+const FaFacebook = BiLogoFacebook;
+const FaLinkedin = BiMaleSign;
+const FaYoutube = BiVideo;
+const FaRoad = BiMaleSign;
+const FaMapMarkerAlt = BiMaleSign;
+const FaGraduationCap = BiSolidGraduation;
+const FaSignature = BiMaleSign;
+const FaSave = BiSave;
+const BiChevronLeftIcon = BiChevronLeft;
+const BiChevronRightIcon = BiChevronRight;
 
-const TextArea = ({ label, name, value, onChange, required = true, rows = 3, placeholder }) => (
-    <div className="mt-4">
-        <Label required={required}>{label}</Label>
-        <textarea
-            name={name}
-            value={value}
-            onChange={onChange}
-            required={required}
-            rows={rows}
-            placeholder={placeholder}
-            className="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors placeholder-slate-400 text-slate-700"
-        />
-    </div>
-);
-
-// Mock useRouter for the completion screen
-const useRouter = () => ({
-    push: (path) => console.log(`Simulating navigation to: ${path}`)
-});
-
-const SmartSelect = ({ label, options, selectedValues, onToggle }) => (
-    <div className="mt-4">
-        <Label>{label}</Label>
-        <div className="flex flex-wrap gap-2">
-            {options.map((opt) => (
-                <button
-                    key={opt}
-                    type="button"
-                    onClick={() => onToggle(opt)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors border-2 ${selectedValues.includes(opt)
-                        ? 'bg-teal-600 text-white border-teal-600 shadow-md'
-                        : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
-                        }`}
-                >
-                    {opt}
-                </button>
-            ))}
-        </div>
-    </div>
-);
-
-const PhoneInput = (props) => (
-    <Input {...props} type="tel" placeholder="e.g., +91 98765 43210" />
-);
-
-/* -------------------------------------------------------------------------- */
-/* UTILITY COMPONENTS                                                         */
-/* -------------------------------------------------------------------------- */
-
-const Label = ({ children, required }) => (
-    <label className="mb-2 block text-sm font-semibold text-slate-700 tracking-wide">
-        {children} {required && <span className="text-teal-600">*</span>}
-    </label>
-);
-
-const SectionHeader = ({ title, subtitle, className = "" }) => (
-    <div className={`mb-6 border-b border-slate-100 pb-2 ${className}`}>
-        <h2 className="text-xl font-bold text-teal-900">{title}</h2>
-        {subtitle && <p className="text-sm text-slate-500 mt-1">{subtitle}</p>}
-    </div>
-);
-
+const SectionHeader = ({ title, subtitle, className = "" }) => <div className={`mb-6 border-b border-slate-100 pb-2 ${className}`}> <h2 className="text-xl font-bold text-teal-900">{title}</h2> {subtitle && <p className="text-sm text-slate-500 mt-1">{subtitle}</p>} </div>;
 const StepIndicator = ({ currentStep, totalSteps }) => {
     // UPDATED steps array for 8 steps (1: Combined, 2-8: Old 4-10)
     const steps = useMemo(() => [
@@ -195,104 +79,173 @@ const StepIndicator = ({ currentStep, totalSteps }) => {
     );
 };
 
+const Label = ({ children, required }) => (<label className="mb-1 block text-sm font-medium text-gray-700">{children} {required && <span className="text-teal-600">*</span>}</label>);
+const CheckboxToggle = ({ label, name, checked, onChange }) => (
+    <div className={`mb-4 flex items-center justify-between rounded-lg border p-3 transition-colors ${checked ? 'border-teal-400 bg-teal-50' : 'border-gray-300 bg-white'}`}>
+        <span className="text-sm font-medium text-gray-700">{label}</span>
+        <input type="checkbox" name={name} checked={checked} onChange={onChange} className="h-4 w-4 text-teal-600" />
+    </div>
+);
+const useRouter = () => ({ push: (path) => console.log(`Simulating navigation to: ${path}`) });
+
+// Utility function (kept internal as it's specific validation logic)
+const isTimeSlotValid = (start, end) => {
+    if (!start || !end) return true;
+    const [startH, startM] = start.split(':').map(Number);
+    let [endH, endM] = end.split(':').map(Number);
+    const startMinutes = startH * 60 + startM;
+    let endMinutes = endH * 60 + endM;
+    if (endMinutes <= startMinutes) {
+        endMinutes += 24 * 60;
+    }
+    const durationMinutes = endMinutes - startMinutes;
+    const maxDurationMinutes = 5 * 60;
+    return durationMinutes <= maxDurationMinutes;
+};
+
+
 /* -------------------------------------------------------------------------- */
-/* MAIN COMPONENT                                                             */
+/* --- MAIN COMPONENT: InstructorOnboarding --- */
 /* -------------------------------------------------------------------------- */
 
 const InstructorOnboarding = () => {
-    // UPDATED: 3 steps combined into 1, reducing total from 10 to 8
     const totalSteps = 8;
-    const [step, setStep] = useState(1);
+    const DRAFT_KEY = 'instructorOnboardingDraft';
+    const [step, setStep] = useState(6);
     const router = useRouter();
     const [isCurrentSameAsPermanent, setIsCurrentSameAsPermanent] = useState(false);
+    const [saveStatus, setSaveStatus] = useState(null);
+    const [timeError, setTimeError] = useState(null);
+    const [validationErrors, setValidationErrors] = useState({});
 
     const initialFormData = useMemo(() => ({
-        // 1. Personal
         fullName: "", dob: "", gender: "", email: "", phone: "", alternatePhone: "",
-
-        // 2. Address (Permanent)
-        permanentCountry: "india", // Defaulting to India for tax demo
-        permanentState: "", permanentCity: "", permanentPincode: "", permanentArea: "", permanentBuilding: "", permanentBlock: "",
-
-        // 2. Address (Current)
+        permanentCountry: "", permanentState: "", permanentCity: "", permanentPincode: "", permanentArea: "", permanentBuilding: "", permanentBlock: "",
         currentCountry: "", currentState: "", currentCity: "", currentPincode: "", currentArea: "", currentBuilding: "", currentBlock: "",
-
-        // 3. Emergency Contact
         emergencyName: "", emergencyPhone: "", emergencyRelation: "",
-
-        // 4. Education (Now Step 2)
         schoolCollege: "", degreeName: "", universityName: "",
-
-        // 5. Taxation (Now Step 3)
         panCard: "", aadharNumber: "", gstin: "",
-
-        // 6. Social Media (Now Step 4)
         socialFb: "", socialLi: "", socialInsta: "", socialYt: "",
-
-        // 7. Qualifications (Now Step 5)
         certifications: [{ title: "", file: null }],
         yogaStyles: [],
-        introVideo: "", sampleVideos: ["", ""], // Two default sample video slots
+        introVideo: "", sampleVideos: ["", ""],
         philosophy: "",
-
-        // 8. Availability (Now Step 6)
-        days: [], times: [], startTime: "07:00", endTime: "19:00",
-
-        // 9. Pricing (Now Step 7)
-        groupRate: "", privateRate: "", trialMode: "none",
-
-        // 10. Agreements (Now Step 8)
+        days: [], times: [], startTime: "07:00", endTime: "12:00",
+        availableOneOnOne: false,
+        availableGroupClass: false,
+        groupRate: "", privateRate: "", trialMode: "",
         confirmAccurate: false, ethicalStandards: false, serviceMindset: false, signature: "",
     }), []);
 
     const [formData, setFormData] = useState(initialFormData);
 
+    // --- EFFECT TO LOAD DRAFT DATA ---
+    useEffect(() => {
+        const draft = localStorage.getItem(DRAFT_KEY);
+        if (draft) {
+            try {
+                const draftData = JSON.parse(draft);
+                setFormData(prev => ({
+                    ...prev,
+                    ...draftData,
+                    certifications: draftData.certifications || [{ title: "", file: null }],
+                    sampleVideos: draftData.sampleVideos || ["", ""],
+                    yogaStyles: draftData.yogaStyles || [],
+                    days: draftData.days || [],
+                    times: draftData.times || [],
+                }));
+                if (draftData.isCurrentSameAsPermanent) {
+                    setIsCurrentSameAsPermanent(true);
+                }
+            } catch (error) {
+                console.error("Failed to parse draft data:", error);
+            }
+        }
+    }, [initialFormData]);
+
+
+    // --- HANDLERS ---
+
     const handleChange = useCallback((e) => {
-        const { name, value, type, checked, files } = e.target;
-        if (type === 'file') setFormData(prev => ({ ...prev, [name]: files[0] }));
-        else if (type === 'checkbox') setFormData(prev => ({ ...prev, [name]: checked }));
-        else setFormData(prev => ({ ...prev, [name]: value }));
+        const { name, value, type, checked } = e.target;
+
+        setValidationErrors(prev => {
+            const newErrors = { ...prev };
+            delete newErrors[name];
+            return newErrors;
+        });
+
+        if (type === 'checkbox') {
+            setFormData(prev => {
+                const updatedData = { ...prev, [name]: checked };
+
+                if (name === 'availableOneOnOne' || name === 'availableGroupClass') {
+                    if (!updatedData.availableOneOnOne && !updatedData.availableGroupClass) {
+                        updatedData.trialMode = 'none';
+                    } else if (updatedData.trialMode === 'none' || updatedData.trialMode === '') {
+                        updatedData.trialMode = updatedData.availableOneOnOne ? '1private' : updatedData.availableGroupClass ? '2group' : '';
+                    }
+                }
+                return updatedData;
+            });
+            return;
+        }
+
+        if (type === 'file') {
+            setFormData(prev => ({ ...prev, [name]: e.target.files[0] }));
+            return;
+        }
+
+        setFormData(prev => ({ ...prev, [name]: value }));
     }, []);
 
     const handleArrayToggle = useCallback((field, value) => {
         setFormData(prev => {
             const current = prev[field];
-            return current.includes(value) ? { ...prev, [field]: current.filter(i => i !== value) } : { ...prev, [field]: [...current, value] };
+            const updated = current.includes(value) ? current.filter(i => i !== value) : [...current, value];
+
+            setValidationErrors(v => {
+                if (v[field] && updated.length > 0) {
+                    const newErrors = { ...v };
+                    delete newErrors[field];
+                    return newErrors;
+                }
+                return v;
+            });
+            return { ...prev, [field]: updated };
         });
     }, []);
 
-    const handleCertChange = useCallback((index, field, value) => {
-        const updated = [...formData.certifications];
-        updated[index][field] = value;
-        setFormData(prev => ({ ...prev, certifications: updated }));
-    }, [formData.certifications]);
+    const handleCertChange = useCallback((index, field, value, file) => {
+        setFormData(prev => {
+            const updated = [...prev.certifications];
+            updated[index][field] = file || value;
+            setValidationErrors(v => {
+                const newErrors = { ...v };
+                delete newErrors[`certifications[${index}].${field}`];
+                return newErrors;
+            });
+            return { ...prev, certifications: updated };
+        });
+    }, []);
 
     const addCertification = () => formData.certifications.length < 10 && setFormData(prev => ({ ...prev, certifications: [...prev.certifications, { title: "", file: null }] }));
     const removeCertification = (index) => setFormData(prev => ({ ...prev, certifications: prev.certifications.filter((_, i) => i !== index) }));
 
     const handleSampleVideoChange = useCallback((index, value) => {
-        const updated = [...formData.sampleVideos];
-        updated[index] = value;
-        setFormData(prev => ({ ...prev, sampleVideos: updated }));
-    }, [formData.sampleVideos]);
-
+        setFormData(prev => {
+            const updated = [...prev.sampleVideos];
+            updated[index] = value;
+            setValidationErrors(v => {
+                const newErrors = { ...v };
+                delete newErrors[`sampleVideos[${index}]`];
+                return newErrors;
+            });
+            return { ...prev, sampleVideos: updated };
+        });
+    }, []);
     const addSampleVideo = () => formData.sampleVideos.length < 10 && setFormData(prev => ({ ...prev, sampleVideos: [...prev.sampleVideos, ""] }));
-    const removeSampleVideo = (index) => setFormData(prev => ({ ...prev, sampleVideos: prev.sampleVideos.filter((_, i) => i !== index) }));
-
-    const nextStep = () => {
-        document.getElementById('form-content-area')?.scrollTo({ top: 0, behavior: 'smooth' });
-        setStep(prev => Math.min(prev + 1, totalSteps));
-    };
-
-    const prevStep = () => {
-        document.getElementById('form-content-area')?.scrollTo({ top: 0, behavior: 'smooth' });
-        setStep(prev => Math.max(prev - 1, 1));
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        setStep(totalSteps); // Move to the Verification Pending step (Now step 8)
-    };
+    const removeSampleVideo = (index) => formData.sampleVideos.length > 2 && setFormData(prev => ({ ...prev, sampleVideos: prev.sampleVideos.filter((_, i) => i !== index) }));
 
     const handleSameAsPermanentToggle = (e) => {
         const isChecked = e.target.checked;
@@ -300,30 +253,272 @@ const InstructorOnboarding = () => {
         if (isChecked) {
             setFormData(prev => ({
                 ...prev,
-                currentCountry: prev.permanentCountry,
-                currentState: prev.permanentState,
-                currentCity: prev.permanentCity,
-                currentPincode: prev.permanentPincode,
-                currentArea: prev.permanentArea,
-                currentBuilding: prev.permanentBuilding,
-                currentBlock: prev.permanentBlock,
+                currentCountry: prev.permanentCountry, currentState: prev.permanentState, currentCity: prev.permanentCity,
+                currentPincode: prev.permanentPincode, currentArea: prev.permanentArea, currentBuilding: prev.permanentBuilding, currentBlock: prev.permanentBlock,
             }));
+            setValidationErrors(v => {
+                const keysToRemove = ['currentCountry', 'currentState', 'currentCity', 'currentPincode', 'currentArea', 'currentBuilding', 'currentBlock'];
+                const newErrors = { ...v };
+                keysToRemove.forEach(key => delete newErrors[key]);
+                return newErrors;
+            });
         } else {
             setFormData(prev => ({
                 ...prev,
-                currentCountry: "",
-                currentState: "",
-                currentCity: "",
-                currentPincode: "",
-                currentArea: "",
-                currentBuilding: "",
-                currentBlock: "",
+                currentCountry: "", currentState: "", currentCity: "", currentPincode: "", currentArea: "", currentBuilding: "", currentBlock: "",
             }));
         }
     };
 
-    // --- CONDITIONAL LOGIC FOR INDIA ---
-    const isSubmitted = step === totalSteps;
+    // --- CORE VALIDATION LOGIC ---
+
+    const validateFormFields = useCallback((stepData) => {
+        const errors = {};
+        const urlRegex = /^(ftp|http|https):\/\/[^ "\s]+$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+        const aadharRegex = /^\d{4}\s?\d{4}\s?\d{4}$/;
+
+        const validateRequired = (field, message) => {
+            if (!stepData[field] || (typeof stepData[field] === 'string' && stepData[field].trim() === '')) {
+                errors[field] = message;
+            }
+        };
+
+        if (step === 1) {
+            validateRequired('fullName', 'Full Name is required.');
+            validateRequired('dob', 'Date of Birth is required.');
+            validateRequired('gender', 'Gender is required.');
+            if (stepData.email && !emailRegex.test(stepData.email)) {
+                errors.email = 'Please enter a valid email address.';
+            } else {
+                validateRequired('email', 'Email is required.');
+            }
+            validateRequired('phone', 'Primary Phone Number is required.');
+
+            validateRequired('permanentCountry', 'Permanent Country is required.');
+            validateRequired('permanentState', 'Permanent State is required.');
+            validateRequired('permanentCity', 'Permanent City is required.');
+            validateRequired('permanentPincode', 'Permanent Pincode is required.');
+            validateRequired('permanentArea', 'Permanent Area is required.');
+            validateRequired('permanentBuilding', 'Permanent Building Name is required.');
+            validateRequired('permanentBlock', 'Permanent Block/Door No. is required.');
+
+            if (!isCurrentSameAsPermanent) {
+                validateRequired('currentCountry', 'Current Country is required.');
+                validateRequired('currentState', 'Current State is required.');
+                validateRequired('currentCity', 'Current City is required.');
+                validateRequired('currentPincode', 'Current Pincode is required.');
+                validateRequired('currentArea', 'Current Area is required.');
+                validateRequired('currentBuilding', 'Current Building Name is required.');
+                validateRequired('currentBlock', 'Current Block/Door No. is required.');
+            }
+
+            validateRequired('emergencyName', 'Emergency Contact Name is required.');
+            validateRequired('emergencyPhone', 'Emergency Phone Number is required.');
+            validateRequired('emergencyRelation', 'Relationship is required.');
+
+        } else if (step === 2) {
+            validateRequired('schoolCollege', 'School/College Name is required.');
+            validateRequired('degreeName', 'Degree/Qualification is required.');
+            validateRequired('universityName', 'University/Institution Name is required.');
+
+        } else if (step === 3) {
+            validateRequired('panCard', 'PAN Card Number is required.');
+            if (stepData.panCard && !panRegex.test(stepData.panCard.toUpperCase())) {
+                errors.panCard = 'Invalid PAN format. Example: ABCDE1234F';
+            }
+            validateRequired('aadharNumber', 'Aadhaar Card Number is required.');
+            if (stepData.aadharNumber && !aadharRegex.test(stepData.aadharNumber.trim().replace(/\s/g, ''))) {
+                errors.aadharNumber = 'Invalid Aadhaar format. Must be 12 digits.';
+            }
+
+        } else if (step === 4) {
+            const checkUrl = (field, label) => {
+                if (stepData[field] && stepData[field].trim() !== "" && !urlRegex.test(stepData[field].trim())) {
+                    errors[field] = `Please enter a valid URL for ${label}.`;
+                }
+            };
+            checkUrl('socialInsta', 'Instagram');
+            checkUrl('socialFb', 'Facebook');
+            checkUrl('socialLi', 'LinkedIn');
+            checkUrl('socialYt', 'YouTube');
+
+        } else if (step === 5) {
+            if (stepData.yogaStyles.length === 0) {
+                errors.yogaStyles = 'Please select at least one Yoga Style.';
+            }
+
+            if (stepData.certifications.length === 0) {
+                errors.certifications = 'Please add at least one certification.';
+            } else {
+                const firstCert = stepData.certifications[0];
+                if (!firstCert.title.trim()) {
+                    errors['certifications[0].title'] = 'Title is required for the first certification.';
+                }
+                if (!firstCert.file) {
+                    errors['certifications[0].file'] = 'File upload is required for the first certification.';
+                }
+            }
+
+            validateRequired('introVideo', 'Introduction Video URL is required.');
+            if (stepData.introVideo && !urlRegex.test(stepData.introVideo.trim())) {
+                errors.introVideo = 'Please enter a valid URL.';
+            }
+
+            const filledSampleVideos = stepData.sampleVideos.filter(v => v.trim() !== '');
+            if (filledSampleVideos.length < 2) {
+                errors.sampleVideos = 'A minimum of two Sample Video URLs are required.';
+                if (!stepData.sampleVideos[0].trim()) errors[`sampleVideos[0]`] = `Video URL 1 is required.`;
+                if (!stepData.sampleVideos[1] || !stepData.sampleVideos[1].trim()) errors[`sampleVideos[1]`] = `Video URL 2 is required.`;
+            }
+
+            stepData.sampleVideos.forEach((video, index) => {
+                if (video.trim() && !urlRegex.test(video.trim())) {
+                    errors[`sampleVideos[${index}]`] = `Video URL ${index + 1} is invalid.`;
+                }
+            });
+
+            validateRequired('philosophy', 'Teaching Philosophy is required.');
+
+        } else if (step === 6) {
+            if (!stepData.availableOneOnOne && !stepData.availableGroupClass) {
+                errors.classType = 'Please select at least one class type.';
+            }
+            if (stepData.days.length === 0) {
+                errors.days = 'Please select at least one preferred teaching day.';
+            }
+            if (stepData.times.length === 0) {
+                errors.times = 'Please select at least one preferred class time.';
+            }
+            validateRequired('startTime', 'Start Time is required.');
+            validateRequired('endTime', 'End Time is required.');
+
+        } else if (step === 7) {
+            if (stepData.availableGroupClass) {
+                validateRequired('groupRate', 'Group Class Rate is required.');
+                if (stepData.groupRate && (isNaN(Number(stepData.groupRate)) || Number(stepData.groupRate) <= 0)) {
+                    errors.groupRate = 'Rate must be a positive number.';
+                }
+            }
+            if (stepData.availableOneOnOne) {
+                validateRequired('privateRate', 'Private Session Rate is required.');
+                if (stepData.privateRate && (isNaN(Number(stepData.privateRate)) || Number(stepData.privateRate) <= 0)) {
+                    errors.privateRate = 'Rate must be a positive number.';
+                }
+            }
+            if (stepData.availableGroupClass || stepData.availableOneOnOne) {
+                if (!stepData.trialMode || stepData.trialMode === 'none') {
+                    errors.trialMode = 'Trial Policy is required.';
+                }
+            }
+
+
+        } else if (step === 8) {
+            if (!stepData.confirmAccurate) errors.confirmAccurate = 'Agreement is required.';
+            if (!stepData.ethicalStandards) errors.ethicalStandards = 'Agreement is required.';
+            if (!stepData.serviceMindset) errors.serviceMindset = 'Agreement is required.';
+            validateRequired('signature', 'Digital Signature is required.');
+        }
+
+        return errors;
+    }, [step, isCurrentSameAsPermanent]);
+
+    const validateStep = () => {
+        const fieldErrors = validateFormFields(formData);
+
+        let customError = null;
+        if (step === 6 && formData.startTime && formData.endTime) {
+            const isValidTime = isTimeSlotValid(formData.startTime, formData.endTime);
+            if (!isValidTime) {
+                customError = "Your total available window cannot exceed 5 hours. Please adjust Start/End Time.";
+                fieldErrors.startTime = fieldErrors.startTime || customError;
+                fieldErrors.endTime = fieldErrors.endTime || customError;
+            }
+        }
+        setTimeError(customError);
+
+        if (Object.keys(fieldErrors).length > 0) {
+            setValidationErrors(fieldErrors);
+            document.getElementById('form-content-area')?.scrollTo({ top: 0, behavior: 'smooth' });
+            return false;
+        }
+
+        setValidationErrors({});
+        return true;
+    };
+
+    const nextStep = () => {
+        if (validateStep()) {
+            document.getElementById('form-content-area')?.scrollTo({ top: 0, behavior: 'smooth' });
+            setStep(prev => Math.min(prev + 1, totalSteps));
+        }
+    };
+
+    const prevStep = () => {
+        setValidationErrors({});
+        setTimeError(null);
+        document.getElementById('form-content-area')?.scrollTo({ top: 0, behavior: 'smooth' });
+        setStep(prev => Math.max(prev - 1, 1));
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (validateStep()) {
+            console.log("Final Submission Data:", formData);
+            localStorage.removeItem(DRAFT_KEY);
+            setStep(totalSteps + 1);
+        }
+    };
+
+    const handleSaveDraft = useCallback(async () => {
+        setSaveStatus('saving');
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        try {
+            const draftToSave = {
+                ...formData,
+                certifications: formData.certifications.map(cert => ({
+                    title: cert.title,
+                    file: null
+                })),
+                isCurrentSameAsPermanent: isCurrentSameAsPermanent,
+            };
+
+            localStorage.setItem(DRAFT_KEY, JSON.stringify(draftToSave));
+            setSaveStatus('saved');
+        } catch (error) {
+            setSaveStatus('error');
+            console.error("Error saving draft:", error);
+        }
+        setTimeout(() => setSaveStatus(null), 3000);
+
+    }, [formData, isCurrentSameAsPermanent]);
+
+    const isSubmitted = step === totalSteps + 1;
+    const isGroupSelected = formData.availableGroupClass;
+    const isPrivateSelected = formData.availableOneOnOne;
+
+    const saveButtonText = useMemo(() => {
+        switch (saveStatus) {
+            case 'saving': return 'Saving...';
+            case 'saved': return 'Draft Saved! ✓';
+            case 'error': return 'Save Failed! ❌';
+            default: return 'Save as Draft';
+        }
+    }, [saveStatus]);
+
+    const trialOptions = useMemo(() => {
+        const options = [];
+        if (isPrivateSelected) {
+            options.push({ label: "1 Free One-on-One Trial", value: "1private" });
+        }
+        if (isGroupSelected) {
+            options.push({ label: "2 Free Group Class Trials", value: "2group" });
+        }
+        options.push({ label: "No Trial", value: "none" });
+        return options;
+    }, [isPrivateSelected, isGroupSelected]);
 
     return (
         <div className="h-screen w-full bg-slate-50 flex flex-col items-center justify-center p-2 md:p-6 font-sans text-slate-800 overflow-hidden">
@@ -335,34 +530,33 @@ const InstructorOnboarding = () => {
                         <div><h1 className="text-2xl md:text-3xl font-bold text-teal-900">Yogalink Instructor</h1><p className="text-slate-500 text-sm">Join the collective.</p></div>
                         <div className="text-right hidden sm:block"><span className="text-xs font-bold text-teal-600 bg-teal-50 px-3 py-1 rounded-full uppercase">{isSubmitted ? "Complete" : `Step ${step} of ${totalSteps}`}</span></div>
                     </div>
-                    <StepIndicator currentStep={step} totalSteps={totalSteps} />
+
+                    {!isSubmitted && <StepIndicator currentStep={step} totalSteps={totalSteps} />}
                 </div>
 
                 {/* SCROLLABLE CONTENT */}
                 <div id="form-content-area" className="flex-1 overflow-y-auto px-6 py-6 md:px-12 scroll-smooth custom-scrollbar">
-                    <form onSubmit={handleSubmit} className="max-w-4xl mx-auto min-h-full">
+
+                    <form id="onboarding-form" onSubmit={handleSubmit} className="max-w-4xl mx-auto min-h-full">
                         <div className={`transition-opacity duration-300 ease-out ${isSubmitted ? 'opacity-100' : 'opacity-100'} pb-4`}>
 
-                            {/* NEW STEP 1: PERSONAL, ADDRESS, EMERGENCY CONTACT (Combined) */}
+                            {/* STEP 1: PERSONAL, ADDRESS, EMERGENCY CONTACT (Combined) */}
                             {step === 1 && (
                                 <div className="space-y-10">
-
-                                    {/* Section 1.1: Personal Details */}
                                     <div className="space-y-4">
                                         <SectionHeader title="1. Basic Personal Details" subtitle="Required for identification and communication." />
-                                        <Input label="Full Name" name="fullName" value={formData.fullName} onChange={handleChange} required placeholder="Your full legal name" />
+                                        <Input label="Full Name" name="fullName" value={formData.fullName} onChange={handleChange} required placeholder="Your full legal name" error={validationErrors.fullName} />
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <Input label="Date of Birth" name="dob" type="date" value={formData.dob} onChange={handleChange} required />
-                                            <Selector label="Gender" name="gender" options={[{ label: "Male", value: "male" }, { label: "Female", value: "female" }, { label: "Other", value: "other" }]} value={formData.gender} onChange={handleChange} required />
+                                            <Input label="Date of Birth" name="dob" type="date" value={formData.dob} onChange={handleChange} required error={validationErrors.dob} />
+                                            <Selector label="Gender" name="gender" options={[{ label: "Male", value: "male" }, { label: "Female", value: "female" }, { label: "Other", value: "other" }]} value={formData.gender} onChange={handleChange} required placeholder="Select Gender" error={validationErrors.gender} />
                                         </div>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <Input label="Email" name="email" type="email" value={formData.email} onChange={handleChange} required />
-                                            <PhoneInput label="Primary Phone Number" name="phone" value={formData.phone} onChange={handleChange} required />
+                                            <Input label="Email" name="email" type="email" value={formData.email} onChange={handleChange} required placeholder="name@example.com" error={validationErrors.email} />
+                                            <PhoneInput label="Primary Phone Number" name="phone" value={formData.phone} onChange={handleChange} required placeholder="98765 43210" error={validationErrors.phone} />
                                         </div>
-                                        <PhoneInput label="Alternate Phone Number (Optional)" name="alternatePhone" value={formData.alternatePhone} onChange={handleChange} required={false} />
+                                        <PhoneInput label="Alternate Phone Number (Optional)" name="alternatePhone" value={formData.alternatePhone} onChange={handleChange} required={false} placeholder="Optional contact number" error={validationErrors.alternatePhone} />
                                     </div>
 
-                                    {/* Section 1.2: Permanent & Current Address */}
                                     <div className="space-y-6 pt-4">
                                         <SectionHeader title="2. Permanent & Current Address" subtitle="Ensure addresses are accurate for legal and tax purposes." className="mt-6" />
 
@@ -370,16 +564,18 @@ const InstructorOnboarding = () => {
                                         <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
                                             <h4 className="text-md font-bold text-teal-900 mb-3 flex items-center"><FaRoad className="mr-2 text-teal-600" size={14} /> Permanent Address</h4>
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                <Selector label="Country" name="permanentCountry" options={[{ label: "India", value: "india" }, { label: "USA", value: "usa" }, { label: "UK", value: "uk" }, { label: "Other", value: "other" }]} value={formData.permanentCountry} onChange={handleChange} required />
-                                                <Input label="State" name="permanentState" value={formData.permanentState} onChange={handleChange} required />
-                                                <Input label="City" name="permanentCity" value={formData.permanentCity} onChange={handleChange} required />
+                                                <Selector label="Country" name="permanentCountry" options={[{ label: "India", value: "india" }, { label: "USA", value: "usa" }, { label: "UK", value: "uk" }, { label: "Other", value: "other" }]} value={formData.permanentCountry} onChange={handleChange} required placeholder="Select Country" error={validationErrors.permanentCountry} />
+                                                <Input label="State" name="permanentState" value={formData.permanentState} onChange={handleChange} required error={validationErrors.permanentState} />
+                                                <Input label="City" name="permanentCity" value={formData.permanentCity} onChange={handleChange} required error={validationErrors.permanentCity} />
                                             </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                <Input label="Pincode / Zip" name="permanentPincode" value={formData.permanentPincode} onChange={handleChange} required />
-                                                <Input label="Area" name="permanentArea" value={formData.permanentArea} onChange={handleChange} required />
-                                                <Input label="Building Name" name="permanentBuilding" value={formData.permanentBuilding} onChange={handleChange} required />
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                                                <Input label="Pincode / Zip" name="permanentPincode" value={formData.permanentPincode} onChange={handleChange} required error={validationErrors.permanentPincode} />
+                                                <Input label="Area" name="permanentArea" value={formData.permanentArea} onChange={handleChange} required error={validationErrors.permanentArea} />
+                                                <Input label="Building Name" name="permanentBuilding" value={formData.permanentBuilding} onChange={handleChange} required error={validationErrors.permanentBuilding} />
                                             </div>
-                                            <Input label="Block / Door No." name="permanentBlock" value={formData.permanentBlock} onChange={handleChange} required />
+                                            <div className="mt-4">
+                                                <Input label="Block / Door No." name="permanentBlock" value={formData.permanentBlock} onChange={handleChange} required error={validationErrors.permanentBlock} />
+                                            </div>
                                         </div>
 
                                         {/* Current Address */}
@@ -393,103 +589,88 @@ const InstructorOnboarding = () => {
                                             </div>
                                             <fieldset disabled={isCurrentSameAsPermanent} className={isCurrentSameAsPermanent ? 'opacity-60' : 'opacity-100'}>
                                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                    <Selector label="Country" name="currentCountry" options={[{ label: "India", value: "india" }, { label: "USA", value: "usa" }, { label: "UK", value: "uk" }, { label: "Other", value: "other" }]} value={formData.currentCountry} onChange={handleChange} required={!isCurrentSameAsPermanent} />
-                                                    <Input label="State" name="currentState" value={formData.currentState} onChange={handleChange} required={!isCurrentSameAsPermanent} />
-                                                    <Input label="City" name="currentCity" value={formData.currentCity} onChange={handleChange} required={!isCurrentSameAsPermanent} />
+                                                    <Selector label="Country" name="currentCountry" options={[{ label: "India", value: "india" }, { label: "USA", value: "usa" }, { label: "UK", value: "uk" }, { label: "Other", value: "other" }]} value={formData.currentCountry} onChange={handleChange} required={!isCurrentSameAsPermanent} placeholder="Select Country" disabled={isCurrentSameAsPermanent} error={validationErrors.currentCountry} />
+                                                    <Input label="State" name="currentState" value={formData.currentState} onChange={handleChange} required={!isCurrentSameAsPermanent} disabled={isCurrentSameAsPermanent} error={validationErrors.currentState} />
+                                                    <Input label="City" name="currentCity" value={formData.currentCity} onChange={handleChange} required={!isCurrentSameAsPermanent} disabled={isCurrentSameAsPermanent} error={validationErrors.currentCity} />
                                                 </div>
-                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                    <Input label="Pincode / Zip" name="currentPincode" value={formData.currentPincode} onChange={handleChange} required={!isCurrentSameAsPermanent} />
-                                                    <Input label="Area" name="currentArea" value={formData.currentArea} onChange={handleChange} required={!isCurrentSameAsPermanent} />
-                                                    <Input label="Building Name" name="currentBuilding" value={formData.currentBuilding} onChange={handleChange} required={!isCurrentSameAsPermanent} />
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                                                    <Input label="Pincode / Zip" name="currentPincode" value={formData.currentPincode} onChange={handleChange} required={!isCurrentSameAsPermanent} disabled={isCurrentSameAsPermanent} error={validationErrors.currentPincode} />
+                                                    <Input label="Area" name="currentArea" value={formData.currentArea} onChange={handleChange} required={!isCurrentSameAsPermanent} disabled={isCurrentSameAsPermanent} error={validationErrors.currentArea} />
+                                                    <Input label="Building Name" name="currentBuilding" value={formData.currentBuilding} onChange={handleChange} required={!isCurrentSameAsPermanent} disabled={isCurrentSameAsPermanent} error={validationErrors.currentBuilding} />
                                                 </div>
-                                                <Input label="Block / Door No." name="currentBlock" value={formData.currentBlock} onChange={handleChange} required={!isCurrentSameAsPermanent} />
+                                                <div className="mt-4">
+                                                    <Input label="Block / Door No." name="currentBlock" value={formData.currentBlock} onChange={handleChange} required={!isCurrentSameAsPermanent} disabled={isCurrentSameAsPermanent} error={validationErrors.currentBlock} />
+                                                </div>
                                             </fieldset>
                                         </div>
-                                    </div>
 
-                                    {/* Section 1.3: Emergency Contact */}
-                                    <div className="space-y-6 pt-4">
-                                        <SectionHeader title="3. Emergency Contact" subtitle="In case of urgent issues, who should we contact?" className="mt-6" />
-                                        <div className="p-6 bg-red-50 rounded-xl border border-red-200 space-y-4">
-                                            <Input label="Full Name" name="emergencyName" value={formData.emergencyName} onChange={handleChange} required placeholder="Emergency Contact Full Name" />
-                                            <PhoneInput label="Phone Number" name="emergencyPhone" value={formData.emergencyPhone} onChange={handleChange} required />
-                                            <Input label="Relationship" name="emergencyRelation" value={formData.emergencyRelation} onChange={handleChange} required placeholder="e.g., Spouse, Parent, Sibling" />
+                                        {/* Section 1.3: Emergency Contact */}
+                                        <div className="space-y-6 pt-4">
+                                            <SectionHeader title="3. Emergency Contact" subtitle="In case of urgent issues, who should we contact?" className="mt-6" />
+                                            <div className="p-6 bg-red-50 rounded-xl border border-red-200 space-y-4">
+                                                <Input label="Full Name" name="emergencyName" value={formData.emergencyName} onChange={handleChange} required placeholder="Emergency Contact Full Name" error={validationErrors.emergencyName} />
+                                                <PhoneInput label="Phone Number" name="emergencyPhone" value={formData.emergencyPhone} onChange={handleChange} required placeholder="98765 43210" error={validationErrors.emergencyPhone} />
+                                                <Input label="Relationship" name="emergencyRelation" value={formData.emergencyRelation} onChange={handleChange} required placeholder="e.g., Spouse, Parent, Sibling" error={validationErrors.emergencyRelation} />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             )}
 
-                            {/* NEW STEP 2 (OLD STEP 4): EDUCATION DETAILS */}
+                            {/* STEP 2: EDUCATION DETAILS */}
                             {step === 2 && (
                                 <div className="space-y-6">
                                     <SectionHeader title="Education Details" subtitle="Your highest educational background." />
-                                    <Input label="School / College Name" name="schoolCollege" value={formData.schoolCollege} onChange={handleChange} required />
-                                    <Input label="Degree / Qualification Name" name="degreeName" value={formData.degreeName} onChange={handleChange} required placeholder="e.g., Master of Arts in Yoga" />
-                                    <Input label="University / Institution Name" name="universityName" value={formData.universityName} onChange={handleChange} required />
+                                    <Input label="School / College Name" name="schoolCollege" value={formData.schoolCollege} onChange={handleChange} required error={validationErrors.schoolCollege} />
+                                    <Input label="Degree / Qualification Name" name="degreeName" value={formData.degreeName} onChange={handleChange} required placeholder="e.g., Master of Arts in Yoga" error={validationErrors.degreeName} />
+                                    <Input label="University / Institution Name" name="universityName" value={formData.universityName} onChange={handleChange} required error={validationErrors.universityName} />
                                 </div>
                             )}
 
-                            {/* NEW STEP 3 (OLD STEP 5): TAXATION DETAILS (India Only) */}
+                            {/* STEP 3: TAXATION DETAILS (India Only) */}
                             {step === 3 && (
                                 <div className="space-y-6">
                                     <SectionHeader title="Taxation Details" subtitle="Required for compliant payouts. Currently accepting Indian Tax IDs only." />
-                                    <div className={`p-6 rounded-xl border transition-all duration-300 `}>
+                                    <div className={`p-6 rounded-xl border border-orange-300 bg-orange-50 transition-all duration-300 `}>
                                         <div className="space-y-4 animate-in fade-in">
                                             <div className="flex items-center gap-2 mb-2 text-orange-800 font-semibold text-sm">
                                                 <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
                                                 Indian Tax Residency Required
                                             </div>
-                                            <Input
-                                                label="PAN Card Number"
-                                                name="panCard"
-                                                placeholder="ABCDE1234F"
-                                                value={formData.panCard}
-                                                onChange={handleChange}
-                                                required
-                                            />
-                                            <Input
-                                                label="Aadhaar Card Number"
-                                                name="aadharNumber"
-                                                placeholder="1234 5678 9012"
-                                                value={formData.aadharNumber}
-                                                onChange={handleChange}
-                                                required
-                                            />
-                                            <Input
-                                                label="GSTIN (Goods and Services Tax Identification Number) - Optional"
-                                                name="gstin"
-                                                placeholder="22AAAAA0000A1Z5"
-                                                value={formData.gstin}
-                                                onChange={handleChange}
-                                            />
+                                            <Input label="PAN Card Number" name="panCard" placeholder="ABCDE1234F" value={formData.panCard} onChange={handleChange} required error={validationErrors.panCard} />
+                                            <Input label="Aadhaar Card Number" name="aadharNumber" placeholder="1234 5678 9012" value={formData.aadharNumber} onChange={handleChange} required error={validationErrors.aadharNumber} />
+                                            <Input label="GSTIN (Goods and Services Tax Identification Number) - Optional" name="gstin" placeholder="22AAAAA0000A1Z5" value={formData.gstin} onChange={handleChange} required={false} error={validationErrors.gstin} />
                                         </div>
                                     </div>
                                 </div>
                             )}
 
-                            {/* NEW STEP 4 (OLD STEP 6): SOCIAL MEDIA DETAILS */}
+                            {/* STEP 4: SOCIAL MEDIA DETAILS */}
                             {step === 4 && (
                                 <div className="space-y-6">
                                     <SectionHeader title="Social Media Profiles" subtitle="Connect your platforms to showcase your digital presence." />
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <Input label="Instagram Link" name="socialInsta" prefix={<FaInstagram className="text-pink-500" size={16} />} placeholder="https://instagram.com/user" value={formData.socialInsta} onChange={handleChange} />
-                                        <Input label="Facebook Link" name="socialFb" prefix={<FaFacebook className="text-blue-600" size={16} />} placeholder="https://facebook.com/profile" value={formData.socialFb} onChange={handleChange} />
-                                        <Input label="LinkedIn Link" name="socialLi" prefix={<FaLinkedin className="text-blue-700" size={16} />} placeholder="https://linkedin.com/in/profile" value={formData.socialLi} onChange={handleChange} />
-                                        <Input label="YouTube Channel Link" name="socialYt" prefix={<FaYoutube className="text-red-600" size={16} />} placeholder="https://youtube.com/channel" value={formData.socialYt} onChange={handleChange} />
+                                        <Input label="Instagram Link" name="socialInsta" prefix={<BiLogoInstagram className="text-pink-500" size={16} />} placeholder="https://instagram.com/user" value={formData.socialInsta} onChange={handleChange} required={false} error={validationErrors.socialInsta} />
+                                        <Input label="Facebook Link" name="socialFb" prefix={<BiLogoFacebook className="text-blue-600" size={16} />} placeholder="https://facebook.com/profile" value={formData.socialFb} onChange={handleChange} required={false} error={validationErrors.socialFb} />
+                                        <Input label="LinkedIn Link" name="socialLi" prefix={<BiMaleSign className="text-blue-700" size={16} />} placeholder="https://linkedin.com/in/profile" value={formData.socialLi} onChange={handleChange} required={false} error={validationErrors.socialLi} />
+                                        <Input label="YouTube Channel Link" name="socialYt" prefix={<BiVideo className="text-red-600" size={16} />} placeholder="https://youtube.com/channel" value={formData.socialYt} onChange={handleChange} required={false} error={validationErrors.socialYt} />
                                     </div>
                                 </div>
                             )}
 
-                            {/* NEW STEP 5 (OLD STEP 7): QUALIFICATIONS & EXPERTISE */}
+                            {/* STEP 5: QUALIFICATIONS & EXPERTISE */}
                             {step === 5 && (
                                 <div className="space-y-8">
                                     <div>
                                         <SectionHeader title="Yoga Expertise" subtitle="Select the styles you are qualified to teach." />
                                         <SmartSelect
-                                            label="Yoga Styles"
+                                            label="Yoga Styles (Required)"
+                                            name="yogaStyles"
                                             options={["Hatha", "Vinyasa", "Ashtanga", "Iyengar", "Kundalini", "Yin", "Meditation", "Prenatal", "Restorative"]}
                                             selectedValues={formData.yogaStyles}
                                             onToggle={(val) => handleArrayToggle('yogaStyles', val)}
+                                            required
+                                            error={validationErrors.yogaStyles}
                                         />
                                     </div>
                                     <div>
@@ -498,84 +679,148 @@ const InstructorOnboarding = () => {
                                             {formData.certifications.map((cert, index) => (
                                                 <div key={index} className="flex flex-col md:flex-row gap-4 items-end bg-slate-50 p-4 rounded-xl border border-slate-200">
                                                     <div className="flex-1 w-full">
-                                                        <Input label={`Certificate ${index + 1} Title`} value={cert.title} placeholder="e.g. RYT 200 from Sivananda" onChange={(e) => handleCertChange(index, 'title', e.target.value)} required={index === 0} />
+                                                        <Input label={`Certificate ${index + 1} Title`} value={cert.title} placeholder="e.g. RYT 200 from Sivananda" onChange={(e) => handleCertChange(index, 'title', e.target.value)} required={index === 0} error={validationErrors[`certifications[${index}].title`]} />
                                                     </div>
                                                     <div className="flex-1 w-full">
-                                                        <Label>Upload File (PDF/Image)</Label>
-                                                        <input type="file" onChange={(e) => handleCertChange(index, 'file', e.target.files[0])} className="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-teal-100 file:text-teal-700 hover:file:bg-teal-200 cursor-pointer border border-slate-300 rounded-xl" required={index === 0} />
+                                                        <div className="flex flex-col w-full">
+                                                            <label htmlFor={`file-${index}`} className="mb-1 text-sm font-medium text-gray-700">Upload File (PDF/Image) {index === 0 && <span className="text-teal-600">*</span>}</label>
+                                                            <input
+                                                                type="file"
+                                                                id={`file-${index}`}
+                                                                onChange={(e) => handleCertChange(index, 'file', e.target.value, e.target.files[0])}
+                                                                className={`block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-teal-100 file:text-teal-700 hover:file:bg-teal-200 cursor-pointer rounded-xl ${validationErrors[`certifications[${index}].file`] ? 'border-red-500 border-2' : 'border-slate-300 border'}`}
+                                                                required={index === 0}
+                                                            />
+                                                            {validationErrors[`certifications[${index}].file`] && <p className="mt-1 text-xs text-red-500">{validationErrors[`certifications[${index}].file`]}</p>}
+                                                        </div>
                                                     </div>
-                                                    {formData.certifications.length > 1 && <button type="button" onClick={() => removeCertification(index)} className="p-3 text-red-500 bg-white border border-red-100 rounded-lg mb-[2px] hover:bg-red-50"><FaTrash size={14} /></button>}
+                                                    {formData.certifications.length > 1 && <button type="button" onClick={() => removeCertification(index)} className="p-3 text-red-500 bg-white border border-red-100 rounded-lg mb-[2px] hover:bg-red-50"><BiTrash size={14} /></button>}
                                                 </div>
                                             ))}
-                                            {formData.certifications.length < 10 && <button type="button" onClick={addCertification} className="flex items-center text-teal-600 font-semibold hover:text-teal-700 mt-2"><FaPlus className="mr-2" size={14} /> Add Certificate</button>}
+                                            {validationErrors.certifications && <p className="mt-1 text-sm text-red-500">{validationErrors.certifications}</p>}
+                                            {formData.certifications.length < 10 && <button type="button" onClick={addCertification} className="flex items-center text-teal-600 font-semibold hover:text-teal-700 mt-2"><BiPlusCircle className="mr-2" size={14} /> Add Certificate</button>}
                                         </div>
                                     </div>
                                     <div>
                                         <SectionHeader title="Profile Videos & Philosophy" subtitle="Your introductory video and teaching philosophy." />
-                                        <Input label="Introduction Video URL (Required)" name="introVideo" value={formData.introVideo} onChange={handleChange} required placeholder="YouTube or Vimeo URL" />
-                                        <Label className="mt-6">Sample Video URLs (Minimum 2)</Label>
+                                        <Input label="Introduction Video URL (Required)" name="introVideo" value={formData.introVideo} onChange={handleChange} required placeholder="YouTube or Vimeo URL" error={validationErrors.introVideo} />
+                                        <label className="pt-6 mb-1 block text-sm font-medium text-gray-700">Sample Video URLs (Minimum 2)</label>
                                         <div className="space-y-4">
                                             {formData.sampleVideos.map((video, index) => (
                                                 <div key={index} className="flex gap-2 items-center">
-                                                    <div className="flex-1 flex flex-col gap-1">
-                                                        <label className="text-sm font-medium text-gray-700">
-                                                            Video URL {index + 1} {index < 2 && <span className="text-red-500">*</span>}
-                                                        </label>
-                                                        <Input
-                                                            placeholder={`Video URL ${index + 1}`}
-                                                            value={video}
-                                                            onChange={(e) => handleSampleVideoChange(index, e.target.value)}
-                                                        />
+                                                    <div className="flex-1">
+                                                        <Input label={`Video ${index + 1}`} name={`sampleVideos[${index}]`} placeholder={`Video URL ${index + 1}`} value={video} onChange={(e) => handleSampleVideoChange(index, e.target.value)} required={index < 2} error={validationErrors[`sampleVideos[${index}]`]} />
                                                     </div>
-
-                                                    {formData.sampleVideos.length > 2 && <button type="button" onClick={() => removeSampleVideo(index)} className="mt-1 p-3 text-slate-400 hover:text-red-500"><FaTrash size={14} /></button>}
+                                                    {formData.sampleVideos.length > 2 && <button type="button" onClick={() => removeSampleVideo(index)} className="p-3 text-slate-400 hover:text-red-500"><BiTrash size={14} /></button>}
                                                 </div>
                                             ))}
                                         </div>
-                                        {formData.sampleVideos.length < 10 && <button type="button" onClick={addSampleVideo} className="mt-3 flex items-center text-teal-600 font-semibold"><FaPlus className="mr-2" size={14} /> Add Video URL</button>}
+                                        {validationErrors.sampleVideos && <p className="mt-1 text-xs text-red-500">{validationErrors.sampleVideos}</p>}
+                                        {formData.sampleVideos.length < 10 && <button type="button" onClick={addSampleVideo} className="mt-3 flex items-center text-teal-600 font-semibold"><BiPlusCircle className="mr-2" size={14} /> Add Video URL</button>}
 
-                                        <TextArea label="Your Teaching Philosophy (Required)" name="philosophy" rows={5} value={formData.philosophy} onChange={handleChange} required placeholder="Describe your approach, values, and why you teach yoga." />
+                                        <TextArea label="Your Teaching Philosophy (Required)" name="philosophy" rows={5} value={formData.philosophy} onChange={handleChange} required placeholder="Describe your approach, values, and why you teach yoga." error={validationErrors.philosophy} />
                                     </div>
                                 </div>
                             )}
 
-                            {/* NEW STEP 6 (OLD STEP 8): AVAILABILITY */}
+                            {/* STEP 6: AVAILABILITY (ENHANCED) */}
                             {step === 6 && (
                                 <div className="space-y-6">
                                     <SectionHeader title="Class Availability" subtitle="Indicate when you are generally available for online classes (Time zone: IST)." />
-                                    <div className="bg-blue-50 text-blue-800 p-4 rounded-xl flex items-start gap-3 border border-blue-100 mb-6"><FaVideo className="mt-1 flex-shrink-0" size={14} /><div><p className="font-bold text-sm">Online Only Classes</p><p className="text-xs">Physical studio support will be added in a later phase.</p></div></div>
-                                    <SmartSelect label="Preferred Teaching Days (Required)" options={["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]} selectedValues={formData.days} onToggle={(val) => handleArrayToggle('days', val)} />
-                                    <SmartSelect label="Preferred Class Times (Required)" options={["Morning (6-10am)", "Mid-Day (10am-4pm)", "Evening (4-9pm)"]} selectedValues={formData.times} onToggle={(val) => handleArrayToggle('times', val)} />
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                                        <Input label="Earliest Start Time" name="startTime" type="time" value={formData.startTime} onChange={handleChange} required />
-                                        <Input label="Latest End Time" name="endTime" type="time" value={formData.endTime} onChange={handleChange} required />
+                                    <div className="bg-blue-50 text-blue-800 p-4 rounded-xl flex items-start gap-3 border border-blue-100 mb-6"><BiVideo className="mt-1 flex-shrink-0" size={14} /><div><p className="font-bold text-sm">Online Only Classes</p><p className="text-xs">Physical studio support will be added in a later phase.</p></div></div>
+
+                                    {/* Class Type Selection */}
+                                    <div className="mt-4">
+                                        <CheckboxToggle
+                                            label="Available for One-on-One Private Session"
+                                            name="availableOneOnOne"
+                                            checked={formData.availableOneOnOne}
+                                            onChange={handleChange}
+                                        />
+                                        <CheckboxToggle
+                                            label="Available for Group Class"
+                                            name="availableGroupClass"
+                                            checked={formData.availableGroupClass}
+                                            onChange={handleChange}
+                                        />
+                                        {validationErrors.classType && <p className="mt-2 text-xs text-red-500">{validationErrors.classType}</p>}
                                     </div>
+
+                                    <SmartSelect
+                                        label="Preferred Teaching Days (Required)"
+                                        options={[
+                                            { label: "Mon", value: "monday" },
+                                            { label: "Tue", value: "tuesday" },
+                                            { label: "Wed", value: "wednesday" },
+                                            { label: "Thu", value: "thursday" },
+                                            { label: "Fri", value: "friday" },
+                                            { label: "Sat", value: "saturday" },
+                                            { label: "Sun", value: "sunday" },
+                                        ]}
+                                        selectedValues={formData.days}
+                                        onToggle={(val) => handleArrayToggle("days", val)}
+                                    />
+
+
+                                    <SmartSelect
+                                        label="Preferred Class Times (Required)"
+                                        options={[
+                                            { label: "Morning (6-10am)", value: "morning" },
+                                            { label: "Mid-Day (10am-4pm)", value: "midday" },
+                                            { label: "Evening (4-9pm)", value: "evening" }
+                                        ]}
+                                        selectedValues={formData.times}
+                                        onToggle={(val) => handleArrayToggle("times", val)}
+                                    />
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                                        <Input label="Earliest Start Time" name="startTime" type="time" value={formData.startTime} onChange={handleChange} required error={validationErrors.startTime} />
+                                        <Input label="Latest End Time" name="endTime" type="time" value={formData.endTime} onChange={handleChange} required error={validationErrors.endTime} />
+                                    </div>
+                                    {/* Display global time error if present */}
+                                    {timeError && <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-200 font-medium mt-3">{timeError}</div>}
                                 </div>
                             )}
 
-                            {/* NEW STEP 7 (OLD STEP 9): PRICING */}
+                            {/* STEP 7: PRICING (ENHANCED) */}
                             {step === 7 && (
                                 <div className="space-y-6">
                                     <SectionHeader title="Pricing Structure" subtitle="Set your rates in USD ($) and define your trial policy." />
+
+                                    {/* Conditional Pricing Inputs */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <Input label="Group Class Rate (per person/hour)" name="groupRate" prefix="$" value={formData.groupRate} onChange={handleChange} required placeholder="e.g., 10" type="number" />
-                                        <Input label="Private Session Rate (per hour)" name="privateRate" prefix="$" value={formData.privateRate} onChange={handleChange} required placeholder="e.g., 50" type="number" />
+                                        {isGroupSelected && (
+                                            <Input label="Group Class Rate (per person/hour)" name="groupRate" prefix="$" value={formData.groupRate} onChange={handleChange} required={isGroupSelected} placeholder="e.g., 10" type="number" min="0" error={validationErrors.groupRate} />
+                                        )}
+                                        {isPrivateSelected && (
+                                            <Input label="Private Session Rate (per hour)" name="privateRate" prefix="$" value={formData.privateRate} onChange={handleChange} required={isPrivateSelected} placeholder="e.g., 50" type="number" min="0" error={validationErrors.privateRate} />
+                                        )}
+                                        {(!isGroupSelected && !isPrivateSelected) && (
+                                            <div className="md:col-span-2 p-6 bg-red-50 rounded-xl border border-red-200 text-red-800 font-semibold">
+                                                <p>⚠️ Please go back to the **Availability** step and select at least one class type (One-on-One or Group Class) to set your rates.</p>
+                                            </div>
+                                        )}
                                     </div>
-                                    <div className="mt-6 p-6 bg-slate-50 rounded-xl border border-slate-200">
-                                        <Label>Trial Policy (Required)</Label>
-                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                            {[{ label: "No Trial", value: "none" }, { label: "1 Free Class", value: "1class" }, { label: "3 Days Free", value: "3days" }, { label: "7 Days Free", value: "7days" }].map((opt) => (
-                                                <label key={opt.value} className={`cursor-pointer border p-4 rounded-xl flex items-center justify-between transition-all ${formData.trialMode === opt.value ? 'bg-teal-100 border-teal-500 shadow-lg scale-[1.02]' : 'bg-white border-slate-200 hover:bg-slate-50'}`}>
-                                                    <span className="text-sm font-semibold text-slate-700">{opt.label}</span>
-                                                    <input type="radio" name="trialMode" value={opt.value} checked={formData.trialMode === opt.value} onChange={handleChange} className="h-5 w-5 text-teal-600 border-gray-300 focus:ring-teal-500" />
-                                                </label>
-                                            ))}
+
+                                    {/* Conditional Trial Policy */}
+                                    {(isPrivateSelected || isGroupSelected) && (
+                                        <div className="mt-6 p-6 bg-slate-50 rounded-xl border border-slate-200">
+                                            <Selector
+                                                label="Trial Policy (Required)"
+                                                name="trialMode"
+                                                options={trialOptions}
+                                                value={formData.trialMode}
+                                                onChange={handleChange}
+                                                required
+                                                placeholder="Select a trial policy"
+                                                error={validationErrors.trialMode}
+                                            />
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
                             )}
 
-                            {/* NEW STEP 8 (OLD STEP 10): AGREEMENTS & SIGNATURE */}
+                            {/* STEP 8: AGREEMENTS & SIGNATURE */}
                             {step === 8 && (
                                 <div className="space-y-6">
                                     <SectionHeader title="Service Agreements" subtitle="Please read and confirm the following legal and ethical standards." />
@@ -593,14 +838,15 @@ const InstructorOnboarding = () => {
                                                     checked={formData[item.name]}
                                                     onChange={handleChange}
                                                     required
-                                                    className="mt-1 h-5 w-5 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                                                    className={`mt-1 h-5 w-5 rounded border-gray-300 text-teal-600 focus:ring-teal-500 ${validationErrors[item.name] ? 'border-red-500 ring-red-500' : ''}`}
                                                 />
                                                 <label htmlFor={item.name} className="ml-3 text-sm text-slate-600 cursor-pointer">{item.label}</label>
+                                                {validationErrors[item.name] && <span className="ml-3 text-xs text-red-500 hidden sm:block">({validationErrors[item.name]})</span>}
                                             </div>
                                         ))}
                                     </div>
                                     <div className="pt-4">
-                                        <Label required>Digital Signature</Label>
+                                        <label className="mb-1 block text-sm font-medium text-gray-700">Digital Signature <span className="text-teal-600">*</span></label>
                                         <input
                                             type="text"
                                             name="signature"
@@ -608,9 +854,9 @@ const InstructorOnboarding = () => {
                                             onChange={handleChange}
                                             placeholder="Type your full legal name to sign"
                                             required
-                                            className="w-full border-b-2 border-slate-300 bg-transparent py-3 text-2xl font-serif italic text-teal-900 focus:border-teal-600 outline-none"
+                                            className={`w-full border-b-2 bg-transparent py-3 text-2xl font-serif italic text-teal-900 outline-none ${validationErrors.signature ? 'border-red-500' : 'border-slate-300 focus:border-teal-600'}`}
                                         />
-                                        <p className="text-xs text-slate-400 mt-1">Typing your name constitutes a legally binding electronic signature.</p>
+                                        <p className="text-xs text-slate-400 mt-1">Typing your name constitutes a legally binding electronic signature. {validationErrors.signature && <span className="text-red-500">({validationErrors.signature})</span>}</p>
                                     </div>
                                 </div>
                             )}
@@ -618,7 +864,7 @@ const InstructorOnboarding = () => {
                             {/* FINAL STEP: VERIFICATION PENDING */}
                             {isSubmitted && (
                                 <div className="flex flex-col items-center justify-center text-center h-full py-10 animate-in zoom-in-95">
-                                    <div className="w-24 h-24 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mb-6 shadow-xl"><FaShieldAlt size={40} /></div>
+                                    <div className="w-24 h-24 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mb-6 shadow-xl"><BiShield size={40} /></div>
                                     <h2 className="text-3xl font-bold text-slate-800 mb-2">Application Submitted!</h2>
                                     <p className="text-slate-500 max-w-md mx-auto mb-4">Thank you for submitting your profile. We are now verifying your documents and qualifications.</p>
                                     <p className="text-slate-600 font-semibold mb-8">Application ID: #YGL-{Math.floor(Math.random() * 90000 + 10000)}</p>
@@ -629,33 +875,52 @@ const InstructorOnboarding = () => {
                     </form>
                 </div>
 
-                {/* FOOTER */}
+                {/* FOOTER - NAVIGATION & DRAFT */}
                 {!isSubmitted && (
                     <div className="flex-none px-6 py-6 border-t border-slate-100 bg-white rounded-b-3xl">
                         <div className="flex items-center justify-between max-w-4xl mx-auto w-full">
-                            <button
-                                type="button"
-                                onClick={prevStep}
-                                disabled={step === 1}
-                                className={`flex items-center px-6 py-3 border border-slate-200 rounded-xl font-medium transition-all ${step === 1 ? 'opacity-0 cursor-default' : 'text-slate-500 hover:bg-slate-50'}`}
-                            >
-                                <BiChevronLeft className="w-5 h-5 mr-1" size={16} /> Back
-                            </button>
 
-                            {/* totalSteps is now 8. We navigate to next until step 7, then submit at step 8. */}
+                            {/* Back Button and Draft Button Group */}
+                            <div className="flex items-center gap-4">
+                                <button
+                                    type="button"
+                                    onClick={prevStep}
+                                    disabled={step === 1}
+                                    className={`flex items-center px-6 py-3 border border-slate-200 rounded-xl font-medium transition-all ${step === 1 ? 'opacity-0 cursor-default pointer-events-none' : 'text-slate-500 hover:bg-slate-50'}`}
+                                >
+                                    <BiChevronLeftIcon className="w-5 h-5 mr-1" size={16} /> Back
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={handleSaveDraft}
+                                    disabled={saveStatus === 'saving'}
+                                    className={`flex items-center px-6 py-3 rounded-xl font-semibold transition-colors text-sm ${saveStatus === 'saving' ? 'bg-amber-100 text-amber-700 cursor-not-allowed' :
+                                        saveStatus === 'saved' ? 'bg-green-100 text-green-700' :
+                                            saveStatus === 'error' ? 'bg-red-100 text-red-700' :
+                                                'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                        }`}
+                                >
+                                    <BiSave className="w-4 h-4 mr-2" size={16} /> {saveButtonText}
+                                </button>
+                            </div>
+
+
+                            {/* Next / Submit Button */}
                             {step < totalSteps ? (
                                 <button type="button" onClick={nextStep} className="flex items-center bg-teal-600 text-white px-8 py-3 rounded-xl font-semibold shadow-md hover:bg-teal-700 transition-colors">
-                                    {step === totalSteps - 1 ? 'Review & Submit' : 'Next'} <BiChevronRight className="w-5 h-5 ml-1" size={16} />
+                                    {step === totalSteps - 1 ? 'Review & Sign' : 'Next'} <BiChevronRightIcon className="w-5 h-5 ml-1" size={16} />
                                 </button>
                             ) : (
-                                <button type="button" onClick={handleSubmit} disabled={step < totalSteps} className="flex items-center bg-teal-600 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:bg-teal-700 transition-colors">
-                                    Submit Application <FaCheckCircle className="w-4 h-4 ml-2" size={16} />
+                                <button type="submit" className="flex items-center bg-teal-600 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled={!formData.confirmAccurate || !formData.ethicalStandards || !formData.serviceMindset || !formData.signature}>
+                                    Submit Application <BiSave className="w-4 h-4 ml-2" size={16} />
                                 </button>
                             )}
                         </div>
                     </div>
                 )}
             </div>
+            {/* Tailwind CSS scrollbar utility class */}
             <style jsx>{` .custom-scrollbar::-webkit-scrollbar { width: 6px; } .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; } `}</style>
         </div>
     );

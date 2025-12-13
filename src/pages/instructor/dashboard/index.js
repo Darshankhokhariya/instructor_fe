@@ -43,8 +43,7 @@ const InstructorDashboard = () => {
     return (
         <>
             <Layout>
-                <div className="p-6 bg-gray-50 min-h-screen">
-
+                <div className="p-6 bg-gray-50">
                     {/* 1. Welcome & Quick Actions */}
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                         <div>
