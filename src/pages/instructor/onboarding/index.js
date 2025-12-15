@@ -6,41 +6,55 @@ import PhoneInput from '@/components/common/PhoneInput';
 
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 // These icons are kept here as they are directly imported from 'react-icons/bi' in your first prompt
-import { BiCalendar, BiFile, BiLogoFacebook, BiLogoInstagram, BiMaleSign, BiPlusCircle, BiShield, BiSolidIdCard, BiTrash, BiUser, BiVideo, BiSave, BiSolidGraduation, BiChevronLeft, BiChevronRight } from 'react-icons/bi';
+import {
+    BiCalendar, BiFile, BiLogoFacebook, BiLogoInstagram, BiMaleSign,
+    BiPlusCircle, BiShield, BiSolidIdCard, BiTrash, BiUser,
+    BiVideo, BiSave, BiSolidGraduation, BiChevronLeft, BiChevronRight,
+    BiWorld, BiAlarm, BiLink
+} from 'react-icons/bi';
 
-
-
-
-const FaCheckCircle = BiSave;
+// Icon Mapping
+const FaCheckCircle = BiSave; // Using BiSave for checkmark style completion
 const FaUser = BiUser;
 const FaFileAlt = BiFile;
 const FaVideo = BiVideo;
 const FaCalendarAlt = BiCalendar;
-const FaDollarSign = BiCalendar;
+const FaDollarSign = BiCalendar; // Using BiCalendar as a proxy for pricing/dollar-related icon
 const FaShieldAlt = BiShield;
 const FaIdCard = BiSolidIdCard;
 const FaPlus = BiPlusCircle;
 const FaTrash = BiTrash;
 const FaInstagram = BiLogoInstagram;
 const FaFacebook = BiLogoFacebook;
-const FaLinkedin = BiMaleSign;
-const FaYoutube = BiVideo;
-const FaRoad = BiMaleSign;
-const FaMapMarkerAlt = BiMaleSign;
+const FaLinkedin = BiMaleSign; // Using BiMaleSign for LinkedIn (as per original code, might be better to use BiLogoLinkedin if available, but sticking to provided icons)
+const FaYoutube = BiVideo; // Using BiVideo as a proxy for YouTube
+const FaRoad = BiMaleSign; // Using BiMaleSign for Road/Address (as per original code, better would be BiMap)
+const FaMapMarkerAlt = BiMaleSign; // Using BiMaleSign for MapMarker (as per original code, better would be BiMapPin)
 const FaGraduationCap = BiSolidGraduation;
 const FaSignature = BiMaleSign;
 const FaSave = BiSave;
 const BiChevronLeftIcon = BiChevronLeft;
 const BiChevronRightIcon = BiChevronRight;
+const BiWorldIcon = BiWorld; // New icon for Languages
+const BiAlarmIcon = BiAlarm; // New icon for Response Time
+const BiLinkIcon = BiLink; // New icon for Website
 
+// Mock Components (assuming these are correctly imported/defined elsewhere)
 const SectionHeader = ({ title, subtitle, className = "" }) => <div className={`mb-6 border-b border-slate-100 pb-2 ${className}`}> <h2 className="text-xl font-bold text-teal-900">{title}</h2> {subtitle && <p className="text-sm text-slate-500 mt-1">{subtitle}</p>} </div>;
+const Label = ({ children, required }) => (<label className="mb-1 block text-sm font-medium text-gray-700">{children} {required && <span className="text-teal-600">*</span>}</label>);
+const CheckboxToggle = ({ label, name, checked, onChange }) => (
+    <div className={`mb-4 flex items-center justify-between rounded-lg border p-3 transition-colors ${checked ? 'border-teal-400 bg-teal-50' : 'border-gray-300 bg-white'}`}>
+        <span className="text-sm font-medium text-gray-700">{label}</span>
+        <input type="checkbox" name={name} checked={checked} onChange={onChange} className="h-4 w-4 text-teal-600" />
+    </div>
+);
 const StepIndicator = ({ currentStep, totalSteps }) => {
-    // UPDATED steps array for 8 steps (1: Combined, 2-8: Old 4-10)
+    // Retaining original StepIndicator implementation
     const steps = useMemo(() => [
         { id: 1, label: "Personal & Contact", icon: FaUser },
         { id: 2, label: "Education", icon: FaGraduationCap },
         { id: 3, label: "Taxation", icon: FaIdCard },
-        { id: 4, label: "Socials", icon: FaInstagram },
+        { id: 4, label: "Socials & Videos", icon: FaVideo },
         { id: 5, label: "Qualifications", icon: FaFileAlt },
         { id: 6, label: "Availability", icon: FaCalendarAlt },
         { id: 7, label: "Pricing", icon: FaDollarSign },
@@ -60,9 +74,6 @@ const StepIndicator = ({ currentStep, totalSteps }) => {
                     const Icon = s.icon;
                     const isActive = s.id === currentStep;
                     const isCompleted = s.id < currentStep;
-
-                    // Only show icons for every 2nd step on small screens to reduce clutter
-                    // Adjusted visibility for the new 8-step structure
                     const isVisibleOnMobile = s.id % 2 === 1 || s.id === totalSteps || isActive;
 
                     return (
@@ -78,17 +89,7 @@ const StepIndicator = ({ currentStep, totalSteps }) => {
         </div>
     );
 };
-
-const Label = ({ children, required }) => (<label className="mb-1 block text-sm font-medium text-gray-700">{children} {required && <span className="text-teal-600">*</span>}</label>);
-const CheckboxToggle = ({ label, name, checked, onChange }) => (
-    <div className={`mb-4 flex items-center justify-between rounded-lg border p-3 transition-colors ${checked ? 'border-teal-400 bg-teal-50' : 'border-gray-300 bg-white'}`}>
-        <span className="text-sm font-medium text-gray-700">{label}</span>
-        <input type="checkbox" name={name} checked={checked} onChange={onChange} className="h-4 w-4 text-teal-600" />
-    </div>
-);
 const useRouter = () => ({ push: (path) => console.log(`Simulating navigation to: ${path}`) });
-
-// Utility function (kept internal as it's specific validation logic)
 const isTimeSlotValid = (start, end) => {
     if (!start || !end) return true;
     const [startH, startM] = start.split(':').map(Number);
@@ -99,7 +100,7 @@ const isTimeSlotValid = (start, end) => {
         endMinutes += 24 * 60;
     }
     const durationMinutes = endMinutes - startMinutes;
-    const maxDurationMinutes = 5 * 60;
+    const maxDurationMinutes = 5 * 60; // Max duration of 5 hours
     return durationMinutes <= maxDurationMinutes;
 };
 
@@ -111,29 +112,36 @@ const isTimeSlotValid = (start, end) => {
 const InstructorOnboarding = () => {
     const totalSteps = 8;
     const DRAFT_KEY = 'instructorOnboardingDraft';
-    const [step, setStep] = useState(6);
+    const [step, setStep] = useState(1); // Start at Step 1
     const router = useRouter();
     const [isCurrentSameAsPermanent, setIsCurrentSameAsPermanent] = useState(false);
     const [saveStatus, setSaveStatus] = useState(null);
     const [timeError, setTimeError] = useState(null);
     const [validationErrors, setValidationErrors] = useState({});
 
+    // Added: languages, instructorWebsite, responseTime, registrationType
     const initialFormData = useMemo(() => ({
         fullName: "", dob: "", gender: "", email: "", phone: "", alternatePhone: "",
         permanentCountry: "", permanentState: "", permanentCity: "", permanentPincode: "", permanentArea: "", permanentBuilding: "", permanentBlock: "",
         currentCountry: "", currentState: "", currentCity: "", currentPincode: "", currentArea: "", currentBuilding: "", currentBlock: "",
         emergencyName: "", emergencyPhone: "", emergencyRelation: "",
+        languages: [], // Existing Field
         schoolCollege: "", degreeName: "", universityName: "",
+        registrationType: "individual", // Existing Field: default to individual
         panCard: "", aadharNumber: "", gstin: "",
         socialFb: "", socialLi: "", socialInsta: "", socialYt: "",
+        instructorWebsite: "", // Existing Field
+        profileImage: null, // [NEW FIELD]
         certifications: [{ title: "", file: null }],
         yogaStyles: [],
         introVideo: "", sampleVideos: ["", ""],
         philosophy: "",
         days: [], times: [], startTime: "07:00", endTime: "12:00",
+        responseTime: "", // Existing Field
         availableOneOnOne: false,
         availableGroupClass: false,
-        groupRate: "", privateRate: "", trialMode: "",
+        singleClass: false,
+        groupRate: "", privateRate: "", singleClassRate: "", trialMode: "",
         confirmAccurate: false, ethicalStandards: false, serviceMindset: false, signature: "",
     }), []);
 
@@ -145,14 +153,18 @@ const InstructorOnboarding = () => {
         if (draft) {
             try {
                 const draftData = JSON.parse(draft);
+                // Merge draft data with initial data, providing fallbacks for arrays
                 setFormData(prev => ({
                     ...prev,
                     ...draftData,
-                    certifications: draftData.certifications || [{ title: "", file: null }],
+                    // Do not load actual File objects (profileImage and cert.file) from localStorage
+                    profileImage: null, // Reset as File object cannot be stored
+                    certifications: (draftData.certifications || [{ title: "", file: null }]).map(cert => ({ ...cert, file: null })),
                     sampleVideos: draftData.sampleVideos || ["", ""],
                     yogaStyles: draftData.yogaStyles || [],
                     days: draftData.days || [],
                     times: draftData.times || [],
+                    languages: draftData.languages || [],
                 }));
                 if (draftData.isCurrentSameAsPermanent) {
                     setIsCurrentSameAsPermanent(true);
@@ -179,10 +191,12 @@ const InstructorOnboarding = () => {
             setFormData(prev => {
                 const updatedData = { ...prev, [name]: checked };
 
+                // Logic for trialMode dependent on class availability
                 if (name === 'availableOneOnOne' || name === 'availableGroupClass') {
                     if (!updatedData.availableOneOnOne && !updatedData.availableGroupClass) {
                         updatedData.trialMode = 'none';
                     } else if (updatedData.trialMode === 'none' || updatedData.trialMode === '') {
+                        // Auto-select a default trial if one is now available
                         updatedData.trialMode = updatedData.availableOneOnOne ? '1private' : updatedData.availableGroupClass ? '2group' : '';
                     }
                 }
@@ -192,6 +206,7 @@ const InstructorOnboarding = () => {
         }
 
         if (type === 'file') {
+            // [MODIFIED] Handles file input for both profileImage and certification files
             setFormData(prev => ({ ...prev, [name]: e.target.files[0] }));
             return;
         }
@@ -278,9 +293,10 @@ const InstructorOnboarding = () => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
         const aadharRegex = /^\d{4}\s?\d{4}\s?\d{4}$/;
+        const positiveNumberRegex = /^\d+(\.\d+)?$/;
 
         const validateRequired = (field, message) => {
-            if (!stepData[field] || (typeof stepData[field] === 'string' && stepData[field].trim() === '')) {
+            if (!stepData[field] || (typeof stepData[field] === 'string' && stepData[field].trim() === '') || (Array.isArray(stepData[field]) && stepData[field].length === 0)) {
                 errors[field] = message;
             }
         };
@@ -295,6 +311,7 @@ const InstructorOnboarding = () => {
                 validateRequired('email', 'Email is required.');
             }
             validateRequired('phone', 'Primary Phone Number is required.');
+            validateRequired('languages', 'Please select at least one language.');
 
             validateRequired('permanentCountry', 'Permanent Country is required.');
             validateRequired('permanentState', 'Permanent State is required.');
@@ -324,6 +341,7 @@ const InstructorOnboarding = () => {
             validateRequired('universityName', 'University/Institution Name is required.');
 
         } else if (step === 3) {
+            validateRequired('registrationType', 'Registration Type is required.');
             validateRequired('panCard', 'PAN Card Number is required.');
             if (stepData.panCard && !panRegex.test(stepData.panCard.toUpperCase())) {
                 errors.panCard = 'Invalid PAN format. Example: ABCDE1234F';
@@ -332,8 +350,9 @@ const InstructorOnboarding = () => {
             if (stepData.aadharNumber && !aadharRegex.test(stepData.aadharNumber.trim().replace(/\s/g, ''))) {
                 errors.aadharNumber = 'Invalid Aadhaar format. Must be 12 digits.';
             }
+            // GSTIN validation is not strict as it is optional
 
-        } else if (step === 4) {
+        } else if (step === 4) { // Socials & Videos
             const checkUrl = (field, label) => {
                 if (stepData[field] && stepData[field].trim() !== "" && !urlRegex.test(stepData[field].trim())) {
                     errors[field] = `Please enter a valid URL for ${label}.`;
@@ -343,8 +362,11 @@ const InstructorOnboarding = () => {
             checkUrl('socialFb', 'Facebook');
             checkUrl('socialLi', 'LinkedIn');
             checkUrl('socialYt', 'YouTube');
+            checkUrl('instructorWebsite', 'Instructor Website');
 
-        } else if (step === 5) {
+        } else if (step === 5) { // Qualifications (Styles, Certs, Videos, Philosophy)
+            validateRequired('profileImage', 'Profile Image is required.'); // [NEW VALIDATION]
+
             if (stepData.yogaStyles.length === 0) {
                 errors.yogaStyles = 'Please select at least one Yoga Style.';
             }
@@ -356,6 +378,7 @@ const InstructorOnboarding = () => {
                 if (!firstCert.title.trim()) {
                     errors['certifications[0].title'] = 'Title is required for the first certification.';
                 }
+                // File upload cannot be reliably validated in this mock setup, but the error handling is structured.
                 if (!firstCert.file) {
                     errors['certifications[0].file'] = 'File upload is required for the first certification.';
                 }
@@ -369,7 +392,7 @@ const InstructorOnboarding = () => {
             const filledSampleVideos = stepData.sampleVideos.filter(v => v.trim() !== '');
             if (filledSampleVideos.length < 2) {
                 errors.sampleVideos = 'A minimum of two Sample Video URLs are required.';
-                if (!stepData.sampleVideos[0].trim()) errors[`sampleVideos[0]`] = `Video URL 1 is required.`;
+                if (!stepData.sampleVideos[0] || !stepData.sampleVideos[0].trim()) errors[`sampleVideos[0]`] = `Video URL 1 is required.`;
                 if (!stepData.sampleVideos[1] || !stepData.sampleVideos[1].trim()) errors[`sampleVideos[1]`] = `Video URL 2 is required.`;
             }
 
@@ -381,7 +404,7 @@ const InstructorOnboarding = () => {
 
             validateRequired('philosophy', 'Teaching Philosophy is required.');
 
-        } else if (step === 6) {
+        } else if (step === 6) { // Availability
             if (!stepData.availableOneOnOne && !stepData.availableGroupClass) {
                 errors.classType = 'Please select at least one class type.';
             }
@@ -393,18 +416,26 @@ const InstructorOnboarding = () => {
             }
             validateRequired('startTime', 'Start Time is required.');
             validateRequired('endTime', 'End Time is required.');
+            validateRequired('responseTime', 'Response Time is required.');
 
-        } else if (step === 7) {
+        } else if (step === 7) { // Pricing
             if (stepData.availableGroupClass) {
                 validateRequired('groupRate', 'Group Class Rate is required.');
-                if (stepData.groupRate && (isNaN(Number(stepData.groupRate)) || Number(stepData.groupRate) <= 0)) {
+                if (stepData.groupRate && (!positiveNumberRegex.test(stepData.groupRate) || Number(stepData.groupRate) <= 0)) {
                     errors.groupRate = 'Rate must be a positive number.';
                 }
             }
             if (stepData.availableOneOnOne) {
                 validateRequired('privateRate', 'Private Session Rate is required.');
-                if (stepData.privateRate && (isNaN(Number(stepData.privateRate)) || Number(stepData.privateRate) <= 0)) {
+                if (stepData.privateRate && (!positiveNumberRegex.test(stepData.privateRate) || Number(stepData.privateRate) <= 0)) {
                     errors.privateRate = 'Rate must be a positive number.';
+                }
+            }
+
+            if (stepData.singleClass) {
+                validateRequired('singleClass', 'single Class Rate is required.');
+                if (stepData.singleClass && (!positiveNumberRegex.test(stepData.singleClass) || Number(stepData.singleClass) <= 0)) {
+                    errors.singleClass = 'Rate must be a positive number.';
                 }
             }
             if (stepData.availableGroupClass || stepData.availableOneOnOne) {
@@ -414,7 +445,7 @@ const InstructorOnboarding = () => {
             }
 
 
-        } else if (step === 8) {
+        } else if (step === 8) { // Agreements
             if (!stepData.confirmAccurate) errors.confirmAccurate = 'Agreement is required.';
             if (!stepData.ethicalStandards) errors.ethicalStandards = 'Agreement is required.';
             if (!stepData.serviceMindset) errors.serviceMindset = 'Agreement is required.';
@@ -449,10 +480,11 @@ const InstructorOnboarding = () => {
     };
 
     const nextStep = () => {
-        if (validateStep()) {
-            document.getElementById('form-content-area')?.scrollTo({ top: 0, behavior: 'smooth' });
-            setStep(prev => Math.min(prev + 1, totalSteps));
-        }
+        // Uncomment the below line to enable mandatory validation before advancing
+        // if (validateStep()) {
+        //     document.getElementById('form-content-area')?.scrollTo({ top: 0, behavior: 'smooth' });
+        setStep(prev => Math.min(prev + 1, totalSteps));
+        // }
     };
 
     const prevStep = () => {
@@ -468,6 +500,7 @@ const InstructorOnboarding = () => {
             console.log("Final Submission Data:", formData);
             localStorage.removeItem(DRAFT_KEY);
             setStep(totalSteps + 1);
+            // In a real app, this is where you'd call the API to submit the final data
         }
     };
 
@@ -476,11 +509,13 @@ const InstructorOnboarding = () => {
         await new Promise(resolve => setTimeout(resolve, 800));
 
         try {
+            // NOTE: Files (cert.file, profileImage) cannot be stored in localStorage. We store the title/URL and skip the file object itself.
             const draftToSave = {
                 ...formData,
+                profileImage: null, // Do not save actual File objects to localStorage
                 certifications: formData.certifications.map(cert => ({
                     title: cert.title,
-                    file: null
+                    file: null // Do not save actual File objects to localStorage
                 })),
                 isCurrentSameAsPermanent: isCurrentSameAsPermanent,
             };
@@ -498,6 +533,8 @@ const InstructorOnboarding = () => {
     const isSubmitted = step === totalSteps + 1;
     const isGroupSelected = formData.availableGroupClass;
     const isPrivateSelected = formData.availableOneOnOne;
+    const isSingleSelected = formData.singleClass;
+
 
     const saveButtonText = useMemo(() => {
         switch (saveStatus) {
@@ -515,6 +552,9 @@ const InstructorOnboarding = () => {
         }
         if (isGroupSelected) {
             options.push({ label: "2 Free Group Class Trials", value: "2group" });
+        }
+        if (isSingleSelected) {
+            options.push({ label: "No Free Trial", value: "nofreetrial" });
         }
         options.push({ label: "No Trial", value: "none" });
         return options;
@@ -540,7 +580,7 @@ const InstructorOnboarding = () => {
                     <form id="onboarding-form" onSubmit={handleSubmit} className="max-w-4xl mx-auto min-h-full">
                         <div className={`transition-opacity duration-300 ease-out ${isSubmitted ? 'opacity-100' : 'opacity-100'} pb-4`}>
 
-                            {/* STEP 1: PERSONAL, ADDRESS, EMERGENCY CONTACT (Combined) */}
+                            {/* STEP 1: PERSONAL, ADDRESS, EMERGENCY CONTACT, LANGUAGES */}
                             {step === 1 && (
                                 <div className="space-y-10">
                                     <div className="space-y-4">
@@ -555,6 +595,19 @@ const InstructorOnboarding = () => {
                                             <PhoneInput label="Primary Phone Number" name="phone" value={formData.phone} onChange={handleChange} required placeholder="98765 43210" error={validationErrors.phone} />
                                         </div>
                                         <PhoneInput label="Alternate Phone Number (Optional)" name="alternatePhone" value={formData.alternatePhone} onChange={handleChange} required={false} placeholder="Optional contact number" error={validationErrors.alternatePhone} />
+
+                                        {/* New Field: Languages Spoken */}
+                                        <SmartSelect
+                                            label="Languages Spoken (Required)"
+                                            name="languages"
+                                            options={["English", "Hindi", "Sanskrit", "Tamil", "Telugu", "Kannada", "Malayalam", "Gujarati", "Marathi", "Bengali", "Other"]}
+                                            selectedValues={formData.languages}
+                                            onToggle={(val) => handleArrayToggle('languages', val)}
+                                            required
+                                            error={validationErrors.languages}
+                                            className="pt-4"
+                                            icon={<BiWorldIcon className="text-teal-600 mr-2" />}
+                                        />
                                     </div>
 
                                     <div className="space-y-6 pt-4">
@@ -630,39 +683,72 @@ const InstructorOnboarding = () => {
                             {/* STEP 3: TAXATION DETAILS (India Only) */}
                             {step === 3 && (
                                 <div className="space-y-6">
-                                    <SectionHeader title="Taxation Details" subtitle="Required for compliant payouts. Currently accepting Indian Tax IDs only." />
-                                    <div className={`p-6 rounded-xl border border-orange-300 bg-orange-50 transition-all duration-300 `}>
+                                    <SectionHeader title="Taxation Details" subtitle="Required for compliant payouts. Currently focused on Indian Tax IDs." />
+                                    <div className="p-6 rounded-xl border border-orange-300 bg-orange-50 transition-all duration-300 ">
                                         <div className="space-y-4 animate-in fade-in">
                                             <div className="flex items-center gap-2 mb-2 text-orange-800 font-semibold text-sm">
                                                 <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
-                                                Indian Tax Residency Required
+                                                Indian Tax Residency Required for PAN/Aadhaar
                                             </div>
+                                            {/* New Field: Registration Type */}
+                                            <Selector
+                                                label="Register As"
+                                                name="registrationType"
+                                                options={[{ label: "Individual (PAN/Aadhaar)", value: "individual" }, { label: "Business (GSTIN/Foreign ID)", value: "business" }]}
+                                                value={formData.registrationType}
+                                                onChange={handleChange}
+                                                required
+                                                error={validationErrors.registrationType}
+                                                placeholder="Select Registration Type"
+                                            />
+
                                             <Input label="PAN Card Number" name="panCard" placeholder="ABCDE1234F" value={formData.panCard} onChange={handleChange} required error={validationErrors.panCard} />
                                             <Input label="Aadhaar Card Number" name="aadharNumber" placeholder="1234 5678 9012" value={formData.aadharNumber} onChange={handleChange} required error={validationErrors.aadharNumber} />
-                                            <Input label="GSTIN (Goods and Services Tax Identification Number) - Optional" name="gstin" placeholder="22AAAAA0000A1Z5" value={formData.gstin} onChange={handleChange} required={false} error={validationErrors.gstin} />
+                                            <Input label="GSTIN" name="gstin" placeholder="22AAAAA0000A1Z5" value={formData.gstin} onChange={handleChange} required={false} error={validationErrors.gstin} />
                                         </div>
                                     </div>
                                 </div>
                             )}
 
-                            {/* STEP 4: SOCIAL MEDIA DETAILS */}
+                            {/* STEP 4: SOCIAL MEDIA DETAILS & INSTRUCTOR WEBSITE */}
                             {step === 4 && (
                                 <div className="space-y-6">
-                                    <SectionHeader title="Social Media Profiles" subtitle="Connect your platforms to showcase your digital presence." />
+                                    <SectionHeader title="Social Media Profiles & Website" subtitle="Connect your platforms to showcase your digital presence." />
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <Input label="Instagram Link" name="socialInsta" prefix={<BiLogoInstagram className="text-pink-500" size={16} />} placeholder="https://instagram.com/user" value={formData.socialInsta} onChange={handleChange} required={false} error={validationErrors.socialInsta} />
                                         <Input label="Facebook Link" name="socialFb" prefix={<BiLogoFacebook className="text-blue-600" size={16} />} placeholder="https://facebook.com/profile" value={formData.socialFb} onChange={handleChange} required={false} error={validationErrors.socialFb} />
                                         <Input label="LinkedIn Link" name="socialLi" prefix={<BiMaleSign className="text-blue-700" size={16} />} placeholder="https://linkedin.com/in/profile" value={formData.socialLi} onChange={handleChange} required={false} error={validationErrors.socialLi} />
                                         <Input label="YouTube Channel Link" name="socialYt" prefix={<BiVideo className="text-red-600" size={16} />} placeholder="https://youtube.com/channel" value={formData.socialYt} onChange={handleChange} required={false} error={validationErrors.socialYt} />
                                     </div>
+                                    {/* New Field: Instructor Website */}
+                                    <Input label="Instructor Website (Optional)" name="instructorWebsite" prefix={<BiLinkIcon className="text-teal-600" size={16} />} placeholder="https://yourwebsite.com" value={formData.instructorWebsite} onChange={handleChange} required={false} error={validationErrors.instructorWebsite} />
                                 </div>
                             )}
 
-                            {/* STEP 5: QUALIFICATIONS & EXPERTISE */}
+                            {/* STEP 5: QUALIFICATIONS & EXPERTISE (Styles, Certs, Videos, Philosophy) */}
                             {step === 5 && (
                                 <div className="space-y-8">
+                                    {/* Profile Image Upload [NEW SECTION] */}
                                     <div>
-                                        <SectionHeader title="Yoga Expertise" subtitle="Select the styles you are qualified to teach." />
+                                        <SectionHeader title="Profile Image & Yoga Expertise" subtitle="Upload a professional photo and select your teaching styles." />
+                                        <div className="p-4 bg-teal-50 rounded-xl border border-teal-200 mb-6">
+                                            <Label required>Profile Image (250px X 250px Recommended)</Label>
+                                            <input
+                                                type="file"
+                                                id="profileImage"
+                                                name="profileImage"
+                                                onChange={handleChange}
+                                                className={`block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-teal-100 file:text-teal-700 hover:file:bg-teal-200 cursor-pointer rounded-xl ${validationErrors.profileImage ? 'border-red-500 border-2' : 'border-slate-300 border'}`}
+                                                accept="image/*"
+                                                required
+                                            />
+                                            {formData.profileImage && <p className="mt-2 text-xs text-slate-600">Selected: **{formData.profileImage.name}**</p>}
+                                            {validationErrors.profileImage && <p className="mt-1 text-xs text-red-500">{validationErrors.profileImage}</p>}
+                                        </div>
+                                    </div>
+
+                                    {/* Yoga Styles */}
+                                    <div>
                                         <SmartSelect
                                             label="Yoga Styles (Required)"
                                             name="yogaStyles"
@@ -673,8 +759,10 @@ const InstructorOnboarding = () => {
                                             error={validationErrors.yogaStyles}
                                         />
                                     </div>
+
+                                    {/* Certifications */}
                                     <div>
-                                        <SectionHeader title="Certifications" subtitle="Upload copies of your certifications (e.g., RYT 200, 500)." />
+                                        <SectionHeader title="Certifications" subtitle="Upload copies of your certifications (e.g., RYT 200, 500). First one is mandatory." />
                                         <div className="space-y-4">
                                             {formData.certifications.map((cert, index) => (
                                                 <div key={index} className="flex flex-col md:flex-row gap-4 items-end bg-slate-50 p-4 rounded-xl border border-slate-200">
@@ -701,9 +789,12 @@ const InstructorOnboarding = () => {
                                             {formData.certifications.length < 10 && <button type="button" onClick={addCertification} className="flex items-center text-teal-600 font-semibold hover:text-teal-700 mt-2"><BiPlusCircle className="mr-2" size={14} /> Add Certificate</button>}
                                         </div>
                                     </div>
+
+                                    {/* Videos & Philosophy */}
                                     <div>
                                         <SectionHeader title="Profile Videos & Philosophy" subtitle="Your introductory video and teaching philosophy." />
                                         <Input label="Introduction Video URL (Required)" name="introVideo" value={formData.introVideo} onChange={handleChange} required placeholder="YouTube or Vimeo URL" error={validationErrors.introVideo} />
+
                                         <label className="pt-6 mb-1 block text-sm font-medium text-gray-700">Sample Video URLs (Minimum 2)</label>
                                         <div className="space-y-4">
                                             {formData.sampleVideos.map((video, index) => (
@@ -727,10 +818,11 @@ const InstructorOnboarding = () => {
                             {step === 6 && (
                                 <div className="space-y-6">
                                     <SectionHeader title="Class Availability" subtitle="Indicate when you are generally available for online classes (Time zone: IST)." />
-                                    <div className="bg-blue-50 text-blue-800 p-4 rounded-xl flex items-start gap-3 border border-blue-100 mb-6"><BiVideo className="mt-1 flex-shrink-0" size={14} /><div><p className="font-bold text-sm">Online Only Classes</p><p className="text-xs">Physical studio support will be added in a later phase.</p></div></div>
+                                    {/* <div className="bg-blue-50 text-blue-800 p-4 rounded-xl flex items-start gap-3 border border-blue-100 mb-6"><BiVideo className="mt-1 flex-shrink-0" size={14} /><div><p className="font-bold text-sm">Online Only Classes</p><p className="text-xs">Physical studio support will be added in a later phase.</p></div></div> */}
 
                                     {/* Class Type Selection */}
                                     <div className="mt-4">
+                                        <Label required>Available Class Types</Label>
                                         <CheckboxToggle
                                             label="Available for One-on-One Private Session"
                                             name="availableOneOnOne"
@@ -743,25 +835,30 @@ const InstructorOnboarding = () => {
                                             checked={formData.availableGroupClass}
                                             onChange={handleChange}
                                         />
+                                        <CheckboxToggle
+                                            label="Single Class"
+                                            name="singleClass"
+                                            checked={formData.singleClass}
+                                            onChange={handleChange}
+                                        />
                                         {validationErrors.classType && <p className="mt-2 text-xs text-red-500">{validationErrors.classType}</p>}
                                     </div>
 
+                                    {/* Preferred Days */}
                                     <SmartSelect
                                         label="Preferred Teaching Days (Required)"
                                         options={[
-                                            { label: "Mon", value: "monday" },
-                                            { label: "Tue", value: "tuesday" },
-                                            { label: "Wed", value: "wednesday" },
-                                            { label: "Thu", value: "thursday" },
-                                            { label: "Fri", value: "friday" },
-                                            { label: "Sat", value: "saturday" },
+                                            { label: "Mon", value: "monday" }, { label: "Tue", value: "tuesday" },
+                                            { label: "Wed", value: "wednesday" }, { label: "Thu", value: "thursday" },
+                                            { label: "Fri", value: "friday" }, { label: "Sat", value: "saturday" },
                                             { label: "Sun", value: "sunday" },
                                         ]}
                                         selectedValues={formData.days}
                                         onToggle={(val) => handleArrayToggle("days", val)}
+                                        error={validationErrors.days}
                                     />
 
-
+                                    {/* Preferred Times */}
                                     <SmartSelect
                                         label="Preferred Class Times (Required)"
                                         options={[
@@ -771,31 +868,54 @@ const InstructorOnboarding = () => {
                                         ]}
                                         selectedValues={formData.times}
                                         onToggle={(val) => handleArrayToggle("times", val)}
+                                        error={validationErrors.times}
                                     />
 
+                                    {/* Start/End Time */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                                        <Input label="Earliest Start Time" name="startTime" type="time" value={formData.startTime} onChange={handleChange} required error={validationErrors.startTime} />
-                                        <Input label="Latest End Time" name="endTime" type="time" value={formData.endTime} onChange={handleChange} required error={validationErrors.endTime} />
+                                        <Input label="Earliest Start Time (IST)" name="startTime" type="time" value={formData.startTime} onChange={handleChange} required error={validationErrors.startTime} />
+                                        <Input label="Latest End Time (IST)" name="endTime" type="time" value={formData.endTime} onChange={handleChange} required error={validationErrors.endTime} />
                                     </div>
-                                    {/* Display global time error if present */}
                                     {timeError && <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-200 font-medium mt-3">{timeError}</div>}
+
+                                    {/* New Field: Response Time */}
+                                    <Selector
+                                        label="Expected Response Time to Queries (Required)"
+                                        name="responseTime"
+                                        options={[
+                                            { label: "Within 6 hours", value: "6h" },
+                                            { label: "Within 12 hours", value: "12h" },
+                                            { label: "Within 24 hours", value: "24h" },
+                                            { label: "Within 48 hours", value: "48h" } // [NEW OPTION ADDED]
+                                        ]}
+                                        value={formData.responseTime}
+                                        onChange={handleChange}
+                                        required
+                                        placeholder="Select expected response time"
+                                        error={validationErrors.responseTime}
+                                        prefix={<BiAlarmIcon className="text-teal-600" />}
+                                    />
                                 </div>
                             )}
 
                             {/* STEP 7: PRICING (ENHANCED) */}
                             {step === 7 && (
                                 <div className="space-y-6">
-                                    <SectionHeader title="Pricing Structure" subtitle="Set your rates in USD ($) and define your trial policy." />
+                                    <SectionHeader title="Pricing Structure" subtitle="" />
 
                                     {/* Conditional Pricing Inputs */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         {isGroupSelected && (
-                                            <Input label="Group Class Rate (per person/hour)" name="groupRate" prefix="$" value={formData.groupRate} onChange={handleChange} required={isGroupSelected} placeholder="e.g., 10" type="number" min="0" error={validationErrors.groupRate} />
+                                            <Input label="Group Class Rate (per person/hour)" name="groupRate" prefix="rs" value={formData.groupRate} onChange={handleChange} required={isGroupSelected} placeholder="e.g., 10rs" type="number" min="0" error={validationErrors.groupRate} />
                                         )}
                                         {isPrivateSelected && (
-                                            <Input label="Private Session Rate (per hour)" name="privateRate" prefix="$" value={formData.privateRate} onChange={handleChange} required={isPrivateSelected} placeholder="e.g., 50" type="number" min="0" error={validationErrors.privateRate} />
+                                            <Input label="Private Session Rate (per hour)" name="privateRate" prefix="rs" value={formData.privateRate} onChange={handleChange} required={isPrivateSelected} placeholder="e.g., 50rs" type="number" min="0" error={validationErrors.privateRate} />
                                         )}
-                                        {(!isGroupSelected && !isPrivateSelected) && (
+                                        {isSingleSelected && (
+                                            <Input label="Single Class Rate (per hour)" name="sigleClassRate" prefix="rs" value={formData.singleClass} onChange={handleChange} required={isSingleSelected} placeholder="e.g., 50rs" type="number" min="0" error={validationErrors.s} />
+                                        )}
+
+                                        {(!isGroupSelected && !isPrivateSelected && !isSingleSelected) && (
                                             <div className="md:col-span-2 p-6 bg-red-50 rounded-xl border border-red-200 text-red-800 font-semibold">
                                                 <p>⚠️ Please go back to the **Availability** step and select at least one class type (One-on-One or Group Class) to set your rates.</p>
                                             </div>
@@ -815,6 +935,7 @@ const InstructorOnboarding = () => {
                                                 placeholder="Select a trial policy"
                                                 error={validationErrors.trialMode}
                                             />
+                                            <p className="text-xs text-slate-500 mt-2">The platform automatically manages the trial based on your selection.</p>
                                         </div>
                                     )}
                                 </div>
@@ -858,6 +979,9 @@ const InstructorOnboarding = () => {
                                         />
                                         <p className="text-xs text-slate-400 mt-1">Typing your name constitutes a legally binding electronic signature. {validationErrors.signature && <span className="text-red-500">({validationErrors.signature})</span>}</p>
                                     </div>
+                                    {/* <div className="p-4 bg-teal-50 rounded-xl border border-teal-200 text-teal-800 text-sm font-medium">
+                                        <p>A registration fee of **100 Rs** will be processed upon successful submission and initial verification. This fee covers administrative and initial profile setup costs.</p>
+                                    </div> */}
                                 </div>
                             )}
 
@@ -912,7 +1036,11 @@ const InstructorOnboarding = () => {
                                     {step === totalSteps - 1 ? 'Review & Sign' : 'Next'} <BiChevronRightIcon className="w-5 h-5 ml-1" size={16} />
                                 </button>
                             ) : (
-                                <button type="submit" className="flex items-center bg-teal-600 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled={!formData.confirmAccurate || !formData.ethicalStandards || !formData.serviceMindset || !formData.signature}>
+                                <button
+                                    type="submit"
+                                    className="flex items-center bg-teal-600 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled={!formData.confirmAccurate || !formData.ethicalStandards || !formData.serviceMindset || !formData.signature || Object.keys(validationErrors).length > 0}
+                                >
                                     Submit Application <BiSave className="w-4 h-4 ml-2" size={16} />
                                 </button>
                             )}

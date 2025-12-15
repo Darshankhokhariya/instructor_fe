@@ -86,7 +86,7 @@ export default function Login() {
         <div className="min-h-screen from-stone-50 to-stone-200 flex items-center justify-center p-4 md:p-8 font-sans">
 
             {/* Main Card: Increased roundedness, softer shadow */}
-            <div className="bg-white rounded-3xl shadow-2xl shadow-stone-200/50 w-full max-w-6xl flex flex-col md:flex-row overflow-hidden">
+            <div className="bg-white rounded-3xl border border-gray-400/20 drop-shadow-2xl w-full max-w-6xl flex flex-col md:flex-row overflow-hidden">
 
                 {/* LEFT SECTION – Brand & Inspiration */}
                 {/* Changed background to a calming green/teal. Added text overlay. */}
