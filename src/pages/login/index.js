@@ -70,8 +70,10 @@ export default function Login() {
                 .unwrap()
                 .then((res) => {
                     if (res.status === 200) {
-                        handleClear();
+                        localStorage.setItem("role", res?.data?.role);
+                        localStorage.setItem("token", res.data.token);
                         toast.success(res.message || `User login succesfully!`)
+                        handleClear();
                     } else {
                         toast.error(res.message || `User not login!`)
                     }

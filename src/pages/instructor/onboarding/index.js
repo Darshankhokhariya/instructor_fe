@@ -541,7 +541,7 @@ const InstructorOnboarding = () => {
             case 'saving': return 'Saving...';
             case 'saved': return 'Draft Saved! ✓';
             case 'error': return 'Save Failed! ❌';
-            default: return 'Save as Draft';
+            default: return 'Save as Draft'
         }
     }, [saveStatus]);
 

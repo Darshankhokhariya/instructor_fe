@@ -47,7 +47,7 @@ export const userLogin = createAsyncThunk(
             if (response.data?.status === 200) {
                 return response.data;
             } else {
-                return rejectWithValue(response.data?.message || "Failed register user!");
+                return rejectWithValue(response.data?.message || "Failed login user!");
             }
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || "Something went wrong");
