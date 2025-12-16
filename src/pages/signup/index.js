@@ -1,7 +1,7 @@
 "use client";
 import { emailRegex } from "@/components/common/constant";
 import Input from "@/components/common/Input";
-import { userSignup } from "@/redux/slices/userSlice";
+import { setOtpEmail, userSignup } from "@/redux/slices/userSlice";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -38,6 +38,8 @@ export default function Register() {
         }
     };
 
+    console.log('fields', fields)
+
     const handleValidation = async () => {
 
         let flag = true;
@@ -66,7 +68,7 @@ export default function Register() {
             errors.email = "Please enter valid email!";
         }
 
-        if (fields.password && fields.cpassword && fields.password !== fields.cpassword) {
+        if (fields.password && fields.cpassword && fields.cpassword !== fields.cpassword) {
             flag = false;
             errors.cpassword = "Password and confirm password not match!";
         }
@@ -78,8 +80,11 @@ export default function Register() {
     const handleClear = () => {
         setErrors({});
         setFields(initialState);
-        router.push("/instructor/onboarding");
+        router.push("/otp");
+        dispatch(setOtpEmail(fields?.email));
     };
+
+    console.log('initialState', initialState)
 
     /* if success redirect on /instructor/onboarding */
     const handleSubmit = async () => {
