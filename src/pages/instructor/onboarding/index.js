@@ -10,11 +10,13 @@ import {
     BiCalendar, BiFile, BiLogoFacebook, BiLogoInstagram, BiMaleSign,
     BiPlusCircle, BiShield, BiSolidIdCard, BiTrash, BiUser,
     BiVideo, BiSave, BiSolidGraduation, BiChevronLeft, BiChevronRight,
-    BiWorld, BiAlarm, BiLink
+    BiWorld, BiAlarm, BiLink, BiCheckCircle
 } from 'react-icons/bi';
+import Modal from '@/components/common/Modal';
+import Link from 'next/link';
 
 // Icon Mapping
-const FaCheckCircle = BiSave; // Using BiSave for checkmark style completion
+const FaCheckCircle = BiSave; // Using BiSave for checkmark style completion (Keeping original component's choice)
 const FaUser = BiUser;
 const FaFileAlt = BiFile;
 const FaVideo = BiVideo;
@@ -38,8 +40,9 @@ const BiChevronRightIcon = BiChevronRight;
 const BiWorldIcon = BiWorld; // New icon for Languages
 const BiAlarmIcon = BiAlarm; // New icon for Response Time
 const BiLinkIcon = BiLink; // New icon for Website
+const BiCheckCircleIcon = BiCheckCircle;
 
-// Mock Components (assuming these are correctly imported/defined elsewhere)
+// Mock Components
 const SectionHeader = ({ title, subtitle, className = "" }) => <div className={`mb-6 border-b border-slate-100 pb-2 ${className}`}> <h2 className="text-xl font-bold text-teal-900">{title}</h2> {subtitle && <p className="text-sm text-slate-500 mt-1">{subtitle}</p>} </div>;
 const Label = ({ children, required }) => (<label className="mb-1 block text-sm font-medium text-gray-700">{children} {required && <span className="text-teal-600">*</span>}</label>);
 const CheckboxToggle = ({ label, name, checked, onChange }) => (
@@ -104,6 +107,58 @@ const isTimeSlotValid = (start, end) => {
     return durationMinutes <= maxDurationMinutes;
 };
 
+/* -------------------------------------------------------------------------- */
+/* --- NEW COMPONENT: SubmissionDialog --- */
+/* -------------------------------------------------------------------------- */
+
+const SubmissionDialog = ({ isOpen, onClose, onAccept, profileImagePreview }) => {
+
+    // Using the generic Modal component for structure, backdrop, and closure.
+    return (
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            title={
+                <span className="flex items-center">
+                    <BiShield size={20} className="mr-2 text-teal-600" /> Final Agreement & Review
+                </span>
+            }
+        >
+            <div className="space-y-4 text-slate-700 custom-scrollbar">
+                <p className="font-semibold text-sm">Please review your profile image and confirm acceptance of our Privacy Policy and Terms of Service before finalizing your application.</p>
+
+
+                {/* Terms & Privacy Mock Content */}
+                <div className="border border-slate-300 rounded-lg p-4 h-48 overflow-y-auto bg-slate-50 text-sm">
+                    <h4 className="font-bold text-teal-800 mb-2">1. Privacy Policy Summary</h4>
+                    <p className="text-xs mb-3">By accepting, you consent to the collection and processing of your personal data (including contact, address, education, and financial identifiers like PAN/Aadhaar) solely for the purpose of platform operation, verification, compliant payments, and public profile display. We commit to protecting your data with industry-standard security measures.</p>
+                    <h4 className="font-bold text-teal-800 mb-2">2. Terms of Service Summary</h4>
+                    <p className="text-xs">You agree to our fee structure, the ethical standards, and the non-compete clause for clients acquired through Yogalink. You retain all IP rights to your content, but grant Yogalink a limited license to display your videos and profile. Termination requires 30 days notice.</p>
+                    <Link href="/privacy-policy" className="text-xs font-bold mt-3 text-red-600">Privacy Policy & Terms</Link>
+                </div>
+
+                {/* Footer Actions (placed inside Modal content for styling, but logically acts as footer) */}
+                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="px-6 py-3 border border-slate-300 rounded-xl text-slate-600 font-medium hover:bg-slate-50 transition-colors"
+                    >
+                        Back
+                    </button>
+                    <button
+                        type="button"
+                        onClick={onAccept}
+                        className="px-6 py-3 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-700 transition-colors flex items-center"
+                    >
+                        <BiCheckCircleIcon className="mr-2" size={16} /> I Accept & Submit
+                    </button>
+                </div>
+            </div>
+        </Modal>
+    );
+};
+
 
 /* -------------------------------------------------------------------------- */
 /* --- MAIN COMPONENT: InstructorOnboarding --- */
@@ -118,6 +173,10 @@ const InstructorOnboarding = () => {
     const [saveStatus, setSaveStatus] = useState(null);
     const [timeError, setTimeError] = useState(null);
     const [validationErrors, setValidationErrors] = useState({});
+
+    // NEW STATE: For Dialog and Image Preview
+    const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+    const [profileImagePreview, setProfileImagePreview] = useState(null);
 
     // Added: languages, instructorWebsite, responseTime, registrationType
     const initialFormData = useMemo(() => ({
@@ -174,6 +233,19 @@ const InstructorOnboarding = () => {
             }
         }
     }, [initialFormData]);
+
+    // --- EFFECT TO HANDLE PROFILE IMAGE PREVIEW ---
+    useEffect(() => {
+        if (formData.profileImage instanceof File) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setProfileImagePreview(reader.result);
+            };
+            reader.readAsDataURL(formData.profileImage);
+        } else {
+            setProfileImagePreview(null);
+        }
+    }, [formData.profileImage]);
 
 
     // --- HANDLERS ---
@@ -285,8 +357,7 @@ const InstructorOnboarding = () => {
         }
     };
 
-    // --- CORE VALIDATION LOGIC ---
-
+    // --- CORE VALIDATION LOGIC (Omitted for brevity, assuming it's correct from the prompt) ---
     const validateFormFields = useCallback((stepData) => {
         const errors = {};
         const urlRegex = /^(ftp|http|https):\/\/[^ "\s]+$/;
@@ -300,7 +371,7 @@ const InstructorOnboarding = () => {
                 errors[field] = message;
             }
         };
-
+        // ... (validation logic for each step 1-7) ...
         if (step === 1) {
             validateRequired('fullName', 'Full Name is required.');
             validateRequired('dob', 'Date of Birth is required.');
@@ -350,7 +421,6 @@ const InstructorOnboarding = () => {
             if (stepData.aadharNumber && !aadharRegex.test(stepData.aadharNumber.trim().replace(/\s/g, ''))) {
                 errors.aadharNumber = 'Invalid Aadhaar format. Must be 12 digits.';
             }
-            // GSTIN validation is not strict as it is optional
 
         } else if (step === 4) { // Socials & Videos
             const checkUrl = (field, label) => {
@@ -378,7 +448,6 @@ const InstructorOnboarding = () => {
                 if (!firstCert.title.trim()) {
                     errors['certifications[0].title'] = 'Title is required for the first certification.';
                 }
-                // File upload cannot be reliably validated in this mock setup, but the error handling is structured.
                 if (!firstCert.file) {
                     errors['certifications[0].file'] = 'File upload is required for the first certification.';
                 }
@@ -405,7 +474,7 @@ const InstructorOnboarding = () => {
             validateRequired('philosophy', 'Teaching Philosophy is required.');
 
         } else if (step === 6) { // Availability
-            if (!stepData.availableOneOnOne && !stepData.availableGroupClass) {
+            if (!stepData.availableOneOnOne && !stepData.availableGroupClass && !stepData.singleClass) {
                 errors.classType = 'Please select at least one class type.';
             }
             if (stepData.days.length === 0) {
@@ -431,11 +500,10 @@ const InstructorOnboarding = () => {
                     errors.privateRate = 'Rate must be a positive number.';
                 }
             }
-
             if (stepData.singleClass) {
-                validateRequired('singleClass', 'single Class Rate is required.');
-                if (stepData.singleClass && (!positiveNumberRegex.test(stepData.singleClass) || Number(stepData.singleClass) <= 0)) {
-                    errors.singleClass = 'Rate must be a positive number.';
+                validateRequired('singleClassRate', 'Single Class Rate is required.');
+                if (stepData.singleClassRate && (!positiveNumberRegex.test(stepData.singleClassRate) || Number(stepData.singleClassRate) <= 0)) {
+                    errors.singleClassRate = 'Rate must be a positive number.';
                 }
             }
             if (stepData.availableGroupClass || stepData.availableOneOnOne) {
@@ -454,6 +522,8 @@ const InstructorOnboarding = () => {
 
         return errors;
     }, [step, isCurrentSameAsPermanent]);
+    // --- END OF VALIDATION LOGIC ---
+
 
     const validateStep = () => {
         const fieldErrors = validateFormFields(formData);
@@ -480,9 +550,8 @@ const InstructorOnboarding = () => {
     };
 
     const nextStep = () => {
-        // Uncomment the below line to enable mandatory validation before advancing
-        // if (validateStep()) {
-        //     document.getElementById('form-content-area')?.scrollTo({ top: 0, behavior: 'smooth' });
+        // if (validateStep()) { // Uncomment for mandatory validation
+        document.getElementById('form-content-area')?.scrollTo({ top: 0, behavior: 'smooth' });
         setStep(prev => Math.min(prev + 1, totalSteps));
         // }
     };
@@ -494,15 +563,27 @@ const InstructorOnboarding = () => {
         setStep(prev => Math.max(prev - 1, 1));
     };
 
+    // --- MODIFIED SUBMISSION HANDLER: Opens Dialog ---
     const handleSubmit = (e) => {
         e.preventDefault();
         if (validateStep()) {
-            console.log("Final Submission Data:", formData);
-            localStorage.removeItem(DRAFT_KEY);
-            setStep(totalSteps + 1);
-            // In a real app, this is where you'd call the API to submit the final data
+            setShowSuccessDialog(true); // Open the review/agreement dialog
         }
     };
+
+    // --- NEW: Final Accept Handler ---
+    const handleFinalAccept = () => {
+        console.log("Final Submission Data (Accepted):", formData);
+        localStorage.removeItem(DRAFT_KEY);
+        setShowSuccessDialog(false);
+        setStep(totalSteps + 1); // Move to the final 'Submitted' screen
+    };
+
+    const handleCloseDialog = () => {
+        setShowSuccessDialog(false);
+        // Optional: Scroll to the bottom of the form for easier editing of Step 8
+        document.getElementById('form-content-area')?.scrollTo({ top: 9999, behavior: 'smooth' });
+    }
 
     const handleSaveDraft = useCallback(async () => {
         setSaveStatus('saving');
@@ -553,7 +634,7 @@ const InstructorOnboarding = () => {
         if (isGroupSelected) {
             options.push({ label: "2 Free Group Class Trials", value: "2group" });
         }
-        if (isSingleSelected) {
+        if (isPrivateSelected || isGroupSelected) { // Added 'No Free Trial' only if classes are available
             options.push({ label: "No Free Trial", value: "nofreetrial" });
         }
         options.push({ label: "No Trial", value: "none" });
@@ -562,7 +643,7 @@ const InstructorOnboarding = () => {
 
     return (
         <div className="h-screen w-full bg-slate-50 flex flex-col items-center justify-center p-2 md:p-6 font-sans text-slate-800 overflow-hidden">
-            <div className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-slate-100 flex flex-col max-h-screen h-full md:h-auto md:min-h-[650px]">
+            <div className="w-full max-w-6xl bg-white rounded-3xl shadow-2xl border border-slate-100 flex flex-col max-h-screen h-full md:h-auto md:min-h-[650px]">
 
                 {/* HEADER */}
                 <div className="flex-none px-4 py-6 md:px-10 border-b border-slate-100 bg-white rounded-t-3xl z-10">
@@ -577,7 +658,7 @@ const InstructorOnboarding = () => {
                 {/* SCROLLABLE CONTENT */}
                 <div id="form-content-area" className="flex-1 overflow-y-auto px-6 py-6 md:px-12 scroll-smooth custom-scrollbar">
 
-                    <form id="onboarding-form" onSubmit={handleSubmit} className="max-w-4xl mx-auto min-h-full">
+                    <form id="onboarding-form" onSubmit={handleSubmit} className="max-w-5xl mx-auto min-h-full">
                         <div className={`transition-opacity duration-300 ease-out ${isSubmitted ? 'opacity-100' : 'opacity-100'} pb-4`}>
 
                             {/* STEP 1: PERSONAL, ADDRESS, EMERGENCY CONTACT, LANGUAGES */}
@@ -731,19 +812,29 @@ const InstructorOnboarding = () => {
                                     {/* Profile Image Upload [NEW SECTION] */}
                                     <div>
                                         <SectionHeader title="Profile Image & Yoga Expertise" subtitle="Upload a professional photo and select your teaching styles." />
-                                        <div className="p-4 bg-teal-50 rounded-xl border border-teal-200 mb-6">
-                                            <Label required>Profile Image (250px X 250px Recommended)</Label>
-                                            <input
-                                                type="file"
-                                                id="profileImage"
-                                                name="profileImage"
-                                                onChange={handleChange}
-                                                className={`block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-teal-100 file:text-teal-700 hover:file:bg-teal-200 cursor-pointer rounded-xl ${validationErrors.profileImage ? 'border-red-500 border-2' : 'border-slate-300 border'}`}
-                                                accept="image/*"
-                                                required
-                                            />
-                                            {formData.profileImage && <p className="mt-2 text-xs text-slate-600">Selected: **{formData.profileImage.name}**</p>}
-                                            {validationErrors.profileImage && <p className="mt-1 text-xs text-red-500">{validationErrors.profileImage}</p>}
+                                        {/* Profile Image Upload [NEW SECTION] */}
+                                        <div className="p-4 bg-teal-50 rounded-xl border border-teal-200 mb-6 flex justify-between items-center">
+                                            <div>
+                                                <Label required>Profile Image (250px X 250px Recommended)</Label>
+                                                <input
+                                                    type="file"
+                                                    id="profileImage"
+                                                    name="profileImage"
+                                                    onChange={handleChange}
+                                                    // ... (rest of the input className) ...
+                                                    accept="image/*"
+                                                    required
+                                                />
+                                                {formData.profileImage && <p className="mt-2 text-xs text-slate-600">Selected: **{formData.profileImage.name}**</p>}
+                                            </div>
+                                            <div>
+                                                {profileImagePreview && (
+                                                    <div className="mt-3 flex flex-col md:flex-row justify-center items-center m-auto gap-3">
+                                                        <img src={profileImagePreview} alt="Preview" className="w-[250px] h-[250px]  rounded-full object-cover border border-slate-200" />
+                                                    </div>
+                                                )}
+                                                {validationErrors.profileImage && <p className="mt-1 text-xs text-red-500">{validationErrors.profileImage}</p>}
+                                            </div>
                                         </div>
                                     </div>
 
@@ -778,6 +869,7 @@ const InstructorOnboarding = () => {
                                                                 onChange={(e) => handleCertChange(index, 'file', e.target.value, e.target.files[0])}
                                                                 className={`block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-teal-100 file:text-teal-700 hover:file:bg-teal-200 cursor-pointer rounded-xl ${validationErrors[`certifications[${index}].file`] ? 'border-red-500 border-2' : 'border-slate-300 border'}`}
                                                                 required={index === 0}
+                                                                accept="application/pdf,image/*"
                                                             />
                                                             {validationErrors[`certifications[${index}].file`] && <p className="mt-1 text-xs text-red-500">{validationErrors[`certifications[${index}].file`]}</p>}
                                                         </div>
@@ -818,7 +910,6 @@ const InstructorOnboarding = () => {
                             {step === 6 && (
                                 <div className="space-y-6">
                                     <SectionHeader title="Class Availability" subtitle="Indicate when you are generally available for online classes (Time zone: IST)." />
-                                    {/* <div className="bg-blue-50 text-blue-800 p-4 rounded-xl flex items-start gap-3 border border-blue-100 mb-6"><BiVideo className="mt-1 flex-shrink-0" size={14} /><div><p className="font-bold text-sm">Online Only Classes</p><p className="text-xs">Physical studio support will be added in a later phase.</p></div></div> */}
 
                                     {/* Class Type Selection */}
                                     <div className="mt-4">
@@ -886,7 +977,7 @@ const InstructorOnboarding = () => {
                                             { label: "Within 6 hours", value: "6h" },
                                             { label: "Within 12 hours", value: "12h" },
                                             { label: "Within 24 hours", value: "24h" },
-                                            { label: "Within 48 hours", value: "48h" } // [NEW OPTION ADDED]
+                                            { label: "Within 48 hours", value: "48h" }
                                         ]}
                                         value={formData.responseTime}
                                         onChange={handleChange}
@@ -912,12 +1003,12 @@ const InstructorOnboarding = () => {
                                             <Input label="Private Session Rate (per hour)" name="privateRate" prefix="rs" value={formData.privateRate} onChange={handleChange} required={isPrivateSelected} placeholder="e.g., 50rs" type="number" min="0" error={validationErrors.privateRate} />
                                         )}
                                         {isSingleSelected && (
-                                            <Input label="Single Class Rate (per hour)" name="sigleClassRate" prefix="rs" value={formData.singleClass} onChange={handleChange} required={isSingleSelected} placeholder="e.g., 50rs" type="number" min="0" error={validationErrors.s} />
+                                            <Input label="Single Class Rate (per hour)" name="singleClassRate" prefix="rs" value={formData.singleClassRate} onChange={handleChange} required={isSingleSelected} placeholder="e.g., 50rs" type="number" min="0" error={validationErrors.singleClassRate} />
                                         )}
 
                                         {(!isGroupSelected && !isPrivateSelected && !isSingleSelected) && (
                                             <div className="md:col-span-2 p-6 bg-red-50 rounded-xl border border-red-200 text-red-800 font-semibold">
-                                                <p>⚠️ Please go back to the **Availability** step and select at least one class type (One-on-One or Group Class) to set your rates.</p>
+                                                <p>⚠️ Please go back to the **Availability** step and select at least one class type (One-on-One, Group Class, or Single Class) to set your rates.</p>
                                             </div>
                                         )}
                                     </div>
@@ -979,9 +1070,6 @@ const InstructorOnboarding = () => {
                                         />
                                         <p className="text-xs text-slate-400 mt-1">Typing your name constitutes a legally binding electronic signature. {validationErrors.signature && <span className="text-red-500">({validationErrors.signature})</span>}</p>
                                     </div>
-                                    {/* <div className="p-4 bg-teal-50 rounded-xl border border-teal-200 text-teal-800 text-sm font-medium">
-                                        <p>A registration fee of **100 Rs** will be processed upon successful submission and initial verification. This fee covers administrative and initial profile setup costs.</p>
-                                    </div> */}
                                 </div>
                             )}
 
@@ -1002,7 +1090,7 @@ const InstructorOnboarding = () => {
                 {/* FOOTER - NAVIGATION & DRAFT */}
                 {!isSubmitted && (
                     <div className="flex-none px-6 py-6 border-t border-slate-100 bg-white rounded-b-3xl">
-                        <div className="flex items-center justify-between max-w-4xl mx-auto w-full">
+                        <div className="flex items-center justify-between max-w-5xl mx-auto w-full">
 
                             {/* Back Button and Draft Button Group */}
                             <div className="flex items-center gap-4">
@@ -1038,6 +1126,7 @@ const InstructorOnboarding = () => {
                             ) : (
                                 <button
                                     type="submit"
+                                    onClick={handleSubmit}
                                     className="flex items-center bg-teal-600 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     disabled={!formData.confirmAccurate || !formData.ethicalStandards || !formData.serviceMindset || !formData.signature || Object.keys(validationErrors).length > 0}
                                 >
@@ -1050,6 +1139,15 @@ const InstructorOnboarding = () => {
             </div>
             {/* Tailwind CSS scrollbar utility class */}
             <style jsx>{` .custom-scrollbar::-webkit-scrollbar { width: 6px; } .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; } `}</style>
+
+            {/* The new Submission Dialog component */}
+            <SubmissionDialog
+                isOpen={showSuccessDialog}
+                onClose={handleCloseDialog}
+                onAccept={handleFinalAccept}
+                profileImagePreview={profileImagePreview}
+            />
+
         </div>
     );
 };
