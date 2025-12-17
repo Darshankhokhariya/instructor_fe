@@ -29,6 +29,19 @@ import {
 } from "react-icons/bi";
 import Modal from "@/components/common/Modal";
 import Link from "next/link";
+import { userOnboarding } from "@/redux/slices/userSlice";
+import toast from "react-hot-toast";
+import StepOne from "@/components/onboarding/StepOne";
+import SectionHeader from "@/components/onboarding/SectionHeader";
+import StepTwo from "@/components/onboarding/StepTwo";
+import StepThree from "@/components/onboarding/StepThree";
+import StepFour from "@/components/onboarding/StepFour";
+import StepFive from "@/components/onboarding/StepFive";
+import StepSixth from "@/components/onboarding/StepSixth";
+import StepSeven from "@/components/onboarding/StepSeven";
+import StepEight from "@/components/onboarding/StepEight";
+import { FIELD_LABELS, isEmpty, LABELS, REGEX } from "../../../../utils/validation";
+import { useDispatch } from "react-redux";
 
 // Icon Mapping
 const FaCheckCircle = BiSave; // Using BiSave for checkmark style completion (Keeping original component's choice)
@@ -57,35 +70,6 @@ const BiAlarmIcon = BiAlarm; // New icon for Response Time
 const BiLinkIcon = BiLink; // New icon for Website
 const BiCheckCircleIcon = BiCheckCircle;
 
-// Mock Components
-const SectionHeader = ({ title, subtitle, className = "" }) => (
-  <div className={`mb-6 border-b border-slate-100 pb-2 ${className}`}>
-    {" "}
-    <h2 className="text-xl font-bold text-teal-900">{title}</h2>{" "}
-    {subtitle && <p className="text-sm text-slate-500 mt-1">{subtitle}</p>}{" "}
-  </div>
-);
-const Label = ({ children, required }) => (
-  <label className="mb-1 block text-sm font-medium text-gray-700">
-    {children} {required && <span className="text-teal-600">*</span>}
-  </label>
-);
-const CheckboxToggle = ({ label, name, checked, onChange }) => (
-  <div
-    className={`mb-4 flex items-center justify-between rounded-lg border p-3 transition-colors ${
-      checked ? "border-teal-400 bg-teal-50" : "border-gray-300 bg-white"
-    }`}
-  >
-    <span className="text-sm font-medium text-gray-700">{label}</span>
-    <input
-      type="checkbox"
-      name={name}
-      checked={checked}
-      onChange={onChange}
-      className="h-4 w-4 text-teal-600"
-    />
-  </div>
-);
 const StepIndicator = ({ currentStep, totalSteps }) => {
   // Retaining original StepIndicator implementation
   const steps = useMemo(
@@ -314,7 +298,7 @@ const InstructorOnboarding = () => {
       yoga_style: [],
       introVideo: "",
       video_url: ["", ""],
-      philosophy: "",
+      teaching_philosophy: "",
       days: [],
       times: [],
       startTime: "07:00",
@@ -336,12 +320,15 @@ const InstructorOnboarding = () => {
   );
 
   const [formData, setFormData] = useState(initialFormData);
+  const dispatch = useDispatch()
 
   console.log("formData", formData);
 
   const parts = formData?.primaryMobile?.trim().split(/\s+/);
+  const partsSecond = formData?.secondMobile?.trim().split(/\s+/);
   const countryCode = parts?.[0];
   const mobileNumber = parts?.slice(1)?.join("");
+  const SecondMobileNumber = partsSecond?.slice(1)?.join("");
 
   console.log("countryCode", countryCode);
 
@@ -549,215 +536,74 @@ const InstructorOnboarding = () => {
 
   // --- CORE VALIDATION LOGIC (Omitted for brevity, assuming it's correct from the prompt) ---
   const validateFormFields = useCallback(
-    (stepData) => {
-      const errors = {};
-      const urlRegex = /^(ftp|http|https):\/\/[^ "\s]+$/;
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
-      const aadharRegex = /^\d{4}\s?\d{4}\s?\d{4}$/;
-      const positiveNumberRegex = /^\d+(\.\d+)?$/;
+  (data) => {
+    const errors = {};
 
-      const validateRequired = (field, message) => {
-        if (
-          !stepData[field] ||
-          (typeof stepData[field] === "string" &&
-            stepData[field].trim() === "") ||
-          (Array.isArray(stepData[field]) && stepData[field].length === 0)
-        ) {
-          errors[field] = message;
-        }
-      };
-      // ... (validation logic for each step 1-7) ...
-      if (step === 1) {
-        validateRequired("name", "Full Name is required.");
-        validateRequired("dateOfBirth", "Date of Birth is required.");
-        validateRequired("gender", "Gender is required.");
-        if (stepData.email && !emailRegex.test(stepData.email)) {
-          errors.email = "Please enter a valid email address.";
-        } else {
-          validateRequired("email", "Email is required.");
-        }
-        validateRequired("primaryMobile", "Primary Phone Number is required.");
-        validateRequired("language", "Please select at least one language.");
+    const requiredFields = {
+      1: [
+        "name","dateOfBirth","gender","email","primaryMobile","language",
+        "pCountry","pState","pCity","pPincode","pArea","pBuilding","pBlock",
+        "eName","eMobile","eRelation"
+      ],
+      2: ["collegeName","qualification","institute"],
+      3: ["registerAs","panCard","aadharNumber"],
+      5: ["profileImage","introVideo","teaching_philosophy"],
+      6: ["startTime","endTime","responseTime"],
+      7: [], // handled conditionally below
+      8: ["confirmAccurate","ethicalStandards","serviceMindset","signature"],
+    };
 
-        validateRequired("pCountry", "Permanent Country is required.");
-        validateRequired("pState", "Permanent State is required.");
-        validateRequired("pCity", "Permanent City is required.");
-        validateRequired("pPincode", "Permanent Pincode is required.");
-        validateRequired("pArea", "Permanent Area is required.");
-        validateRequired("pBuilding", "Permanent Building Name is required.");
-        validateRequired("pBlock", "Permanent Block/Door No. is required.");
+    // Step 1-8: required fields
+    (requiredFields[step] || []).forEach((field) => {
+      if (isEmpty(data[field])) errors[field] = `${FIELD_LABELS[field]} is required.`;
+    });
 
-        if (!isCurrentSameAsPermanent) {
-          validateRequired("cCountry", "Current Country is required.");
-          validateRequired("cState", "Current State is required.");
-          validateRequired("cCity", "Current City is required.");
-          validateRequired("cPincode", "Current Pincode is required.");
-          validateRequired("cArea", "Current Area is required.");
-          validateRequired("cBuilding", "Current Building Name is required.");
-          validateRequired("cBlock", "Current Block/Door No. is required.");
-        }
+    // Step 1: current address if different
+    if (step === 1 && !isCurrentSameAsPermanent) {
+      ["cCountry","cState","cCity","cPincode","cArea","cBuilding","cBlock"]
+        .forEach(f => { if(isEmpty(data[f])) errors[f] = `${FIELD_LABELS[f]} is required.` });
+    }
 
-        validateRequired("eName", "Emergency Contact Name is required.");
-        validateRequired("eMobile", "Emergency Phone Number is required.");
-        validateRequired("eRelation", "Relationship is required.");
-      } else if (step === 2) {
-        validateRequired("collegeName", "School/College Name is required.");
-        validateRequired("qualification", "Degree/Qualification is required.");
-        validateRequired(
-          "institute",
-          "University/Institution Name is required."
-        );
-      } else if (step === 3) {
-        validateRequired("registerAs", "Registration Type is required.");
-        validateRequired("panCard", "PAN Card Number is required.");
-        if (
-          stepData.panCard &&
-          !panRegex.test(stepData.panCard.toUpperCase())
-        ) {
-          errors.panCard = "Invalid PAN format. Example: ABCDE1234F";
-        }
-        validateRequired("aadharNumber", "Aadhaar Card Number is required.");
-        if (
-          stepData.aadharNumber &&
-          !aadharRegex.test(stepData.aadharNumber.trim().replace(/\s/g, ""))
-        ) {
-          errors.aadharNumber = "Invalid Aadhaar format. Must be 12 digits.";
-        }
-      } else if (step === 4) {
-        // Socials & Videos
-        const checkUrl = (field, label) => {
-          if (
-            stepData[field] &&
-            stepData[field].trim() !== "" &&
-            !urlRegex.test(stepData[field].trim())
-          ) {
-            errors[field] = `Please enter a valid URL for ${label}.`;
-          }
-        };
-        checkUrl("instagram_link", "Instagram");
-        checkUrl("facebook_link", "Facebook");
-        checkUrl("linkdin_link", "LinkedIn");
-        checkUrl("youtube_link", "YouTube");
-        checkUrl("instructor_website", "Instructor Website");
-      } else if (step === 5) {
-        // Qualifications (Styles, Certs, Videos, Philosophy)
-        validateRequired("profileImage", "Profile Image is required."); // [NEW VALIDATION]
+    // Regex validations
+    if (step === 1 && data.email && !REGEX.email.test(data.email)) errors.email = "Invalid email";
+    if (step === 3) {
+      if(data.panCard && !REGEX.pan.test(data.panCard.toUpperCase())) errors.panCard = "Invalid PAN format";
+      if(data.aadharNumber && !REGEX.aadhar.test(data.aadharNumber.replace(/\s/g,""))) errors.aadharNumber = "Invalid Aadhaar number";
+    }
+    if (step === 4) {
+      ["instagram_link","facebook_link","linkdin_link","youtube_link","instructor_website"]
+        .forEach(f => { if(data[f]?.trim() && !REGEX.url.test(data[f].trim())) errors[f] = "Invalid URL" });
+    }
+    if (step === 5) {
+      if(!data.yoga_style?.length) errors.yoga_style = "Select at least one Yoga Style";
+      if(!data.certifications?.length) errors.certifications = "Add at least one certification";
+      const videos = data.video_url?.filter(v => v.trim()) || [];
+      if(videos.length < 2) errors.video_url = "Minimum two sample videos required";
+      data.video_url?.forEach((v,i) => { if(v.trim() && !REGEX.url.test(v)) errors[`video_url[${i}]`] = `Video ${i+1} is invalid` });
+      if(data.introVideo && !REGEX.url.test(data.introVideo)) errors.introVideo = "Invalid video URL";
+    }
 
-        if (stepData.yoga_style.length === 0) {
-          errors.yoga_style = "Please select at least one Yoga Style.";
-        }
+    // Step 6: class selection
+    if(step === 6 && !data.availableOneOnOne && !data.availableGroupClass && !data.singleClass) errors.classType = "Select at least one class type";
+    if(step === 6 && !data.days?.length) errors.days = "Select at least one teaching day";
+    if(step === 6 && !data.times?.length) errors.times = "Select at least one class time";
 
-        if (stepData.certifications.length === 0) {
-          errors.certifications = "Please add at least one certification.";
-        } else {
-          const firstCert = stepData.certifications[0];
-          if (!firstCert.title.trim()) {
-            errors["certifications[0].title"] =
-              "Title is required for the first certification.";
-          }
-          if (!firstCert.file) {
-            errors["certifications[0].file"] =
-              "File upload is required for the first certification.";
-          }
-        }
-
-        validateRequired("introVideo", "Introduction Video URL is required.");
-        if (stepData.introVideo && !urlRegex.test(stepData.introVideo.trim())) {
-          errors.introVideo = "Please enter a valid URL.";
-        }
-
-        const filledSampleVideos = stepData.video_url.filter(
-          (v) => v.trim() !== ""
-        );
-        if (filledSampleVideos.length < 2) {
-          errors.video_url =
-            "A minimum of two Sample Video URLs are required.";
-          if (!stepData.video_url[0] || !stepData.video_url[0].trim())
-            errors[`video_url[0]`] = `Video URL 1 is required.`;
-          if (!stepData.video_url[1] || !stepData.video_url[1].trim())
-            errors[`video_url[1]`] = `Video URL 2 is required.`;
-        }
-
-        stepData.video_url.forEach((video, index) => {
-          if (video.trim() && !urlRegex.test(video.trim())) {
-            errors[`video_url[${index}]`] = `Video URL ${
-              index + 1
-            } is invalid.`;
+    // Step 7: pricing
+    if(step === 7){
+      [["group_class_rate", "availableGroupClass"], ["private_class_rate", "availableOneOnOne"], ["single_class_rate", "singleClass"]]
+        .forEach(([field, cond]) => {
+          if(data[cond]){
+            if(isEmpty(data[field])) errors[field] = `${FIELD_LABELS[field]} is required`;
+            else if(!REGEX.positiveNumber.test(data[field]) || Number(data[field])<=0) errors[field] = `${FIELD_LABELS[field]} must be positive`;
           }
         });
+      if((data.availableGroupClass||data.availableOneOnOne) && (!data.trialMode || data.trialMode==='none')) errors.trialMode = "Trial Policy is required";
+    }
 
-        validateRequired("philosophy", "Teaching Philosophy is required.");
-      } else if (step === 6) {
-        // Availability
-        if (
-          !stepData.availableOneOnOne &&
-          !stepData.availableGroupClass &&
-          !stepData.singleClass
-        ) {
-          errors.classType = "Please select at least one class type.";
-        }
-        if (stepData.days.length === 0) {
-          errors.days = "Please select at least one preferred teaching day.";
-        }
-        if (stepData.times.length === 0) {
-          errors.times = "Please select at least one preferred class time.";
-        }
-        validateRequired("startTime", "Start Time is required.");
-        validateRequired("endTime", "End Time is required.");
-        validateRequired("responseTime", "Response Time is required.");
-      } else if (step === 7) {
-        // Pricing
-        if (stepData.availableGroupClass) {
-          validateRequired("group_class_rate", "Group Class Rate is required.");
-          if (
-            stepData.group_class_rate &&
-            (!positiveNumberRegex.test(stepData.group_class_rate) ||
-              Number(stepData.group_class_rate) <= 0)
-          ) {
-            errors.group_class_rate = "Rate must be a positive number.";
-          }
-        }
-        if (stepData.availableOneOnOne) {
-          validateRequired("private_class_rate", "Private Session Rate is required.");
-          if (
-            stepData.private_class_rate &&
-            (!positiveNumberRegex.test(stepData.private_class_rate) ||
-              Number(stepData.private_class_rate) <= 0)
-          ) {
-            errors.private_class_rate = "Rate must be a positive number.";
-          }
-        }
-        if (stepData.singleClass) {
-          validateRequired("single_class_rate", "Single Class Rate is required.");
-          if (
-            stepData.single_class_rate &&
-            (!positiveNumberRegex.test(stepData.single_class_rate) ||
-              Number(stepData.single_class_rate) <= 0)
-          ) {
-            errors.single_class_rate = "Rate must be a positive number.";
-          }
-        }
-        if (stepData.availableGroupClass || stepData.availableOneOnOne) {
-          if (!stepData.trialMode || stepData.trialMode === "none") {
-            errors.trialMode = "Trial Policy is required.";
-          }
-        }
-      } else if (step === 8) {
-        // Agreements
-        if (!stepData.confirmAccurate)
-          errors.confirmAccurate = "Agreement is required.";
-        if (!stepData.ethicalStandards)
-          errors.ethicalStandards = "Agreement is required.";
-        if (!stepData.serviceMindset)
-          errors.serviceMindset = "Agreement is required.";
-        validateRequired("signature", "Digital Signature is required.");
-      }
+    return errors;
+  },
+);
 
-      return errors;
-    },
-    [step, isCurrentSameAsPermanent]
-  );
   // --- END OF VALIDATION LOGIC ---
 
   const validateStep = () => {
@@ -806,12 +652,80 @@ const InstructorOnboarding = () => {
     setStep((prev) => Math.max(prev - 1, 1));
   };
 
+  const handleClear = () => {
+    setFormData(initialFormData);
+    setShowSuccessDialog(true);
+  };
+
+  const saveDraft = async () => {
+    const payload = {
+      ...formData,
+      countryCode: countryCode,
+      primaryMobile: mobileNumber,
+      secondMobile: SecondMobileNumber,
+      class_availability: {
+        availableClassTypes: [
+          formData.availableOneOnOne,
+          formData.availableGroupClass,
+        ],
+        teachingDays: formData.days,
+        earliestStartTime: formData.startTime,
+        latestEndTime: formData.endTime,
+        responseTime: formData.responseTime,
+      },
+    };
+
+    await dispatch(userOnboarding(payload))
+      .unwrap()
+      .then((res) => {
+        if (res.status === 200) {
+          // handleClear();
+          toast.success(res.message || `User Onboarding succesfully!`);
+        } else {
+          toast.error(res.message || `Something went wrong`);
+        }
+      })
+      .catch((err) => {
+        toast.error(err || "Something went wrong");
+      });
+  };
+
   // --- MODIFIED SUBMISSION HANDLER: Opens Dialog ---
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateStep()) {
-      setShowSuccessDialog(true); // Open the review/agreement dialog
-    }
+
+    const payload = {
+      ...formData,
+      countryCode: countryCode,
+      primaryMobile: mobileNumber,
+      secondMobile: SecondMobileNumber,
+      class_availability: {
+        availableClassTypes: [
+          formData.availableOneOnOne,
+          formData.availableGroupClass,
+        ],
+        teachingDays: formData.days,
+        earliestStartTime: formData.startTime,
+        latestEndTime: formData.endTime,
+        responseTime: formData.responseTime,
+      },
+    };
+
+    console.log("payload", payload);
+    return;
+    await dispatch(userOnboarding(payload))
+      .unwrap()
+      .then((res) => {
+        if (res.status === 200) {
+          handleClear();
+          toast.success(res.message || `User Onboarding succesfully!`);
+        } else {
+          toast.error(res.message || `Something went wrong`);
+        }
+      })
+      .catch((err) => {
+        toast.error(err || "Something went wrong");
+      });
   };
 
   // --- NEW: Final Accept Handler ---
@@ -830,30 +744,13 @@ const InstructorOnboarding = () => {
       ?.scrollTo({ top: 9999, behavior: "smooth" });
   };
 
-  const handleSaveDraft = useCallback(async () => {
-    setSaveStatus("saving");
-    await new Promise((resolve) => setTimeout(resolve, 800));
-
-    try {
-      // NOTE: Files (cert.file, profileImage) cannot be stored in localStorage. We store the title/URL and skip the file object itself.
-      const draftToSave = {
-        ...formData,
-        profileImage: null, // Do not save actual File objects to localStorage
-        certifications: formData.certifications.map((cert) => ({
-          title: cert.title,
-          file: null, // Do not save actual File objects to localStorage
-        })),
-        isCurrentSameAsPermanent: isCurrentSameAsPermanent,
-      };
-
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(draftToSave));
-      setSaveStatus("saved");
-    } catch (error) {
-      setSaveStatus("error");
-      console.error("Error saving draft:", error);
-    }
-    setTimeout(() => setSaveStatus(null), 3000);
-  }, [formData, isCurrentSameAsPermanent]);
+  const handleSaveDraft = useCallback(
+    async (e) => {
+      // setSaveStatus("saving");
+      handleSubmit(e);
+    },
+    [formData]
+  );
 
   const isSubmitted = step === totalSteps + 1;
   const isGroupSelected = formData.availableGroupClass;
@@ -930,1041 +827,87 @@ const InstructorOnboarding = () => {
             >
               {/* STEP 1: PERSONAL, ADDRESS, EMERGENCY CONTACT, LANGUAGES */}
               {step === 1 && (
-                <div className="space-y-10">
-                  <div className="space-y-4">
-                    <SectionHeader
-                      title="1. Basic Personal Details"
-                      subtitle="Required for identification and communication."
-                    />
-                    <Input
-                      label="Full Name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      placeholder="Your full legal name"
-                      error={validationErrors.name}
-                    />
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <Input
-                        label="Date of Birth"
-                        name="dateOfBirth"
-                        type="date"
-                        value={formData.dateOfBirth}
-                        onChange={handleChange}
-                        required
-                        error={validationErrors.dateOfBirth}
-                      />
-                      <Selector
-                        label="Gender"
-                        name="gender"
-                        options={[
-                          { label: "Male", value: "male" },
-                          { label: "Female", value: "female" },
-                          { label: "Other", value: "other" },
-                        ]}
-                        value={formData.gender}
-                        onChange={handleChange}
-                        required
-                        placeholder="Select Gender"
-                        error={validationErrors.gender}
-                      />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <Input
-                        label="Email"
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                        placeholder="name@example.com"
-                        error={validationErrors.email}
-                      />
-                      <PhoneInput
-                        label="Primary Phone Number"
-                        name="primaryMobile"
-                        value={formData.primaryMobile}
-                        onChange={handleChange}
-                        required
-                        placeholder="98765 43210"
-                        error={validationErrors.primaryMobile}
-                      />
-                    </div>
-                    <PhoneInput
-                      label="Alternate Phone Number (Optional)"
-                      name="secondMobile"
-                      value={formData.secondMobile}
-                      onChange={handleChange}
-                      required={false}
-                      placeholder="Optional contact number"
-                      error={validationErrors.secondMobile}
-                    />
-
-                    {/* New Field: Languages Spoken */}
-                    <SmartSelect
-                      label="Languages Spoken (Required)"
-                      name="language"
-                      options={[
-                        "English",
-                        "Hindi",
-                        "Sanskrit",
-                        "Tamil",
-                        "Telugu",
-                        "Kannada",
-                        "Malayalam",
-                        "Gujarati",
-                        "Marathi",
-                        "Bengali",
-                        "Other",
-                      ]}
-                      selectedValues={formData.language}
-                      onToggle={(val) => handleArrayToggle("language", val)}
-                      required
-                      error={validationErrors.language}
-                      className="pt-4"
-                      icon={<BiWorldIcon className="text-teal-600 mr-2" />}
-                    />
-                  </div>
-
-                  <div className="space-y-6 pt-4">
-                    <SectionHeader
-                      title="2. Permanent & Current Address"
-                      subtitle="Ensure addresses are accurate for legal and tax purposes."
-                      className="mt-6"
-                    />
-
-                    {/* Permanent Address */}
-                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                      <h4 className="text-md font-bold text-teal-900 mb-3 flex items-center">
-                        <FaRoad className="mr-2 text-teal-600" size={14} />{" "}
-                        Permanent Address
-                      </h4>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <Selector
-                          label="Country"
-                          name="pCountry"
-                          options={[
-                            { label: "India", value: "india" },
-                            { label: "USA", value: "usa" },
-                            { label: "UK", value: "uk" },
-                            { label: "Other", value: "other" },
-                          ]}
-                          value={formData.pCountry}
-                          onChange={handleChange}
-                          required
-                          placeholder="Select Country"
-                          error={validationErrors.pCountry}
-                        />
-                        <Input
-                          label="State"
-                          name="pState"
-                          value={formData.pState}
-                          onChange={handleChange}
-                          required
-                          error={validationErrors.pState}
-                        />
-                        <Input
-                          label="City"
-                          name="pCity"
-                          value={formData.pCity}
-                          onChange={handleChange}
-                          required
-                          error={validationErrors.pCity}
-                        />
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                        <Input
-                          label="Pincode / Zip"
-                          name="pPincode"
-                          value={formData.pPincode}
-                          onChange={handleChange}
-                          required
-                          error={validationErrors.pPincode}
-                        />
-                        <Input
-                          label="Area"
-                          name="pArea"
-                          value={formData.pArea}
-                          onChange={handleChange}
-                          required
-                          error={validationErrors.pArea}
-                        />
-                        <Input
-                          label="Building Name"
-                          name="pBuilding"
-                          value={formData.pBuilding}
-                          onChange={handleChange}
-                          required
-                          error={validationErrors.pBuilding}
-                        />
-                      </div>
-                      <div className="mt-4">
-                        <Input
-                          label="Block / Door No."
-                          name="pBlock"
-                          value={formData.pBlock}
-                          onChange={handleChange}
-                          required
-                          error={validationErrors.pBlock}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Current Address */}
-                    <div className="p-4 bg-white rounded-xl border border-slate-200">
-                      <div className="flex justify-between items-center mb-3">
-                        <h4 className="text-md font-bold text-teal-900 flex items-center">
-                          <FaMapMarkerAlt
-                            className="mr-2 text-teal-600"
-                            size={14}
-                          />{" "}
-                          Current Address
-                        </h4>
-                        <div className="flex items-center">
-                          <input
-                            type="checkbox"
-                            id="sameAsPermanent"
-                            checked={isCurrentSameAsPermanent}
-                            onChange={handleSameAsPermanentToggle}
-                            className="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
-                          />
-                          <label
-                            htmlFor="sameAsPermanent"
-                            className="ml-2 text-sm text-slate-600 font-medium"
-                          >
-                            Same as Permanent
-                          </label>
-                        </div>
-                      </div>
-                      <fieldset
-                        disabled={isCurrentSameAsPermanent}
-                        className={
-                          isCurrentSameAsPermanent
-                            ? "opacity-60"
-                            : "opacity-100"
-                        }
-                      >
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <Selector
-                            label="Country"
-                            name="cCountry"
-                            options={[
-                              { label: "India", value: "india" },
-                              { label: "USA", value: "usa" },
-                              { label: "UK", value: "uk" },
-                              { label: "Other", value: "other" },
-                            ]}
-                            value={formData.cCountry}
-                            onChange={handleChange}
-                            required={!isCurrentSameAsPermanent}
-                            placeholder="Select Country"
-                            disabled={isCurrentSameAsPermanent}
-                            error={validationErrors.cCountry}
-                          />
-                          <Input
-                            label="State"
-                            name="cState"
-                            value={formData.cState}
-                            onChange={handleChange}
-                            required={!isCurrentSameAsPermanent}
-                            disabled={isCurrentSameAsPermanent}
-                            error={validationErrors.cState}
-                          />
-                          <Input
-                            label="City"
-                            name="cCity"
-                            value={formData.cCity}
-                            onChange={handleChange}
-                            required={!isCurrentSameAsPermanent}
-                            disabled={isCurrentSameAsPermanent}
-                            error={validationErrors.cCity}
-                          />
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                          <Input
-                            label="Pincode / Zip"
-                            name="cPincode"
-                            value={formData.cPincode}
-                            onChange={handleChange}
-                            required={!isCurrentSameAsPermanent}
-                            disabled={isCurrentSameAsPermanent}
-                            error={validationErrors.cPincode}
-                          />
-                          <Input
-                            label="Area"
-                            name="cArea"
-                            value={formData.cArea}
-                            onChange={handleChange}
-                            required={!isCurrentSameAsPermanent}
-                            disabled={isCurrentSameAsPermanent}
-                            error={validationErrors.cArea}
-                          />
-                          <Input
-                            label="Building Name"
-                            name="cBuilding"
-                            value={formData.cBuilding}
-                            onChange={handleChange}
-                            required={!isCurrentSameAsPermanent}
-                            disabled={isCurrentSameAsPermanent}
-                            error={validationErrors.cBuilding}
-                          />
-                        </div>
-                        <div className="mt-4">
-                          <Input
-                            label="Block / Door No."
-                            name="cBlock"
-                            value={formData.cBlock}
-                            onChange={handleChange}
-                            required={!isCurrentSameAsPermanent}
-                            disabled={isCurrentSameAsPermanent}
-                            error={validationErrors.cBlock}
-                          />
-                        </div>
-                      </fieldset>
-                    </div>
-
-                    {/* Section 1.3: Emergency Contact */}
-                    <div className="space-y-6 pt-4">
-                      <SectionHeader
-                        title="3. Emergency Contact"
-                        subtitle="In case of urgent issues, who should we contact?"
-                        className="mt-6"
-                      />
-                      <div className="p-6 bg-red-50 rounded-xl border border-red-200 space-y-4">
-                        <Input
-                          label="Full Name"
-                          name="eName"
-                          value={formData.eName}
-                          onChange={handleChange}
-                          required
-                          placeholder="Emergency Contact Full Name"
-                          error={validationErrors.eName}
-                        />
-                        <PhoneInput
-                          label="Phone Number"
-                          name="eMobile"
-                          value={formData.eMobile}
-                          onChange={handleChange}
-                          required
-                          placeholder="98765 43210"
-                          error={validationErrors.eMobile}
-                        />
-                        <Input
-                          label="Relationship"
-                          name="eRelation"
-                          value={formData.eRelation}
-                          onChange={handleChange}
-                          required
-                          placeholder="e.g., Spouse, Parent, Sibling"
-                          error={validationErrors.eRelation}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <StepOne
+                  formData={formData}
+                  handleChange={handleChange}
+                  validationErrors={validationErrors}
+                  handleArrayToggle={handleArrayToggle}
+                  isCurrentSameAsPermanent={isCurrentSameAsPermanent}
+                  handleSameAsPermanentToggle={handleSameAsPermanentToggle}
+                />
               )}
 
               {/* STEP 2: EDUCATION DETAILS */}
               {step === 2 && (
-                <div className="space-y-6">
-                  <SectionHeader
-                    title="Education Details"
-                    subtitle="Your highest educational background."
-                  />
-                  <Input
-                    label="School / College Name"
-                    name="collegeName"
-                    value={formData.collegeName}
-                    onChange={handleChange}
-                    required
-                    error={validationErrors.collegeName}
-                  />
-                  <Input
-                    label="Degree / Qualification Name"
-                    name="qualification"
-                    value={formData.qualification}
-                    onChange={handleChange}
-                    required
-                    placeholder="e.g., Master of Arts in Yoga"
-                    error={validationErrors.qualification}
-                  />
-                  <Input
-                    label="University / Institution Name"
-                    name="institute"
-                    value={formData.institute}
-                    onChange={handleChange}
-                    required
-                    error={validationErrors.institute}
-                  />
-                </div>
+                <StepTwo
+                  formData={formData}
+                  handleChange={handleChange}
+                  validationErrors={validationErrors}
+                />
               )}
 
               {/* STEP 3: TAXATION DETAILS (India Only) */}
               {step === 3 && (
-                <div className="space-y-6">
-                  <SectionHeader
-                    title="Taxation Details"
-                    subtitle="Required for compliant payouts. Currently focused on Indian Tax IDs."
-                  />
-                  <div className="p-6 rounded-xl border border-orange-300 bg-orange-50 transition-all duration-300 ">
-                    <div className="space-y-4 animate-in fade-in">
-                      <div className="flex items-center gap-2 mb-2 text-orange-800 font-semibold text-sm">
-                        <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
-                        Indian Tax Residency Required for PAN/Aadhaar
-                      </div>
-                      {/* New Field: Registration Type */}
-                      <Selector
-                        label="Register As"
-                        name="registerAs"
-                        options={[
-                          {
-                            label: "Individual (PAN/Aadhaar)",
-                            value: "individual",
-                          },
-                          {
-                            label: "Business (GSTIN/Foreign ID)",
-                            value: "business",
-                          },
-                        ]}
-                        value={formData.registerAs}
-                        onChange={handleChange}
-                        required
-                        error={validationErrors.registerAs}
-                        placeholder="Select Registration Type"
-                      />
-
-                      <Input
-                        label="PAN Card Number"
-                        name="panCard"
-                        placeholder="ABCDE1234F"
-                        value={formData.panCard}
-                        onChange={handleChange}
-                        required
-                        error={validationErrors.panCard}
-                      />
-                      <Input
-                        label="Aadhaar Card Number"
-                        name="aadharNumber"
-                        placeholder="1234 5678 9012"
-                        value={formData.aadharNumber}
-                        onChange={handleChange}
-                        required
-                        error={validationErrors.aadharNumber}
-                      />
-                      <Input
-                        label="GSTIN"
-                        name="GSTIN"
-                        placeholder="22AAAAA0000A1Z5"
-                        value={formData.GSTIN}
-                        onChange={handleChange}
-                        required={false}
-                        error={validationErrors.GSTIN}
-                      />
-                    </div>
-                  </div>
-                </div>
+                <StepThree
+                  formData={formData}
+                  handleChange={handleChange}
+                  validationErrors={validationErrors}
+                />
               )}
 
               {/* STEP 4: SOCIAL MEDIA DETAILS & INSTRUCTOR WEBSITE */}
               {step === 4 && (
-                <div className="space-y-6">
-                  <SectionHeader
-                    title="Social Media Profiles & Website"
-                    subtitle="Connect your platforms to showcase your digital presence."
-                  />
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Input
-                      label="Instagram Link"
-                      name="instagram_link"
-                      prefix={
-                        <BiLogoInstagram className="text-pink-500" size={16} />
-                      }
-                      placeholder="https://instagram.com/user"
-                      value={formData.instagram_link}
-                      onChange={handleChange}
-                      required={false}
-                      error={validationErrors.instagram_link}
-                    />
-                    <Input
-                      label="Facebook Link"
-                      name="facebook_link"
-                      prefix={
-                        <BiLogoFacebook className="text-blue-600" size={16} />
-                      }
-                      placeholder="https://facebook.com/profile"
-                      value={formData.facebook_link}
-                      onChange={handleChange}
-                      required={false}
-                      error={validationErrors.facebook_link}
-                    />
-                    <Input
-                      label="LinkedIn Link"
-                      name="linkdin_link"
-                      prefix={
-                        <BiMaleSign className="text-blue-700" size={16} />
-                      }
-                      placeholder="https://linkedin.com/in/profile"
-                      value={formData.linkdin_link}
-                      onChange={handleChange}
-                      required={false}
-                      error={validationErrors.linkdin_link}
-                    />
-                    <Input
-                      label="YouTube Channel Link"
-                      name="youtube_link"
-                      prefix={<BiVideo className="text-red-600" size={16} />}
-                      placeholder="https://youtube.com/channel"
-                      value={formData.youtube_link}
-                      onChange={handleChange}
-                      required={false}
-                      error={validationErrors.youtube_link}
-                    />
-                  </div>
-                  {/* New Field: Instructor Website */}
-                  <Input
-                    label="Instructor Website (Optional)"
-                    name="instructor_website"
-                    prefix={<BiLinkIcon className="text-teal-600" size={16} />}
-                    placeholder="https://yourwebsite.com"
-                    value={formData.instructor_website}
-                    onChange={handleChange}
-                    required={false}
-                    error={validationErrors.instructor_website}
-                  />
-                </div>
+                <StepFour
+                  formData={formData}
+                  handleChange={handleChange}
+                  validationErrors={validationErrors}
+                />
               )}
 
               {/* STEP 5: QUALIFICATIONS & EXPERTISE (Styles, Certs, Videos, Philosophy) */}
               {step === 5 && (
-                <div className="space-y-8">
-                  {/* Profile Image Upload [NEW SECTION] */}
-                  <div>
-                    <SectionHeader
-                      title="Profile Image & Yoga Expertise"
-                      subtitle="Upload a professional photo and select your teaching styles."
-                    />
-                    {/* Profile Image Upload [NEW SECTION] */}
-                    <div className="p-4 bg-teal-50 rounded-xl border border-teal-200 mb-6 flex justify-between items-center">
-                      <div>
-                        <Label required>
-                          Profile Image (250px X 250px Recommended)
-                        </Label>
-                        <input
-                          type="file"
-                          id="profileImage"
-                          name="profileImage"
-                          onChange={handleChange}
-                          // ... (rest of the input className) ...
-                          accept="image/*"
-                          required
-                        />
-                        {formData.profileImage && (
-                          <p className="mt-2 text-xs text-slate-600">
-                            Selected: **{formData.profileImage.name}**
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        {profileImagePreview && (
-                          <div className="mt-3 flex flex-col md:flex-row justify-center items-center m-auto gap-3">
-                            <img
-                              src={profileImagePreview}
-                              alt="Preview"
-                              className="w-[250px] h-[250px]  rounded-full object-cover border border-slate-200"
-                            />
-                          </div>
-                        )}
-                        {validationErrors.profileImage && (
-                          <p className="mt-1 text-xs text-red-500">
-                            {validationErrors.profileImage}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Yoga Styles */}
-                  <div>
-                    <SmartSelect
-                      label="Yoga Styles (Required)"
-                      name="yoga_style"
-                      options={[
-                        "Hatha",
-                        "Vinyasa",
-                        "Ashtanga",
-                        "Iyengar",
-                        "Kundalini",
-                        "Yin",
-                        "Meditation",
-                        "Prenatal",
-                        "Restorative",
-                      ]}
-                      selectedValues={formData.yoga_style}
-                      onToggle={(val) => handleArrayToggle("yoga_style", val)}
-                      required
-                      error={validationErrors.yoga_style}
-                    />
-                  </div>
-
-                  {/* Certifications */}
-                  <div>
-                    <SectionHeader
-                      title="Certifications"
-                      subtitle="Upload copies of your certifications (e.g., RYT 200, 500). First one is mandatory."
-                    />
-                    <div className="space-y-4">
-                      {formData.certifications.map((cert, index) => (
-                        <div
-                          key={index}
-                          className="flex flex-col md:flex-row gap-4 items-end bg-slate-50 p-4 rounded-xl border border-slate-200"
-                        >
-                          <div className="flex-1 w-full">
-                            <Input
-                              label={`Certificate ${index + 1} Title`}
-                              value={cert.title}
-                              placeholder="e.g. RYT 200 from Sivananda"
-                              onChange={(e) =>
-                                handleCertChange(index, "title", e.target.value)
-                              }
-                              required={index === 0}
-                              error={
-                                validationErrors[
-                                  `certifications[${index}].title`
-                                ]
-                              }
-                            />
-                          </div>
-                          <div className="flex-1 w-full">
-                            <div className="flex flex-col w-full">
-                              <label
-                                htmlFor={`file-${index}`}
-                                className="mb-1 text-sm font-medium text-gray-700"
-                              >
-                                Upload File (PDF/Image){" "}
-                                {index === 0 && (
-                                  <span className="text-teal-600">*</span>
-                                )}
-                              </label>
-                              <input
-                                type="file"
-                                id={`file-${index}`}
-                                onChange={(e) =>
-                                  handleCertChange(
-                                    index,
-                                    "file",
-                                    e.target.value,
-                                    e.target.files[0]
-                                  )
-                                }
-                                className={`block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-teal-100 file:text-teal-700 hover:file:bg-teal-200 cursor-pointer rounded-xl ${
-                                  validationErrors[
-                                    `certifications[${index}].file`
-                                  ]
-                                    ? "border-red-500 border-2"
-                                    : "border-slate-300 border"
-                                }`}
-                                required={index === 0}
-                                accept="application/pdf,image/*"
-                              />
-                              {validationErrors[
-                                `certifications[${index}].file`
-                              ] && (
-                                <p className="mt-1 text-xs text-red-500">
-                                  {
-                                    validationErrors[
-                                      `certifications[${index}].file`
-                                    ]
-                                  }
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                          {formData.certifications.length > 1 && (
-                            <button
-                              type="button"
-                              onClick={() => removeCertification(index)}
-                              className="p-3 text-red-500 bg-white border border-red-100 rounded-lg mb-[2px] hover:bg-red-50"
-                            >
-                              <BiTrash size={14} />
-                            </button>
-                          )}
-                        </div>
-                      ))}
-                      {validationErrors.certifications && (
-                        <p className="mt-1 text-sm text-red-500">
-                          {validationErrors.certifications}
-                        </p>
-                      )}
-                      {formData.certifications.length < 10 && (
-                        <button
-                          type="button"
-                          onClick={addCertification}
-                          className="flex items-center text-teal-600 font-semibold hover:text-teal-700 mt-2"
-                        >
-                          <BiPlusCircle className="mr-2" size={14} /> Add
-                          Certificate
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Videos & Philosophy */}
-                  <div>
-                    <SectionHeader
-                      title="Profile Videos & Philosophy"
-                      subtitle="Your introductory video and teaching philosophy."
-                    />
-                    <Input
-                      label="Introduction Video URL (Required)"
-                      name="introVideo"
-                      value={formData.introVideo}
-                      onChange={handleChange}
-                      required
-                      placeholder="YouTube or Vimeo URL"
-                      error={validationErrors.introVideo}
-                    />
-
-                    <label className="pt-6 mb-1 block text-sm font-medium text-gray-700">
-                      Sample Video URLs (Minimum 2)
-                    </label>
-                    <div className="space-y-4">
-                      {formData.video_url.map((video, index) => (
-                        <div key={index} className="flex gap-2 items-center">
-                          <div className="flex-1">
-                            <Input
-                              label={`Video ${index + 1}`}
-                              name={`video_url[${index}]`}
-                              placeholder={`Video URL ${index + 1}`}
-                              value={video}
-                              onChange={(e) =>
-                                handleSampleVideoChange(index, e.target.value)
-                              }
-                              required={index < 2}
-                              error={validationErrors[`video_url[${index}]`]}
-                            />
-                          </div>
-                          {formData.video_url.length > 2 && (
-                            <button
-                              type="button"
-                              onClick={() => removeSampleVideo(index)}
-                              className="p-3 text-slate-400 hover:text-red-500"
-                            >
-                              <BiTrash size={14} />
-                            </button>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                    {validationErrors.video_url && (
-                      <p className="mt-1 text-xs text-red-500">
-                        {validationErrors.video_url}
-                      </p>
-                    )}
-                    {formData.video_url.length < 10 && (
-                      <button
-                        type="button"
-                        onClick={addSampleVideo}
-                        className="mt-3 flex items-center text-teal-600 font-semibold"
-                      >
-                        <BiPlusCircle className="mr-2" size={14} /> Add Video
-                        URL
-                      </button>
-                    )}
-
-                    <TextArea
-                      label="Your Teaching Philosophy (Required)"
-                      name="philosophy"
-                      rows={5}
-                      value={formData.philosophy}
-                      onChange={handleChange}
-                      required
-                      placeholder="Describe your approach, values, and why you teach yoga."
-                      error={validationErrors.philosophy}
-                    />
-                  </div>
-                </div>
+                <StepFive
+                  formData={formData}
+                  handleChange={handleChange}
+                  validationErrors={validationErrors}
+                  handleArrayToggle={handleArrayToggle}
+                  handleCertChange={handleCertChange}
+                  profileImagePreview={profileImagePreview}
+                  addCertification={addCertification}
+                  addSampleVideo={addSampleVideo}
+                />
               )}
 
               {/* STEP 6: AVAILABILITY (ENHANCED) */}
               {step === 6 && (
-                <div className="space-y-6">
-                  <SectionHeader
-                    title="Class Availability"
-                    subtitle="Indicate when you are generally available for online classes (Time zone: IST)."
-                  />
-
-                  {/* Class Type Selection */}
-                  <div className="mt-4">
-                    <Label required>Available Class Types</Label>
-                    <CheckboxToggle
-                      label="Available for One-on-One Private Session"
-                      name="availableOneOnOne"
-                      checked={formData.availableOneOnOne}
-                      onChange={handleChange}
-                    />
-                    <CheckboxToggle
-                      label="Available for Group Class"
-                      name="availableGroupClass"
-                      checked={formData.availableGroupClass}
-                      onChange={handleChange}
-                    />
-                    <CheckboxToggle
-                      label="Single Class"
-                      name="singleClass"
-                      checked={formData.singleClass}
-                      onChange={handleChange}
-                    />
-                    {validationErrors.classType && (
-                      <p className="mt-2 text-xs text-red-500">
-                        {validationErrors.classType}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Preferred Days */}
-                  <SmartSelect
-                    label="Preferred Teaching Days (Required)"
-                    options={[
-                      { label: "Mon", value: "monday" },
-                      { label: "Tue", value: "tuesday" },
-                      { label: "Wed", value: "wednesday" },
-                      { label: "Thu", value: "thursday" },
-                      { label: "Fri", value: "friday" },
-                      { label: "Sat", value: "saturday" },
-                      { label: "Sun", value: "sunday" },
-                    ]}
-                    selectedValues={formData.days}
-                    onToggle={(val) => handleArrayToggle("days", val)}
-                    error={validationErrors.days}
-                  />
-
-                  {/* Preferred Times */}
-                  <SmartSelect
-                    label="Preferred Class Times (Required)"
-                    options={[
-                      { label: "Morning (6-10am)", value: "morning" },
-                      { label: "Mid-Day (10am-4pm)", value: "midday" },
-                      { label: "Evening (4-9pm)", value: "evening" },
-                    ]}
-                    selectedValues={formData.times}
-                    onToggle={(val) => handleArrayToggle("times", val)}
-                    error={validationErrors.times}
-                  />
-
-                  {/* Start/End Time */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                    <Input
-                      label="Earliest Start Time (IST)"
-                      name="startTime"
-                      type="time"
-                      value={formData.startTime}
-                      onChange={handleChange}
-                      required
-                      error={validationErrors.startTime}
-                    />
-                    <Input
-                      label="Latest End Time (IST)"
-                      name="endTime"
-                      type="time"
-                      value={formData.endTime}
-                      onChange={handleChange}
-                      required
-                      error={validationErrors.endTime}
-                    />
-                  </div>
-                  {timeError && (
-                    <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-200 font-medium mt-3">
-                      {timeError}
-                    </div>
-                  )}
-
-                  {/* New Field: Response Time */}
-                  <Selector
-                    label="Expected Response Time to Queries (Required)"
-                    name="responseTime"
-                    options={[
-                      { label: "Within 6 hours", value: "6h" },
-                      { label: "Within 12 hours", value: "12h" },
-                      { label: "Within 24 hours", value: "24h" },
-                      { label: "Within 48 hours", value: "48h" },
-                    ]}
-                    value={formData.responseTime}
-                    onChange={handleChange}
-                    required
-                    placeholder="Select expected response time"
-                    error={validationErrors.responseTime}
-                    prefix={<BiAlarmIcon className="text-teal-600" />}
-                  />
-                </div>
+                <StepSixth
+                  formData={formData}
+                  handleChange={handleChange}
+                  validationErrors={validationErrors}
+                  handleArrayToggle={handleArrayToggle}
+                  timeError={timeError}
+                />
               )}
 
               {/* STEP 7: PRICING (ENHANCED) */}
               {step === 7 && (
-                <div className="space-y-6">
-                  <SectionHeader title="Pricing Structure" subtitle="" />
-
-                  {/* Conditional Pricing Inputs */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {isGroupSelected && (
-                      <Input
-                        label="Group Class Rate (per person/hour)"
-                        name="group_class_rate"
-                        prefix="rs"
-                        value={formData.group_class_rate}
-                        onChange={handleChange}
-                        required={isGroupSelected}
-                        placeholder="e.g., 10rs"
-                        type="number"
-                        min="0"
-                        error={validationErrors.group_class_rate}
-                      />
-                    )}
-                    {isPrivateSelected && (
-                      <Input
-                        label="Private Session Rate (per hour)"
-                        name="private_class_rate"
-                        prefix="rs"
-                        value={formData.private_class_rate}
-                        onChange={handleChange}
-                        required={isPrivateSelected}
-                        placeholder="e.g., 50rs"
-                        type="number"
-                        min="0"
-                        error={validationErrors.private_class_rate}
-                      />
-                    )}
-                    {isSingleSelected && (
-                      <Input
-                        label="Single Class Rate (per hour)"
-                        name="single_class_rate"
-                        prefix="rs"
-                        value={formData.single_class_rate}
-                        onChange={handleChange}
-                        required={isSingleSelected}
-                        placeholder="e.g., 50rs"
-                        type="number"
-                        min="0"
-                        error={validationErrors.single_class_rate}
-                      />
-                    )}
-
-                    {!isGroupSelected &&
-                      !isPrivateSelected &&
-                      !isSingleSelected && (
-                        <div className="md:col-span-2 p-6 bg-red-50 rounded-xl border border-red-200 text-red-800 font-semibold">
-                          <p>
-                            ⚠️ Please go back to the **Availability** step and
-                            select at least one class type (One-on-One, Group
-                            Class, or Single Class) to set your rates.
-                          </p>
-                        </div>
-                      )}
-                  </div>
-
-                  {/* Conditional Trial Policy */}
-                  {(isPrivateSelected || isGroupSelected) && (
-                    <div className="mt-6 p-6 bg-slate-50 rounded-xl border border-slate-200">
-                      <Selector
-                        label="Trial Policy (Required)"
-                        name="trialMode"
-                        options={trialOptions}
-                        value={formData.trialMode}
-                        onChange={handleChange}
-                        required
-                        placeholder="Select a trial policy"
-                        error={validationErrors.trialMode}
-                      />
-                      <p className="text-xs text-slate-500 mt-2">
-                        The platform automatically manages the trial based on
-                        your selection.
-                      </p>
-                    </div>
-                  )}
-                </div>
+                <StepSeven
+                  formData={formData}
+                  handleChange={handleChange}
+                  validationErrors={validationErrors}
+                  isGroupSelected={isGroupSelected}
+                  isPrivateSelected={isPrivateSelected}
+                  isSingleSelected={isSingleSelected}
+                />
               )}
 
               {/* STEP 8: AGREEMENTS & SIGNATURE */}
               {step === 8 && (
-                <div className="space-y-6">
-                  <SectionHeader
-                    title="Service Agreements"
-                    subtitle="Please read and confirm the following legal and ethical standards."
-                  />
-                  <div className="bg-slate-50 p-6 rounded-xl space-y-4 border border-slate-200">
-                    {[
-                      {
-                        label:
-                          "I confirm all submitted details are accurate and truthful.",
-                        name: "confirmAccurate",
-                      },
-                      {
-                        label:
-                          "I agree to uphold the platform's ethical standards and professional conduct guidelines.",
-                        name: "ethicalStandards",
-                      },
-                      {
-                        label:
-                          "I accept the Yogalink service mindset, prioritizing student safety and experience.",
-                        name: "serviceMindset",
-                      },
-                    ].map((item) => (
-                      <div key={item.name} className="flex items-start">
-                        <input
-                          type="checkbox"
-                          id={item.name}
-                          name={item.name}
-                          checked={formData[item.name]}
-                          onChange={handleChange}
-                          required
-                          className={`mt-1 h-5 w-5 rounded border-gray-300 text-teal-600 focus:ring-teal-500 ${
-                            validationErrors[item.name]
-                              ? "border-red-500 ring-red-500"
-                              : ""
-                          }`}
-                        />
-                        <label
-                          htmlFor={item.name}
-                          className="ml-3 text-sm text-slate-600 cursor-pointer"
-                        >
-                          {item.label}
-                        </label>
-                        {validationErrors[item.name] && (
-                          <span className="ml-3 text-xs text-red-500 hidden sm:block">
-                            ({validationErrors[item.name]})
-                          </span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                  <div className="pt-4">
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
-                      Digital Signature <span className="text-teal-600">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="signature"
-                      value={formData.signature}
-                      onChange={handleChange}
-                      placeholder="Type your full legal name to sign"
-                      required
-                      className={`w-full border-b-2 bg-transparent py-3 text-2xl font-serif italic text-teal-900 outline-none ${
-                        validationErrors.signature
-                          ? "border-red-500"
-                          : "border-slate-300 focus:border-teal-600"
-                      }`}
-                    />
-                    <p className="text-xs text-slate-400 mt-1">
-                      Typing your name constitutes a legally binding electronic
-                      signature.{" "}
-                      {validationErrors.signature && (
-                        <span className="text-red-500">
-                          ({validationErrors.signature})
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                </div>
+                <StepEight
+                  formData={formData}
+                  handleChange={handleChange}
+                  validationErrors={validationErrors}
+                />
               )}
 
               {/* FINAL STEP: VERIFICATION PENDING */}
@@ -2017,7 +960,7 @@ const InstructorOnboarding = () => {
 
                 <button
                   type="button"
-                  onClick={handleSaveDraft}
+                  onClick={saveDraft}
                   disabled={saveStatus === "saving"}
                   className={`flex items-center px-6 py-3 rounded-xl font-semibold transition-colors text-sm ${
                     saveStatus === "saving"

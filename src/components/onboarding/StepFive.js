@@ -1,0 +1,257 @@
+import React from "react";
+import SectionHeader from "./SectionHeader";
+import Label from "./Label";
+import SmartSelect from "../common/SmartSelect";
+import Input from "../common/Input";
+import { BiPlusCircle } from "react-icons/bi";
+import TextArea from "../common/TextArea";
+
+const StepFive = ({
+  formData,
+  handleChange,
+  validationErrors,
+  handleArrayToggle,
+  handleCertChange,
+  profileImagePreview,
+  addCertification,
+  addSampleVideo 
+}) => {
+  return (
+    <div className="space-y-8">
+      {/* Profile Image Upload [NEW SECTION] */}
+      <div>
+        <SectionHeader
+          title="Profile Image & Yoga Expertise"
+          subtitle="Upload a professional photo and select your teaching styles."
+        />
+        {/* Profile Image Upload [NEW SECTION] */}
+        <div className="p-4 bg-teal-50 rounded-xl border border-teal-200 mb-6 flex justify-between items-center">
+          <div>
+            <Label required>Profile Image (250px X 250px Recommended)</Label>
+            <input
+              type="file"
+              id="profileImage"
+              name="profileImage"
+              onChange={handleChange}
+              // ... (rest of the input className) ...
+              accept="image/*"
+              required
+            />
+            {formData.profileImage && (
+              <p className="mt-2 text-xs text-slate-600">
+                Selected: **{formData.profileImage.name}**
+              </p>
+            )}
+          </div>
+          <div>
+            {profileImagePreview && (
+              <div className="mt-3 flex flex-col md:flex-row justify-center items-center m-auto gap-3">
+                <img
+                  src={profileImagePreview}
+                  alt="Preview"
+                  className="w-[250px] h-[250px]  rounded-full object-cover border border-slate-200"
+                />
+              </div>
+            )}
+            {validationErrors.profileImage && (
+              <p className="mt-1 text-xs text-red-500">
+                {validationErrors.profileImage}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Yoga Styles */}
+      <div>
+        <SmartSelect
+          label="Yoga Styles (Required)"
+          name="yoga_style"
+          options={[
+            "Hatha",
+            "Vinyasa",
+            "Ashtanga",
+            "Iyengar",
+            "Kundalini",
+            "Yin",
+            "Meditation",
+            "Prenatal",
+            "Restorative",
+          ]}
+          selectedValues={formData.yoga_style}
+          onToggle={(val) => handleArrayToggle("yoga_style", val)}
+          required
+          error={validationErrors.yoga_style}
+        />
+        {validationErrors.yoga_style && (
+          <p className="mt-1 text-sm text-red-500">
+            {validationErrors.yoga_style}
+          </p>
+        )}
+      </div>
+
+      {/* Certifications */}
+      <div>
+        <SectionHeader
+          title="Certifications"
+          subtitle="Upload copies of your certifications (e.g., RYT 200, 500). First one is mandatory."
+        />
+        <div className="space-y-4">
+          {formData.certifications.map((cert, index) => (
+            <div
+              key={index}
+              className="flex flex-col md:flex-row gap-4 items-end bg-slate-50 p-4 rounded-xl border border-slate-200"
+            >
+              <div className="flex-1 w-full">
+                <Input
+                  label={`Certificate ${index + 1} Title`}
+                  value={cert.title}
+                  placeholder="e.g. RYT 200 from Sivananda"
+                  onChange={(e) =>
+                    handleCertChange(index, "title", e.target.value)
+                  }
+                  required={index === 0}
+                  error={validationErrors[`certifications[${index}].title`]}
+                />
+              </div>
+              <div className="flex-1 w-full">
+                <div className="flex flex-col w-full">
+                  <label
+                    htmlFor={`file-${index}`}
+                    className="mb-1 text-sm font-medium text-gray-700"
+                  >
+                    Upload File (PDF/Image){" "}
+                    {index === 0 && <span className="text-teal-600">*</span>}
+                  </label>
+                  <input
+                    type="file"
+                    id={`file-${index}`}
+                    onChange={(e) =>
+                      handleCertChange(
+                        index,
+                        "file",
+                        e.target.value,
+                        e.target.files[0]
+                      )
+                    }
+                    className={`block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-teal-100 file:text-teal-700 hover:file:bg-teal-200 cursor-pointer rounded-xl ${
+                      validationErrors[`certifications[${index}].file`]
+                        ? "border-red-500 border-2"
+                        : "border-slate-300 border"
+                    }`}
+                    required={index === 0}
+                    accept="application/pdf,image/*"
+                  />
+                  {validationErrors[`certifications[${index}].file`] && (
+                    <p className="mt-1 text-xs text-red-500">
+                      {validationErrors[`certifications[${index}].file`]}
+                    </p>
+                  )}
+                </div>
+              </div>
+              {formData.certifications.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeCertification(index)}
+                  className="p-3 text-red-500 bg-white border border-red-100 rounded-lg mb-[2px] hover:bg-red-50"
+                >
+                  <BiTrash size={14} />
+                </button>
+              )}
+            </div>
+          ))}
+          {validationErrors.certifications && (
+            <p className="mt-1 text-sm text-red-500">
+              {validationErrors.certifications}
+            </p>
+          )}
+          {formData.certifications.length < 10 && (
+            <button
+              type="button"
+              onClick={addCertification}
+              className="flex items-center text-teal-600 font-semibold hover:text-teal-700 mt-2"
+            >
+              <BiPlusCircle className="mr-2" size={14} /> Add Certificate
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Videos & Philosophy */}
+      <div>
+        <SectionHeader
+          title="Profile Videos & Philosophy"
+          subtitle="Your introductory video and teaching teaching_philosophy."
+        />
+        <Input
+          label="Introduction Video URL (Required)"
+          name="introVideo"
+          value={formData.introVideo}
+          onChange={handleChange}
+          required
+          placeholder="YouTube or Vimeo URL"
+          error={validationErrors.introVideo}
+        />
+
+        <label className="pt-6 mb-1 block text-sm font-medium text-gray-700">
+          Sample Video URLs (Minimum 2)
+        </label>
+        <div className="space-y-4">
+          {formData.video_url.map((video, index) => (
+            <div key={index} className="flex gap-2 items-center">
+              <div className="flex-1">
+                <Input
+                  label={`Video ${index + 1}`}
+                  name={`video_url[${index}]`}
+                  placeholder={`Video URL ${index + 1}`}
+                  value={video}
+                  onChange={(e) =>
+                    handleSampleVideoChange(index, e.target.value)
+                  }
+                  required={index < 2}
+                  error={validationErrors[`video_url[${index}]`]}
+                />
+              </div>
+              {formData.video_url.length > 2 && (
+                <button
+                  type="button"
+                  onClick={() => removeSampleVideo(index)}
+                  className="p-3 text-slate-400 hover:text-red-500"
+                >
+                  <BiTrash size={14} />
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+        {validationErrors.video_url && (
+          <p className="mt-1 text-xs text-red-500">
+            {validationErrors.video_url}
+          </p>
+        )}
+        {formData.video_url.length < 10 && (
+          <button
+            type="button"
+            onClick={addSampleVideo}
+            className="mt-3 flex items-center text-teal-600 font-semibold"
+          >
+            <BiPlusCircle className="mr-2" size={14} /> Add Video URL
+          </button>
+        )}
+
+        <TextArea
+          label="Your Teaching Philosophy (Required)"
+          name="teaching_philosophy"
+          rows={5}
+          value={formData.teaching_philosophy}
+          onChange={handleChange}
+          required
+          placeholder="Describe your approach, values, and why you teach yoga."
+          error={validationErrors.teaching_philosophy}
+        />
+      </div>
+    </div>
+  );
+};
+
+export default StepFive;
