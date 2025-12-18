@@ -74,7 +74,7 @@ const StepOne = ({
               value={formData.primaryMobile}
               onChange={handleChange}
               required
-              placeholder="98765 43210"
+              placeholder="Primary contact number"
               error={validationErrors.primaryMobile}
             />
             {validationErrors.primaryMobile && (
@@ -163,6 +163,7 @@ const StepOne = ({
               onChange={handleChange}
               required
               error={validationErrors.pState}
+              placeholder="Enter State"
             />
             <Input
               label="City"
@@ -171,6 +172,7 @@ const StepOne = ({
               onChange={handleChange}
               required
               error={validationErrors.pCity}
+              placeholder="Enter City"
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
@@ -181,6 +183,7 @@ const StepOne = ({
               onChange={handleChange}
               required
               error={validationErrors.pPincode}
+              placeholder="Enter Pincode / Zip"
             />
             <Input
               label="Area"
@@ -189,6 +192,7 @@ const StepOne = ({
               onChange={handleChange}
               required
               error={validationErrors.pArea}
+              placeholder="Enter Area"
             />
             <Input
               label="Building Name"
@@ -197,6 +201,7 @@ const StepOne = ({
               onChange={handleChange}
               required
               error={validationErrors.pBuilding}
+              placeholder="Enter Building Name"
             />
           </div>
           <div className="mt-4">
@@ -207,6 +212,7 @@ const StepOne = ({
               onChange={handleChange}
               required
               error={validationErrors.pBlock}
+              placeholder="Enter Block / Door Number"
             />
           </div>
         </div>
@@ -263,6 +269,7 @@ const StepOne = ({
                 required={!isCurrentSameAsPermanent}
                 disabled={isCurrentSameAsPermanent}
                 error={validationErrors.cState}
+                placeholder="Enter State"
               />
               <Input
                 label="City"
@@ -272,6 +279,7 @@ const StepOne = ({
                 required={!isCurrentSameAsPermanent}
                 disabled={isCurrentSameAsPermanent}
                 error={validationErrors.cCity}
+                placeholder="Enter City"
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
@@ -283,6 +291,7 @@ const StepOne = ({
                 required={!isCurrentSameAsPermanent}
                 disabled={isCurrentSameAsPermanent}
                 error={validationErrors.cPincode}
+                placeholder="Enter Pincode / Zip"
               />
               <Input
                 label="Area"
@@ -292,6 +301,7 @@ const StepOne = ({
                 required={!isCurrentSameAsPermanent}
                 disabled={isCurrentSameAsPermanent}
                 error={validationErrors.cArea}
+                placeholder="Enter Area"
               />
               <Input
                 label="Building Name"
@@ -301,6 +311,7 @@ const StepOne = ({
                 required={!isCurrentSameAsPermanent}
                 disabled={isCurrentSameAsPermanent}
                 error={validationErrors.cBuilding}
+                placeholder="Enter Building Name"
               />
             </div>
             <div className="mt-4">
@@ -312,6 +323,7 @@ const StepOne = ({
                 required={!isCurrentSameAsPermanent}
                 disabled={isCurrentSameAsPermanent}
                 error={validationErrors.cBlock}
+                placeholder="Enter Block / Door Number"
               />
             </div>
           </fieldset>
@@ -340,7 +352,7 @@ const StepOne = ({
               value={formData.eMobile}
               onChange={handleChange}
               required
-              placeholder="98765 43210"
+              placeholder="Emergency contact number"
               error={validationErrors.eMobile}
             />
             <Input

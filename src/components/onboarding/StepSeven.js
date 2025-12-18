@@ -3,7 +3,7 @@ import SectionHeader from "./SectionHeader";
 import Input from "../common/Input";
 import Selector from "../common/Selector";
 
-const StepSeven = ({ formData, handleChange, validationErrors, isGroupSelected, isPrivateSelected, isSingleSelected }) => {
+const StepSeven = ({ formData, handleChange, validationErrors, isGroupSelected, isPrivateSelected, isSingleSelected, trialOptions }) => {
   return (
     <div className="space-y-6">
       <SectionHeader title="Pricing Structure" subtitle="" />

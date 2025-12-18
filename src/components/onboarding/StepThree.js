@@ -22,48 +22,62 @@ const StepThree = ({ formData, handleChange, validationErrors }) => {
             name="registerAs"
             options={[
               {
-                label: "Individual (PAN/Aadhaar)",
+                label: "Individual (PAN/Aadhaar/GSTIN)",
                 value: "individual",
               },
               {
-                label: "Business (GSTIN/Foreign ID)",
+                label: "Business (Foreign ID)",
                 value: "business",
               },
             ]}
+            defaultValue={formData.pCountry === "india" ? "india" : "business" }
             value={formData.registerAs}
             onChange={handleChange}
             required
             error={validationErrors.registerAs}
             placeholder="Select Registration Type"
           />
-
-          <Input
-            label="PAN Card Number"
-            name="panCard"
-            placeholder="ABCDE1234F"
-            value={formData.panCard}
-            onChange={handleChange}
-            required
-            error={validationErrors.panCard}
-          />
-          <Input
-            label="Aadhaar Card Number"
-            name="aadharNumber"
-            placeholder="1234 5678 9012"
-            value={formData.aadharNumber}
-            onChange={handleChange}
-            required
-            error={validationErrors.aadharNumber}
-          />
-          <Input
-            label="GSTIN"
-            name="GSTIN"
-            placeholder="22AAAAA0000A1Z5"
-            value={formData.GSTIN}
-            onChange={handleChange}
-            required={false}
-            error={validationErrors.GSTIN}
-          />
+          {formData.pCountry === "india" ? (
+            <>
+              <Input
+                label="PAN Card Number"
+                name="panCard"
+                placeholder="ABCDE1234F"
+                value={formData.panCard}
+                onChange={handleChange}
+                required
+                error={validationErrors.panCard}
+              />
+              <Input
+                label="Aadhaar Card Number"
+                name="aadharNumber"
+                placeholder="1234 5678 9012"
+                value={formData.aadharNumber}
+                onChange={handleChange}
+                required
+                error={validationErrors.aadharNumber}
+              />
+              <Input
+                label="GSTIN"
+                name="GSTIN"
+                placeholder="22AAAAA0000A1Z5"
+                value={formData.GSTIN}
+                onChange={handleChange}
+                required={false}
+                error={validationErrors.GSTIN}
+              />
+            </>
+          ) : (
+            <Input
+              label="Taxpayer Identification Number(TIN)"
+              name="aadharNumber"
+              placeholder="1234 5678 9012"
+              value={formData.aadharNumber}
+              onChange={handleChange}
+              required
+              error={validationErrors.aadharNumber}
+            />
+          )}
         </div>
       </div>
     </div>

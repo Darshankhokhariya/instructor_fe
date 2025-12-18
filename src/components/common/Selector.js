@@ -11,6 +11,7 @@ const Selector = ({
     placeholder = "Select an option",
     error,
     disabled = false,
+    defaultValue
 }) => {
     return (
         <div className="flex flex-col w-full gap-1">
@@ -31,6 +32,7 @@ const Selector = ({
                     id={name}
                     name={name}
                     value={value}
+                    defaultValue={defaultValue}
                     onChange={onChange}
                     disabled={disabled}
                     className={`w-full appearance-none rounded-lg border bg-white px-4 py-2 pr-10 text-gray-800 transition-all shadow-sm

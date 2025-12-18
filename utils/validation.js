@@ -65,6 +65,35 @@ export const FIELD_LABELS = {
   serviceMindset: "Agreement - Service Mindset",
   signature: "Digital Signature",
 };
+
+export const STEP_FIELDS = {
+  1: [
+    "name",
+    "dateOfBirth",
+    "gender",
+    "email",
+    "primaryMobile",
+    "language",
+    "pCountry",
+    "pState",
+    "pCity",
+    "pPincode",
+    "pArea",
+    "pBuilding",
+    "pBlock",
+    "cCountry",
+    "cState",
+    "cCity",
+    "cPincode",
+    "cArea",
+    "cBuilding",
+    "cBlock",
+    "eName",
+    "eMobile",
+    "eRelation",
+  ],
+  2: ["collegeName", "qualification", "institute"],
+};
 export const REGEX = {
   url: /^(ftp|http|https):\/\/[^ "\s]+$/,
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,

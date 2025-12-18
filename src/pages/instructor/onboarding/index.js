@@ -1,38 +1,7 @@
-import Input from "@/components/common/Input";
-import Selector from "@/components/common/Selector";
-import SmartSelect from "@/components/common/SmartSelect";
-import TextArea from "@/components/common/TextArea";
-import PhoneInput from "@/components/common/PhoneInput";
-
 import React, { useState, useCallback, useMemo, useEffect } from "react";
-// These icons are kept here as they are directly imported from 'react-icons/bi' in your first prompt
-import {
-  BiCalendar,
-  BiFile,
-  BiLogoFacebook,
-  BiLogoInstagram,
-  BiMaleSign,
-  BiPlusCircle,
-  BiShield,
-  BiSolidIdCard,
-  BiTrash,
-  BiUser,
-  BiVideo,
-  BiSave,
-  BiSolidGraduation,
-  BiChevronLeft,
-  BiChevronRight,
-  BiWorld,
-  BiAlarm,
-  BiLink,
-  BiCheckCircle,
-} from "react-icons/bi";
-import Modal from "@/components/common/Modal";
-import Link from "next/link";
 import { userOnboarding } from "@/redux/slices/userSlice";
 import toast from "react-hot-toast";
 import StepOne from "@/components/onboarding/StepOne";
-import SectionHeader from "@/components/onboarding/SectionHeader";
 import StepTwo from "@/components/onboarding/StepTwo";
 import StepThree from "@/components/onboarding/StepThree";
 import StepFour from "@/components/onboarding/StepFour";
@@ -40,203 +9,22 @@ import StepFive from "@/components/onboarding/StepFive";
 import StepSixth from "@/components/onboarding/StepSixth";
 import StepSeven from "@/components/onboarding/StepSeven";
 import StepEight from "@/components/onboarding/StepEight";
-import { FIELD_LABELS, isEmpty, LABELS, REGEX } from "../../../../utils/validation";
+import {
+  FIELD_LABELS,
+  isEmpty,
+  REGEX,
+  STEP_FIELDS,
+} from "../../../../utils/validation";
 import { useDispatch } from "react-redux";
+import OnboardingFooter from "@/components/onboarding/OnboardingFooter";
+import { BiCheckCircleIcon, FaShieldAlt } from "../../../../utils/icon";
+import StepIndicator from "@/components/onboarding/StepIndicator";
+import { isTimeSlotValid } from "../../../../utils/onboarding";
+import SubmissionDialog from "@/components/onboarding/SubmissionDialog";
 
-// Icon Mapping
-const FaCheckCircle = BiSave; // Using BiSave for checkmark style completion (Keeping original component's choice)
-const FaUser = BiUser;
-const FaFileAlt = BiFile;
-const FaVideo = BiVideo;
-const FaCalendarAlt = BiCalendar;
-const FaDollarSign = BiCalendar; // Using BiCalendar as a proxy for pricing/dollar-related icon
-const FaShieldAlt = BiShield;
-const FaIdCard = BiSolidIdCard;
-const FaPlus = BiPlusCircle;
-const FaTrash = BiTrash;
-const FaInstagram = BiLogoInstagram;
-const FaFacebook = BiLogoFacebook;
-const FaLinkedin = BiMaleSign; // Using BiMaleSign for LinkedIn (as per original code, might be better to use BiLogoLinkedin if available, but sticking to provided icons)
-const FaYoutube = BiVideo; // Using BiVideo as a proxy for YouTube
-const FaRoad = BiMaleSign; // Using BiMaleSign for Road/Address (as per original code, better would be BiMap)
-const FaMapMarkerAlt = BiMaleSign; // Using BiMaleSign for MapMarker (as per original code, better would be BiMapPin)
-const FaGraduationCap = BiSolidGraduation;
-const FaSignature = BiMaleSign;
-const FaSave = BiSave;
-const BiChevronLeftIcon = BiChevronLeft;
-const BiChevronRightIcon = BiChevronRight;
-const BiWorldIcon = BiWorld; // New icon for Languages
-const BiAlarmIcon = BiAlarm; // New icon for Response Time
-const BiLinkIcon = BiLink; // New icon for Website
-const BiCheckCircleIcon = BiCheckCircle;
-
-const StepIndicator = ({ currentStep, totalSteps }) => {
-  // Retaining original StepIndicator implementation
-  const steps = useMemo(
-    () => [
-      { id: 1, label: "Personal & Contact", icon: FaUser },
-      { id: 2, label: "Education", icon: FaGraduationCap },
-      { id: 3, label: "Taxation", icon: FaIdCard },
-      { id: 4, label: "Socials & Videos", icon: FaVideo },
-      { id: 5, label: "Qualifications", icon: FaFileAlt },
-      { id: 6, label: "Availability", icon: FaCalendarAlt },
-      { id: 7, label: "Pricing", icon: FaDollarSign },
-      { id: 8, label: "Agreements", icon: FaSignature },
-    ],
-    []
-  );
-
-  return (
-    <div className="w-full">
-      <div className="flex items-center justify-between relative px-2">
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-slate-100 -z-10 rounded-full"></div>
-        <div
-          className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-teal-600 -z-10 rounded-full transition-all duration-500 ease-in-out"
-          style={{ width: `${((currentStep - 1) / (totalSteps - 1)) * 100}%` }}
-        ></div>
-
-        {steps.map((s) => {
-          const Icon = s.icon;
-          const isActive = s.id === currentStep;
-          const isCompleted = s.id < currentStep;
-          const isVisibleOnMobile =
-            s.id % 2 === 1 || s.id === totalSteps || isActive;
-
-          return (
-            <div
-              key={s.id}
-              className={`flex flex-col items-center group relative bg-white p-1 rounded-full ${
-                !isVisibleOnMobile && "hidden sm:flex"
-              }`}
-            >
-              <div
-                className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-                  isActive
-                    ? "border-teal-600 text-teal-600 shadow-lg scale-110 bg-white"
-                    : isCompleted
-                    ? "border-teal-600 bg-teal-600 text-white"
-                    : "border-slate-200 text-slate-300 bg-white"
-                }`}
-              >
-                {isCompleted ? <FaCheckCircle size={14} /> : <Icon size={14} />}
-              </div>
-              <span
-                className={`absolute top-12 text-[10px] font-medium whitespace-nowrap transition-colors duration-300 ${
-                  isActive
-                    ? "text-teal-600 opacity-100"
-                    : "text-slate-400 opacity-0"
-                } hidden md:block`}
-              >
-                {s.label}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
 const useRouter = () => ({
   push: (path) => console.log(`Simulating navigation to: ${path}`),
 });
-const isTimeSlotValid = (start, end) => {
-  if (!start || !end) return true;
-  const [startH, startM] = start.split(":").map(Number);
-  let [endH, endM] = end.split(":").map(Number);
-  const startMinutes = startH * 60 + startM;
-  let endMinutes = endH * 60 + endM;
-  if (endMinutes <= startMinutes) {
-    endMinutes += 24 * 60;
-  }
-  const durationMinutes = endMinutes - startMinutes;
-  const maxDurationMinutes = 5 * 60; // Max duration of 5 hours
-  return durationMinutes <= maxDurationMinutes;
-};
-
-/* -------------------------------------------------------------------------- */
-/* --- NEW COMPONENT: SubmissionDialog --- */
-/* -------------------------------------------------------------------------- */
-
-const SubmissionDialog = ({
-  isOpen,
-  onClose,
-  onAccept,
-  profileImagePreview,
-}) => {
-  // Using the generic Modal component for structure, backdrop, and closure.
-  return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={
-        <span className="flex items-center">
-          <BiShield size={20} className="mr-2 text-teal-600" /> Final Agreement
-          & Review
-        </span>
-      }
-    >
-      <div className="space-y-4 text-slate-700 custom-scrollbar">
-        <p className="font-semibold text-sm">
-          Please review your profile image and confirm acceptance of our Privacy
-          Policy and Terms of Service before finalizing your application.
-        </p>
-
-        {/* Terms & Privacy Mock Content */}
-        <div className="border border-slate-300 rounded-lg p-4 h-48 overflow-y-auto bg-slate-50 text-sm">
-          <h4 className="font-bold text-teal-800 mb-2">
-            1. Privacy Policy Summary
-          </h4>
-          <p className="text-xs mb-3">
-            By accepting, you consent to the collection and processing of your
-            personal data (including contact, address, education, and financial
-            identifiers like PAN/Aadhaar) solely for the purpose of platform
-            operation, verification, compliant payments, and public profile
-            display. We commit to protecting your data with industry-standard
-            security measures.
-          </p>
-          <h4 className="font-bold text-teal-800 mb-2">
-            2. Terms of Service Summary
-          </h4>
-          <p className="text-xs">
-            You agree to our fee structure, the ethical standards, and the
-            non-compete clause for clients acquired through Yogalink. You retain
-            all IP rights to your content, but grant Yogalink a limited license
-            to display your videos and profile. Termination requires 30 days
-            notice.
-          </p>
-          <Link
-            href="/privacy-policy"
-            className="text-xs font-bold mt-3 text-red-600"
-          >
-            Privacy Policy & Terms
-          </Link>
-        </div>
-
-        {/* Footer Actions (placed inside Modal content for styling, but logically acts as footer) */}
-        <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-6 py-3 border border-slate-300 rounded-xl text-slate-600 font-medium hover:bg-slate-50 transition-colors"
-          >
-            Back
-          </button>
-          <button
-            type="button"
-            onClick={onAccept}
-            className="px-6 py-3 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-700 transition-colors flex items-center"
-          >
-            <BiCheckCircleIcon className="mr-2" size={16} /> I Accept & Submit
-          </button>
-        </div>
-      </div>
-    </Modal>
-  );
-};
-
-/* -------------------------------------------------------------------------- */
-/* --- MAIN COMPONENT: InstructorOnboarding --- */
-/* -------------------------------------------------------------------------- */
 
 const InstructorOnboarding = () => {
   const totalSteps = 8;
@@ -320,7 +108,7 @@ const InstructorOnboarding = () => {
   );
 
   const [formData, setFormData] = useState(initialFormData);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   console.log("formData", formData);
 
@@ -442,6 +230,48 @@ const InstructorOnboarding = () => {
     });
   }, []);
 
+  const handleSameAsPermanentToggle = (e) => {
+    const isChecked = e.target.checked;
+    setIsCurrentSameAsPermanent(isChecked);
+    if (isChecked) {
+      setFormData((prev) => ({
+        ...prev,
+        cCountry: prev.pCountry,
+        cState: prev.pState,
+        cCity: prev.pCity,
+        cPincode: prev.pPincode,
+        cArea: prev.pArea,
+        cBuilding: prev.pBuilding,
+        cBlock: prev.pBlock,
+      }));
+      setValidationErrors((v) => {
+        const keysToRemove = [
+          "cCountry",
+          "cState",
+          "cCity",
+          "cPincode",
+          "cArea",
+          "cBuilding",
+          "cBlock",
+        ];
+        const newErrors = { ...v };
+        keysToRemove.forEach((key) => delete newErrors[key]);
+        return newErrors;
+      });
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        cCountry: "",
+        cState: "",
+        cCity: "",
+        cPincode: "",
+        cArea: "",
+        cBuilding: "",
+        cBlock: "",
+      }));
+    }
+  };
+
   const handleCertChange = useCallback((index, field, value, file) => {
     setFormData((prev) => {
       const updated = [...prev.certifications];
@@ -492,117 +322,137 @@ const InstructorOnboarding = () => {
       video_url: prev.video_url.filter((_, i) => i !== index),
     }));
 
-  const handleSameAsPermanentToggle = (e) => {
-    const isChecked = e.target.checked;
-    setIsCurrentSameAsPermanent(isChecked);
-    if (isChecked) {
-      setFormData((prev) => ({
-        ...prev,
-        cCountry: prev.pCountry,
-        cState: prev.pState,
-        cCity: prev.pCity,
-        cPincode: prev.pPincode,
-        cArea: prev.pArea,
-        cBuilding: prev.pBuilding,
-        cBlock: prev.pBlock,
-      }));
-      setValidationErrors((v) => {
-        const keysToRemove = [
-          "cCountry",
-          "cState",
-          "cCity",
-          "cPincode",
-          "cArea",
-          "cBuilding",
-          "cBlock",
-        ];
-        const newErrors = { ...v };
-        keysToRemove.forEach((key) => delete newErrors[key]);
-        return newErrors;
-      });
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        cCountry: "",
-        cState: "",
-        cCity: "",
-        cPincode: "",
-        cArea: "",
-        cBuilding: "",
-        cBlock: "",
-      }));
-    }
-  };
-
   // --- CORE VALIDATION LOGIC (Omitted for brevity, assuming it's correct from the prompt) ---
-  const validateFormFields = useCallback(
-  (data) => {
+  const validateFormFields = useCallback((data) => {
     const errors = {};
 
     const requiredFields = {
       1: [
-        "name","dateOfBirth","gender","email","primaryMobile","language",
-        "pCountry","pState","pCity","pPincode","pArea","pBuilding","pBlock",
-        "eName","eMobile","eRelation"
+        "name",
+        "dateOfBirth",
+        "gender",
+        "email",
+        "primaryMobile",
+        "language",
+        "pCountry",
+        "pState",
+        "pCity",
+        "pPincode",
+        "pArea",
+        "pBuilding",
+        "pBlock",
+        "eName",
+        "eMobile",
+        "eRelation",
       ],
-      2: ["collegeName","qualification","institute"],
-      3: ["registerAs","panCard","aadharNumber"],
-      5: ["profileImage","introVideo","teaching_philosophy"],
-      6: ["startTime","endTime","responseTime"],
+      2: ["collegeName", "qualification", "institute"],
+      3: ["registerAs", "panCard", "aadharNumber"],
+      5: ["profileImage", "introVideo", "teaching_philosophy"],
+      6: ["startTime", "endTime", "responseTime"],
       7: [], // handled conditionally below
-      8: ["confirmAccurate","ethicalStandards","serviceMindset","signature"],
+      8: ["confirmAccurate", "ethicalStandards", "serviceMindset", "signature"],
     };
 
     // Step 1-8: required fields
     (requiredFields[step] || []).forEach((field) => {
-      if (isEmpty(data[field])) errors[field] = `${FIELD_LABELS[field]} is required.`;
+      if (isEmpty(data[field]))
+        errors[field] = `${FIELD_LABELS[field]} is required.`;
     });
 
     // Step 1: current address if different
     if (step === 1 && !isCurrentSameAsPermanent) {
-      ["cCountry","cState","cCity","cPincode","cArea","cBuilding","cBlock"]
-        .forEach(f => { if(isEmpty(data[f])) errors[f] = `${FIELD_LABELS[f]} is required.` });
+      [
+        "cCountry",
+        "cState",
+        "cCity",
+        "cPincode",
+        "cArea",
+        "cBuilding",
+        "cBlock",
+      ].forEach((f) => {
+        if (isEmpty(data[f])) errors[f] = `${FIELD_LABELS[f]} is required.`;
+      });
     }
 
     // Regex validations
-    if (step === 1 && data.email && !REGEX.email.test(data.email)) errors.email = "Invalid email";
+    if (step === 1 && data.email && !REGEX.email.test(data.email))
+      errors.email = "Invalid email";
     if (step === 3) {
-      if(data.panCard && !REGEX.pan.test(data.panCard.toUpperCase())) errors.panCard = "Invalid PAN format";
-      if(data.aadharNumber && !REGEX.aadhar.test(data.aadharNumber.replace(/\s/g,""))) errors.aadharNumber = "Invalid Aadhaar number";
+      if (data.panCard && !REGEX.pan.test(data.panCard.toUpperCase()))
+        errors.panCard = "Invalid PAN format";
+      if (
+        data.aadharNumber &&
+        !REGEX.aadhar.test(data.aadharNumber.replace(/\s/g, ""))
+      )
+        errors.aadharNumber = "Invalid Aadhaar number";
     }
     if (step === 4) {
-      ["instagram_link","facebook_link","linkdin_link","youtube_link","instructor_website"]
-        .forEach(f => { if(data[f]?.trim() && !REGEX.url.test(data[f].trim())) errors[f] = "Invalid URL" });
+      [
+        "instagram_link",
+        "facebook_link",
+        "linkdin_link",
+        "youtube_link",
+        "instructor_website",
+      ].forEach((f) => {
+        if (data[f]?.trim() && !REGEX.url.test(data[f].trim()))
+          errors[f] = "Invalid URL";
+      });
     }
     if (step === 5) {
-      if(!data.yoga_style?.length) errors.yoga_style = "Select at least one Yoga Style";
-      if(!data.certifications?.length) errors.certifications = "Add at least one certification";
-      const videos = data.video_url?.filter(v => v.trim()) || [];
-      if(videos.length < 2) errors.video_url = "Minimum two sample videos required";
-      data.video_url?.forEach((v,i) => { if(v.trim() && !REGEX.url.test(v)) errors[`video_url[${i}]`] = `Video ${i+1} is invalid` });
-      if(data.introVideo && !REGEX.url.test(data.introVideo)) errors.introVideo = "Invalid video URL";
+      if (!data.yoga_style?.length)
+        errors.yoga_style = "Select at least one Yoga Style";
+      if (!data.certifications?.length)
+        errors.certifications = "Add at least one certification";
+      const videos = data.video_url?.filter((v) => v.trim()) || [];
+      if (videos.length < 2)
+        errors.video_url = "Minimum two sample videos required";
+      data.video_url?.forEach((v, i) => {
+        if (v.trim() && !REGEX.url.test(v))
+          errors[`video_url[${i}]`] = `Video ${i + 1} is invalid`;
+      });
+      if (data.introVideo && !REGEX.url.test(data.introVideo))
+        errors.introVideo = "Invalid video URL";
     }
 
     // Step 6: class selection
-    if(step === 6 && !data.availableOneOnOne && !data.availableGroupClass && !data.singleClass) errors.classType = "Select at least one class type";
-    if(step === 6 && !data.days?.length) errors.days = "Select at least one teaching day";
-    if(step === 6 && !data.times?.length) errors.times = "Select at least one class time";
+    if (
+      step === 6 &&
+      !data.availableOneOnOne &&
+      !data.availableGroupClass &&
+      !data.singleClass
+    )
+      errors.classType = "Select at least one class type";
+    if (step === 6 && !data.days?.length)
+      errors.days = "Select at least one teaching day";
+    if (step === 6 && !data.times?.length)
+      errors.times = "Select at least one class time";
 
     // Step 7: pricing
-    if(step === 7){
-      [["group_class_rate", "availableGroupClass"], ["private_class_rate", "availableOneOnOne"], ["single_class_rate", "singleClass"]]
-        .forEach(([field, cond]) => {
-          if(data[cond]){
-            if(isEmpty(data[field])) errors[field] = `${FIELD_LABELS[field]} is required`;
-            else if(!REGEX.positiveNumber.test(data[field]) || Number(data[field])<=0) errors[field] = `${FIELD_LABELS[field]} must be positive`;
-          }
-        });
-      if((data.availableGroupClass||data.availableOneOnOne) && (!data.trialMode || data.trialMode==='none')) errors.trialMode = "Trial Policy is required";
+    if (step === 7) {
+      [
+        ["group_class_rate", "availableGroupClass"],
+        ["private_class_rate", "availableOneOnOne"],
+        ["single_class_rate", "singleClass"],
+      ].forEach(([field, cond]) => {
+        if (data[cond]) {
+          if (isEmpty(data[field]))
+            errors[field] = `${FIELD_LABELS[field]} is required`;
+          else if (
+            !REGEX.positiveNumber.test(data[field]) ||
+            Number(data[field]) <= 0
+          )
+            errors[field] = `${FIELD_LABELS[field]} must be positive`;
+        }
+      });
+      if (
+        (data.availableGroupClass || data.availableOneOnOne) &&
+        (!data.trialMode || data.trialMode === "none")
+      )
+        errors.trialMode = "Trial Policy is required";
     }
 
     return errors;
-  },
-);
+  });
 
   // --- END OF VALIDATION LOGIC ---
 
@@ -633,13 +483,15 @@ const InstructorOnboarding = () => {
     return true;
   };
 
-  const nextStep = () => {
+  const nextStep = (e) => {
     if (validateStep()) {
       // Uncomment for mandatory validation
       document
         .getElementById("form-content-area")
         ?.scrollTo({ top: 0, behavior: "smooth" });
       setStep((prev) => Math.min(prev + 1, totalSteps));
+
+      handleSubmit(e);
     }
   };
 
@@ -690,28 +542,94 @@ const InstructorOnboarding = () => {
       });
   };
 
+  const buildPayloadByStep = (step, formData, extra = {}) => {
+    const payload = {};
+
+    STEP_FIELDS[step]?.forEach((key) => {
+      if (formData[key] !== undefined) {
+        payload[key] = formData[key];
+      }
+    });
+
+    if (step === 1) {
+      payload.countryCode = countryCode;
+      payload.primaryMobile = mobileNumber;
+      payload.secondMobile = SecondMobileNumber;
+    }
+
+    return payload;
+  };
+
   // --- MODIFIED SUBMISSION HANDLER: Opens Dialog ---
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const payload = {
-      ...formData,
-      countryCode: countryCode,
+    let payload = {};
+
+    if (step === 1) {
+      payload.name = formData.name;
+      payload.dateOfBirth = formData.dateOfBirth;
+      payload.gender = formData.gender;
+      payload.countryCode = countryCode;
+      payload.primaryMobile = mobileNumber;
+      payload.secondMobile = SecondMobileNumber;
+      payload.language = formData.language;
+      // parmanat address
+      payload.pCountry = formData.pCountry;
+      payload.pState = formData.pState;
+      payload.pCity = formData.pCity;
+      payload.pPincode = formData.pPincode;
+      payload.pArea = formData.pArea;
+      payload.pBuilding = formData.pBuilding;
+      payload.pBlock = formData.pBlock;
+      // current address
+      payload.cCountry = formData.cCountry;
+      payload.cState = formData.cState;
+      payload.cCity = formData.cCity;
+      payload.cPincode = formData.cPincode;
+      payload.cArea = formData.cArea;
+      payload.cBuilding = formData.cBuilding;
+      payload.cBlock = formData.cBlock;
+      // Emergency Contact
+      payload.eName = formData.eName;
+      payload.eMobile = formData.eMobile;
+      payload.eRelation = formData.eRelation;
+    }
+
+    if (step === 2) {
+      // Education details
+      payload.collegeName = formData.collegeName;
+      payload.qualification = formData.qualification;
+      payload.institute = formData.institute;
+    }
+
+    if (step === 3) {
+    }
+
+    const payloads = buildPayloadByStep(step, formData, {
+      countryCode,
       primaryMobile: mobileNumber,
       secondMobile: SecondMobileNumber,
-      class_availability: {
-        availableClassTypes: [
-          formData.availableOneOnOne,
-          formData.availableGroupClass,
-        ],
-        teachingDays: formData.days,
-        earliestStartTime: formData.startTime,
-        latestEndTime: formData.endTime,
-        responseTime: formData.responseTime,
-      },
-    };
-
+    });
     console.log("payload", payload);
+    console.log("payloads", payloads);
+
+    // const payload = {
+    //   ...formData,
+    //   countryCode: countryCode,
+    //   primaryMobile: mobileNumber,
+    //   secondMobile: SecondMobileNumber,
+    //   class_availability: {
+    //     availableClassTypes: [
+    //       formData.availableOneOnOne,
+    //       formData.availableGroupClass,
+    //     ],
+    //     teachingDays: formData.days,
+    //     earliestStartTime: formData.startTime,
+    //     latestEndTime: formData.endTime,
+    //     responseTime: formData.responseTime,
+    //   },
+    // };
     return;
     await dispatch(userOnboarding(payload))
       .unwrap()
@@ -898,6 +816,7 @@ const InstructorOnboarding = () => {
                   isGroupSelected={isGroupSelected}
                   isPrivateSelected={isPrivateSelected}
                   isSingleSelected={isSingleSelected}
+                  trialOptions={trialOptions}
                 />
               )}
 
@@ -914,7 +833,7 @@ const InstructorOnboarding = () => {
               {isSubmitted && (
                 <div className="flex flex-col items-center justify-center text-center h-full py-10 animate-in zoom-in-95">
                   <div className="w-24 h-24 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mb-6 shadow-xl">
-                    <BiShield size={40} />
+                    <FaShieldAlt size={40} />
                   </div>
                   <h2 className="text-3xl font-bold text-slate-800 mb-2">
                     Application Submitted!
@@ -941,70 +860,16 @@ const InstructorOnboarding = () => {
 
         {/* FOOTER - NAVIGATION & DRAFT */}
         {!isSubmitted && (
-          <div className="flex-none px-6 py-6 border-t border-slate-100 bg-white rounded-b-3xl">
-            <div className="flex items-center justify-between max-w-5xl mx-auto w-full">
-              {/* Back Button and Draft Button Group */}
-              <div className="flex items-center gap-4">
-                <button
-                  type="button"
-                  onClick={prevStep}
-                  disabled={step === 1}
-                  className={`flex items-center px-6 py-3 border border-slate-200 rounded-xl font-medium transition-all ${
-                    step === 1
-                      ? "opacity-0 cursor-default pointer-events-none"
-                      : "text-slate-500 hover:bg-slate-50"
-                  }`}
-                >
-                  <BiChevronLeftIcon className="w-5 h-5 mr-1" size={16} /> Back
-                </button>
-
-                <button
-                  type="button"
-                  onClick={saveDraft}
-                  disabled={saveStatus === "saving"}
-                  className={`flex items-center px-6 py-3 rounded-xl font-semibold transition-colors text-sm ${
-                    saveStatus === "saving"
-                      ? "bg-amber-100 text-amber-700 cursor-not-allowed"
-                      : saveStatus === "saved"
-                      ? "bg-green-100 text-green-700"
-                      : saveStatus === "error"
-                      ? "bg-red-100 text-red-700"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                  }`}
-                >
-                  <BiSave className="w-4 h-4 mr-2" size={16} /> {saveButtonText}
-                </button>
-              </div>
-
-              {/* Next / Submit Button */}
-              {step < totalSteps ? (
-                <button
-                  type="button"
-                  onClick={nextStep}
-                  className="flex items-center bg-teal-600 text-white px-8 py-3 rounded-xl font-semibold shadow-md hover:bg-teal-700 transition-colors"
-                >
-                  {step === totalSteps - 1 ? "Review & Sign" : "Next"}{" "}
-                  <BiChevronRightIcon className="w-5 h-5 ml-1" size={16} />
-                </button>
-              ) : (
-                <button
-                  type="submit"
-                  onClick={handleSubmit}
-                  className="flex items-center bg-teal-600 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={
-                    !formData.confirmAccurate ||
-                    !formData.ethicalStandards ||
-                    !formData.serviceMindset ||
-                    !formData.signature ||
-                    Object.keys(validationErrors).length > 0
-                  }
-                >
-                  Submit Application{" "}
-                  <BiSave className="w-4 h-4 ml-2" size={16} />
-                </button>
-              )}
-            </div>
-          </div>
+          <OnboardingFooter
+            prevStep={prevStep}
+            nextStep={nextStep}
+            step={step}
+            saveStatus={saveStatus}
+            saveDraft={saveDraft}
+            totalSteps={totalSteps}
+            formData={formData}
+            saveButtonText={saveButtonText}
+          />
         )}
       </div>
       {/* Tailwind CSS scrollbar utility class */}
