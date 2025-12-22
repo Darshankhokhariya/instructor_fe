@@ -690,16 +690,15 @@ const InstructorOnboarding = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    let payload = {};
 
-    const payloads = buildPayloadByStep(step, formData);
-
-    if (step === 6) {
-      const payloadSixth = buildClassAvailabilityPayload(formData);
-    }
+    // const payloads = buildPayloadByStep(step, formData);
+    const payload =
+      step === 6
+        ? buildClassAvailabilityPayload(formData)
+        : buildPayloadByStep(step, formData);
 
     if (step === 1) {
-      await dispatch(onboardingStepOne(payloads))
+      await dispatch(onboardingStepOne(payload))
         .unwrap()
         .then((res) => {
           if (res.status === 200) {
@@ -714,7 +713,7 @@ const InstructorOnboarding = () => {
         });
     }
     if (step === 2) {
-      await dispatch(onboardingStepTwo(payloads))
+      await dispatch(onboardingStepTwo(payload))
         .unwrap()
         .then((res) => {
           if (res.status === 200) {
@@ -730,7 +729,7 @@ const InstructorOnboarding = () => {
     }
 
     if (step === 3) {
-      await dispatch(onboardingStepThree(payloads))
+      await dispatch(onboardingStepThree(payload))
         .unwrap()
         .then((res) => {
           if (res.status === 200) {
@@ -746,7 +745,7 @@ const InstructorOnboarding = () => {
     }
 
     if (step === 4) {
-      await dispatch(onboardingStepFour(payloads))
+      await dispatch(onboardingStepFour(payload))
         .unwrap()
         .then((res) => {
           if (res.status === 200) {
@@ -761,7 +760,7 @@ const InstructorOnboarding = () => {
         });
     }
     if (step === 5) {
-      await dispatch(onboardingStepFive(payloads))
+      await dispatch(onboardingStepFive(payload))
         .unwrap()
         .then((res) => {
           if (res.status === 200) {
@@ -776,7 +775,7 @@ const InstructorOnboarding = () => {
         });
     }
     if (step === 6) {
-      await dispatch(onboardingStepSixth(payloads))
+      await dispatch(onboardingStepSixth(payload))
         .unwrap()
         .then((res) => {
           if (res.status === 200) {
