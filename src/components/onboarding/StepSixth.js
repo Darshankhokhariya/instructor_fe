@@ -1,8 +1,7 @@
 import React from "react";
 import Selector from "../common/Selector";
 import { BiAlarmIcon } from "../../../utils/icon";
-import Input from "../common/Input";
-import SmartSelect from "../common/SmartSelect";
+import WeeklySchedule from "../common/WeeklySchedule";
 import SectionHeader from "./SectionHeader";
 import Label from "./Label";
 import CheckboxToggle from "../common/CheckboxToggle";
@@ -13,6 +12,7 @@ const StepSixth = ({
   validationErrors,
   handleArrayToggle,
   timeError,
+  handleTimeSlotsChange,
 }) => {
   return (
     <div className="space-y-6">
@@ -49,57 +49,15 @@ const StepSixth = ({
         )}
       </div>
 
-      {/* Preferred Days */}
-      <SmartSelect
-        label="Preferred Teaching Days (Required)"
-        options={[
-          { label: "Mon", value: "monday" },
-          { label: "Tue", value: "tuesday" },
-          { label: "Wed", value: "wednesday" },
-          { label: "Thu", value: "thursday" },
-          { label: "Fri", value: "friday" },
-          { label: "Sat", value: "saturday" },
-          { label: "Sun", value: "sunday" },
-        ]}
-        selectedValues={formData.days}
-        onToggle={(val) => handleArrayToggle("days", val)}
+      {/* Weekly Schedule with Time Slots */}
+      <WeeklySchedule
+        selectedDays={formData.days}
+        onDaysChange={(days) => handleArrayToggle("days", days, true)}
+        timeSlots={formData.timeSlots || {}}
+        onTimeSlotsChange={handleTimeSlotsChange}
         error={validationErrors.days}
       />
 
-      {/* Preferred Times */}
-      <SmartSelect
-        label="Preferred Class Times (Required)"
-        options={[
-          { label: "Morning (5-10am)", value: "morning" },
-          { label: "Mid-Day (10am-5pm)", value: "midday" },
-          { label: "Evening (5-10pm)", value: "evening" },
-        ]}
-        selectedValues={formData.times}
-        onToggle={(val) => handleArrayToggle("times", val)}
-        error={validationErrors.times}
-      />
-
-      {/* Start/End Time */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-        <Input
-          label="Earliest Start Time (IST)"
-          name="startTime"
-          type="time"
-          value={formData.startTime}
-          onChange={handleChange}
-          required
-          error={validationErrors.startTime}
-        />
-        <Input
-          label="Latest End Time (IST)"
-          name="endTime"
-          type="time"
-          value={formData.endTime}
-          onChange={handleChange}
-          required
-          error={validationErrors.endTime}
-        />
-      </div>
       {timeError && (
         <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-200 font-medium mt-3">
           {timeError}

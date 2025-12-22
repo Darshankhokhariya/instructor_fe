@@ -1,12 +1,20 @@
 @import "tailwindcss";
 
+/* -----------------------------
+   Tailwind Theme Variables
+----------------------------- */
 @theme {
-  --color-primary: #099789;
+  --color-primary: #19e6c4;
 }
 
-/* Thin scrollbar for Webkit browsers */
+/* -----------------------------
+   Scrollbar (Thin)
+----------------------------- */
+
+/* WebKit browsers */
 .scrollbar-thin::-webkit-scrollbar {
   width: 4px;
+  height: 4px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-track {
@@ -18,20 +26,24 @@
   border-radius: 3px;
 }
 
-/* For Firefox */
+/* Firefox */
 .scrollbar-thin {
   scrollbar-width: thin;
   scrollbar-color: #a0a0a0 #f0f0f0;
 }
 
-/* Hide arrows for number inputs (Chrome, Safari, Edge) */
+/* -----------------------------
+   Number Input Arrow Hide
+----------------------------- */
+
+/* Chrome, Safari, Edge */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-/* Hide arrows for number inputs (Firefox) */
+/* Firefox */
 input[type="number"] {
   -moz-appearance: textfield;
 }

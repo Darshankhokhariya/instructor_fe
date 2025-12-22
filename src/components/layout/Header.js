@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { FaBars } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
 import { LuLanguages } from 'react-icons/lu';
+import { MdNotifications } from 'react-icons/md';
 
 // Dummy components to replace Redux/external dependencies
 const DummyLanguageSelector = () => (
@@ -73,22 +74,20 @@ const Header = ({ onToggleSidebar }) => {
 
     return (
         <>
-            <header className="flex items-center justify-between bg-white sticky top-0 h-[6svh] md:h-[8svh] border-b border-gray-200 md:border-0 md:shadow z-50">
-                {/* Left Side - Logo and Sidebar Toggle */}
-                <div className="flex items-center gap-4">
-                    <button
-                        onClick={onToggleSidebar}
-                        className="p-2 rounded-md hover:bg-gray-200 transition"
-                        aria-label="Toggle Sidebar"
-                    >
-                        <FaBars className="cursor-pointer w-6 h-6 text-gray-700" />
-                    </button>
-                    {/* Placeholder for Yogalink Logo - use your actual path */}
-                    Yogalink
-                    {/* <img src="/images/yogalink-logo.png" alt="Yogalink Logo" className="h-12 object-contain" />
-                     */}
+            <div class="flex items-center justify-between px-6 pb-2 h-[10svh] bg-white">
+                <div class="flex flex-col">
+                    <span class="text-text-sub-light dark:text-text-sub-dark text-sm font-medium">Good Morning</span>
+                    <h2 class="text-text-main-light dark:text-text-main-dark text-xl font-bold leading-tight tracking-tight">Namaste, Priya</h2>
                 </div>
-            </header>
+                <div class="flex items-center gap-3">
+                    <div class="h-10 w-10 overflow-hidden rounded-full border-2 border-primary/20 bg-gray-200">
+                        <img alt="Profile" class="h-full w-full object-cover" data-alt="Portrait of a yoga instructor smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRusvG5X2RFhmH9y_qAXcQNrK8AZ8v2ppSGDI72vLFgvdFccPR0hETCjdgma4pXr2uyJ74jvF7nyxMsXiaGapcrnorwzsLCdETGNJUV0a6_SI6I0yps7E_88SQvFiLEODzCEb9n9hFLku94XHRHIjYWhNRSocnrPM2SfUcI5mjgQMz52Rldsq645flUNeMoCxndGjNLCjKjKQEEH3Eco9X3GU6UMUt1j1T9BHpZeDOvw5hgbuYxKWH_n9hGkRCX-rndTiVHvCI23Jw" />
+                    </div>
+                    <button class="flex h-10 w-10 items-center justify-center rounded-full bg-white dark:bg-card-dark shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10 transition-transform active:scale-95">
+                        <MdNotifications class="text-text-sub-light dark:text-text-sub-dark text-lg" />
+                    </button>
+                </div>
+            </div>
         </>
     );
 };

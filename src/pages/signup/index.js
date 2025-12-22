@@ -38,10 +38,7 @@ export default function Register() {
         }
     };
 
-    console.log('fields', fields)
-
-    const handleValidation = async () => {
-
+    const handleValidation = () => {
         let flag = true;
         let errors = {};
 
@@ -54,23 +51,26 @@ export default function Register() {
             }
         });
 
-        if (fields.mobile) {
-            const mobileLength = fields.mobile.length;
-
-            if (mobileLength !== 10) {
-                flag = false;
-                errors.mobile = "Mobile number length should be 10 digits!";
-            }
+        // Mobile validation (10 digits only)
+        if (fields.mobile && !/^[0-9]{10}$/.test(fields.mobile)) {
+            flag = false;
+            errors.mobile = "Mobile number must be exactly 10 digits!";
         }
 
+        // Email validation
         if (fields.email && !emailRegex.test(fields.email)) {
             flag = false;
-            errors.email = "Please enter valid email!";
+            errors.email = "Please enter a valid email!";
         }
 
-        if (fields.password && fields.cpassword && fields.cpassword !== fields.cpassword) {
+        // Password match validation ✅ FIXED
+        if (
+            fields.password &&
+            fields.cpassword &&
+            fields.password !== fields.cpassword
+        ) {
             flag = false;
-            errors.cpassword = "Password and confirm password not match!";
+            errors.cpassword = "Password and confirm password do not match!";
         }
 
         setErrors(errors);

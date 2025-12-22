@@ -19,12 +19,14 @@ const Layout = ({ children }) => {
 
                 <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
-                <main
-                    className={`flex-grow  transition-all duration-300 ${contentShiftClass} overflow-x-hidden  pb-20 md:pb-0`}
-                >
+                <div className='flex flex-col h-screen w-full'>
                     <Header onToggleSidebar={toggleSidebar} />
-                    {children}
-                </main>
+                    <main
+                        className={`flex-grow  transition-all duration-300 ${contentShiftClass} overflow-x-hidden  pb-20 md:pb-0 h-[90svh]`}
+                    >
+                        {children}
+                    </main>
+                </div>
             </div>
         </div>
     );

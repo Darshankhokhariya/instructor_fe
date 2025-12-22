@@ -89,6 +89,7 @@ const InstructorOnboarding = () => {
       teaching_philosophy: "",
       days: [],
       times: [],
+      timeSlots: {}, // NEW: Time slots for each day
       startTime: "07:00",
       endTime: "12:00",
       responseTime: "", // Existing Field
@@ -139,6 +140,7 @@ const InstructorOnboarding = () => {
           yoga_style: draftData.yoga_style || [],
           days: draftData.days || [],
           times: draftData.times || [],
+          timeSlots: draftData.timeSlots || {},
           language: draftData.language || [],
         }));
         if (draftData.isCurrentSameAsPermanent) {
@@ -193,8 +195,8 @@ const InstructorOnboarding = () => {
             updatedData.trialMode = updatedData.availableOneOnOne
               ? "1private"
               : updatedData.availableGroupClass
-              ? "2group"
-              : "";
+                ? "2group"
+                : "";
           }
         }
         return updatedData;
@@ -211,12 +213,15 @@ const InstructorOnboarding = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   }, []);
 
-  const handleArrayToggle = useCallback((field, value) => {
+  const handleArrayToggle = useCallback((field, value, replaceArray = false) => {
     setFormData((prev) => {
       const current = prev[field];
-      const updated = current.includes(value)
-        ? current.filter((i) => i !== value)
-        : [...current, value];
+      // If replaceArray is true, replace the entire array with the new value
+      const updated = replaceArray ? value : (
+        current.includes(value)
+          ? current.filter((i) => i !== value)
+          : [...current, value]
+      );
 
       setValidationErrors((v) => {
         if (v[field] && updated.length > 0) {
@@ -228,6 +233,13 @@ const InstructorOnboarding = () => {
       });
       return { ...prev, [field]: updated };
     });
+  }, []);
+
+  const handleTimeSlotsChange = useCallback((newTimeSlots) => {
+    setFormData((prev) => ({
+      ...prev,
+      timeSlots: newTimeSlots,
+    }));
   }, []);
 
   const handleSameAsPermanentToggle = (e) => {
@@ -484,15 +496,15 @@ const InstructorOnboarding = () => {
   };
 
   const nextStep = (e) => {
-    if (validateStep()) {
-      // Uncomment for mandatory validation
-      document
-        .getElementById("form-content-area")
-        ?.scrollTo({ top: 0, behavior: "smooth" });
-      setStep((prev) => Math.min(prev + 1, totalSteps));
+    // if (validateStep()) {
+    //   // Uncomment for mandatory validation
+    //   document
+    //     .getElementById("form-content-area")
+    //     ?.scrollTo({ top: 0, behavior: "smooth" });
+    setStep((prev) => Math.min(prev + 1, totalSteps));
 
-      handleSubmit(e);
-    }
+    //   handleSubmit(e);
+    // }
   };
 
   const prevStep = () => {
@@ -739,9 +751,8 @@ const InstructorOnboarding = () => {
             className="max-w-5xl mx-auto min-h-full"
           >
             <div
-              className={`transition-opacity duration-300 ease-out ${
-                isSubmitted ? "opacity-100" : "opacity-100"
-              } pb-4`}
+              className={`transition-opacity duration-300 ease-out ${isSubmitted ? "opacity-100" : "opacity-100"
+                } pb-4`}
             >
               {/* STEP 1: PERSONAL, ADDRESS, EMERGENCY CONTACT, LANGUAGES */}
               {step === 1 && (
@@ -804,6 +815,7 @@ const InstructorOnboarding = () => {
                   validationErrors={validationErrors}
                   handleArrayToggle={handleArrayToggle}
                   timeError={timeError}
+                  handleTimeSlotsChange={handleTimeSlotsChange}
                 />
               )}
 
