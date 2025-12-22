@@ -44,14 +44,12 @@ export const getRequest = async (url, params = {}) => {
       },
     });
 
-    if (response.data?.status === 200) {
-      return response.data;
-    }
+    console.log('response===', response)
 
-    throw new Error(response.data?.message || "Request failed");
+    return response;
   } catch (error) {
-    throw new Error(
-      error.response?.data?.message || error.message || "Something went wrong"
+    throw (
+      error
     );
   }
 };
@@ -67,6 +65,7 @@ export const API_ENDPOINTS = {
 
   ONBOARDING: {
     GET_STEP: `/onBoarding/getStep`,
+    GET_STEP_DATA: (step) => `/onBoarding/getStepData?step=${step}`,
     STEP_ONE: `/onBoarding/step1`,
     STEP_TWO: `/onBoarding/step2`,
     STEP_THREE: `/onBoarding/step3`,

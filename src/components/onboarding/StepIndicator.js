@@ -11,8 +11,8 @@ const StepIndicator = ({ currentStep, totalSteps }) => {
       { id: 4, label: "Socials & Videos", icon: FaVideo },
       { id: 5, label: "Qualifications", icon: FaFileAlt },
       { id: 6, label: "Availability", icon: FaCalendarAlt },
-      { id: 7, label: "Pricing", icon: FaDollarSign },
-      { id: 8, label: "Agreements", icon: FaSignature },
+      { id: 7, label: "Pricing & Sign", icon: FaDollarSign },
+      // { id: 8, label: "Agreements", icon: FaSignature },
     ],
     []
   );

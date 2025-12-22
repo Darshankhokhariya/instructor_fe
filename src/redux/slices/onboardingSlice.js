@@ -13,8 +13,10 @@ const initialState = {
     stepEight: false,
     userOnboarding: false,
     getOnboardingStep: false,
+    getOnboardingStepData: false,
   },
   onboardingStep: null,
+  onboardingStepData: null,
   error: null,
   approverList: null,
   email: null,
@@ -78,8 +80,15 @@ export const onboardingStepEight = createAsyncThunk(
 
 export const getOnboardingStep = createAsyncThunk(
   "onboarding/getOnboardingStep",
-  async (step) => {
+  async () => {
     return await getRequest(API_ENDPOINTS.ONBOARDING.GET_STEP);
+  }
+);
+
+export const getOnboardingStepData = createAsyncThunk(
+  "onboarding/getOnboardingStepData",
+  async (step) => {
+    return await getRequest(API_ENDPOINTS.ONBOARDING.GET_STEP_DATA(step));
   }
 );
 
@@ -192,14 +201,29 @@ const onboardingSlice = createSlice({
       })
       .addCase(getOnboardingStep.fulfilled, (state, action) => {
         state.loading.getOnboardingStep = false;
-        state.onboardingStep = action.payload.data
+        state.onboardingStep = action.payload.data;
       })
       .addCase(getOnboardingStep.rejected, (state, action) => {
         state.loading.getOnboardingStep = false;
         state.error = action.payload;
       });
+    builder
+      .addCase(getOnboardingStepData.pending, (state) => {
+        state.loading.getOnboardingStepData = true;
+        state.error = null;
+      })
+      .addCase(getOnboardingStepData.fulfilled, (state, action) => {
+        state.loading.getOnboardingStepData = false;
+        state.onboardingStep = action.payload.data;
+      })
+      .addCase(getOnboardingStepData.rejected, (state, action) => {
+        state.loading.getOnboardingStepData = false;
+        state.error = action.payload;
+      });
   },
 });
 export const selectOnboardingStep = (state) => state.onboarding.onboardingStep;
+export const selectOnboardingStepData = (state) =>
+  state.onboarding.onboardingStepData;
 
 export default onboardingSlice.reducer;

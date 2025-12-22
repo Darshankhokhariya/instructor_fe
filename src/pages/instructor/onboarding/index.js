@@ -26,6 +26,7 @@ import {
   onboardingStepFive,
   onboardingStepFour,
   onboardingStepOne,
+  onboardingStepSeven,
   onboardingStepSixth,
   onboardingStepThree,
   onboardingStepTwo,
@@ -38,7 +39,7 @@ const useRouter = () => ({
 });
 
 const InstructorOnboarding = () => {
-  const totalSteps = 8;
+  const totalSteps = 7;
   const DRAFT_KEY = "instructorOnboardingDraft";
 
   const router = useRouter();
@@ -137,21 +138,40 @@ const InstructorOnboarding = () => {
 
   console.log("countryCode", countryCode);
 
+  console.log("formData", formData);
+
   useEffect(() => {
-    dispatch(getOnboardingStep());
+    const fetchOnboardingStep = async () => {
+      try {
+        const response = await dispatch(getOnboardingStep());
+        const stepCompleted = response?.data?.step_completed;
+
+        console.log("response", response);
+
+        if (
+          stepCompleted === null ||
+          stepCompleted === 0 ||
+          stepCompleted === undefined
+        ) {
+          setStep(1);
+        } else if (stepCompleted === 7) {
+          router.push("/verification");
+        } else {
+          setStep(stepCompleted + 1);
+        }
+      } catch (err) {
+        // err is now the full object from API
+        console.error("Full API Error:", err);
+
+        toast.error(err.message || "Failed to fetch onboarding step");
+
+        // Default to Step 1
+        setStep(1);
+      }
+    };
+
+    fetchOnboardingStep();
   }, []);
-
-  useEffect(() => {
-    if (defaultOnboardingStep?.step_completed !== undefined) {
-      setStep(
-        defaultOnboardingStep.step_completed === null ||
-          defaultOnboardingStep.step_completed === 0
-          ? 1
-          : defaultOnboardingStep.step_completed + 1
-      );
-    }
-  }, [defaultOnboardingStep]);
-
   // --- EFFECT TO HANDLE PROFILE IMAGE PREVIEW ---
   // useEffect(() => {
   //   if (formData.profileImage instanceof File) {
@@ -512,7 +532,9 @@ const InstructorOnboarding = () => {
       //   document
       //     .getElementById("form-content-area")
       //     ?.scrollTo({ top: 0, behavior: "smooth" });
-      setStep((prev) => Math.min(prev + 1, totalSteps));
+      if (step < totalSteps) {
+        setStep((prev) => Math.min(prev + 1, totalSteps));
+      }
 
       handleSubmit(e);
     }
@@ -599,7 +621,9 @@ const InstructorOnboarding = () => {
 
   const buildPayloadByStep = (step, formData, extra = {}) => {
     const payload = {};
-
+    const finalLanguages = formData.language.map((lang) =>
+      lang === "Other" ? formData.otherLanguage.trim() : lang
+    );
     STEP_FIELDS[step]?.forEach((key) => {
       if (key === "email") return;
       if (key === "panCard") return;
@@ -614,10 +638,12 @@ const InstructorOnboarding = () => {
       payload.countryCode = countryCode;
       payload.primaryMobile = mobileNumber;
       payload.secondMobile = SecondMobileNumber;
+      payload.language = finalLanguages;
       payload.dateOfBirth = moment(formData.dateOfBirth).format("DD-MM-YYYY");
     }
 
-    console.log("formData", formData);
+    console.log("payload", payload);
+
     if (step === 3) {
       if (formData.registerAs === "individual") {
         payload.registerAs = formData.registerAs;
@@ -696,137 +722,60 @@ const InstructorOnboarding = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // const payloads = buildPayloadByStep(step, formData);
-    const payload =
-      step === 6
-        ? buildClassAvailabilityPayload(formData)
-        : buildPayloadByStep(step, formData);
-
-    if (step === 1) {
-      await dispatch(onboardingStepOne(payload))
-        .unwrap()
-        .then((res) => {
-          if (res.status === 200) {
-            // handleClear();
-            toast.success(res.message || `User Onboarding succesfully!`);
-          } else {
-            toast.error(res.message || `Something went wrong`);
-          }
-        })
-        .catch((err) => {
-          toast.error(err || "Something went wrong");
-        });
-    }
-    if (step === 2) {
-      await dispatch(onboardingStepTwo(payload))
-        .unwrap()
-        .then((res) => {
-          if (res.status === 200) {
-            // handleClear();
-            toast.success(res.message || `User Onboarding succesfully!`);
-          } else {
-            toast.error(res.message || `Something went wrong`);
-          }
-        })
-        .catch((err) => {
-          toast.error(err || "Something went wrong");
-        });
-    }
-
-    if (step === 3) {
-      await dispatch(onboardingStepThree(payload))
-        .unwrap()
-        .then((res) => {
-          if (res.status === 200) {
-            // handleClear();
-            toast.success(res.message || `User Onboarding succesfully!`);
-          } else {
-            toast.error(res.message || `Something went wrong`);
-          }
-        })
-        .catch((err) => {
-          toast.error(err || "Something went wrong");
-        });
-    }
-
-    if (step === 4) {
-      await dispatch(onboardingStepFour(payload))
-        .unwrap()
-        .then((res) => {
-          if (res.status === 200) {
-            // handleClear();
-            toast.success(res.message || `User Onboarding succesfully!`);
-          } else {
-            toast.error(res.message || `Something went wrong`);
-          }
-        })
-        .catch((err) => {
-          toast.error(err || "Something went wrong");
-        });
-    }
-    if (step === 5) {
-      await dispatch(onboardingStepFive(payload))
-        .unwrap()
-        .then((res) => {
-          if (res.status === 200) {
-            // handleClear();
-            toast.success(res.message || `User Onboarding succesfully!`);
-          } else {
-            toast.error(res.message || `Something went wrong`);
-          }
-        })
-        .catch((err) => {
-          toast.error(err || "Something went wrong");
-        });
-    }
+    // Determine payload for current step
+    let payload;
     if (step === 6) {
-      await dispatch(onboardingStepSixth(payload))
-        .unwrap()
-        .then((res) => {
-          if (res.status === 200) {
-            // handleClear();
-            toast.success(res.message || `User Onboarding succesfully!`);
-          } else {
-            toast.error(res.message || `Something went wrong`);
-          }
-        })
-        .catch((err) => {
-          toast.error(err || "Something went wrong");
-        });
+      payload = buildClassAvailabilityPayload(formData);
+    } else if (step === 7) {
+      payload = {
+        pricing_agreement: {
+          group_class_rate: Number(formData.group_class_rate) || 0,
+          private_class_rate: Number(formData.private_class_rate) || 0,
+          single_class_rate: Number(formData.single_class_rate) || 0,
+          trial_period_days: 7,
+          isAgree:
+            !!formData.confirmAccurate &&
+            !!formData.ethicalStandards &&
+            !!formData.serviceMindset,
+          signature: formData.signature || "",
+        },
+      };
+    } else {
+      payload = buildPayloadByStep(step, formData);
     }
 
-    // const payload = {
-    //   ...formData,
-    //   countryCode: countryCode,
-    //   primaryMobile: mobileNumber,
-    //   secondMobile: SecondMobileNumber,
-    //   class_availability: {
-    //     availableClassTypes: [
-    //       formData.availableOneOnOne,
-    //       formData.availableGroupClass,
-    //     ],
-    //     teachingDays: formData.days,
-    //     earliestStartTime: formData.startTime,
-    //     latestEndTime: formData.endTime,
-    //     responseTime: formData.responseTime,
-    //   },
-    // };
-    return;
-    await dispatch(userOnboarding(payload))
-      .unwrap()
-      .then((res) => {
-        if (res.status === 200) {
-          handleClear();
-          toast.success(res.message || `User Onboarding succesfully!`);
-        } else {
-          toast.error(res.message || `Something went wrong`);
-        }
-      })
-      .catch((err) => {
-        toast.error(err || "Something went wrong");
-      });
-  };
+    // Map step to corresponding async thunk
+    const stepDispatchMap = {
+      1: onboardingStepOne,
+      2: onboardingStepTwo,
+      3: onboardingStepThree,
+      4: onboardingStepFour,
+      5: onboardingStepFive,
+      6: onboardingStepSixth,
+      7: onboardingStepSeven,
+    };
 
+    const stepThunk = stepDispatchMap[step];
+
+    if (!stepThunk) {
+      // toast.error("Invalid step!");
+      return;
+    }
+    console.log("payload=====", payload);
+
+    try {
+      const res = await dispatch(stepThunk(payload)).unwrap();
+
+      if (res.status === 200) {
+        toast.success(res.message || `User Onboarding successfully!`);
+        if (step === 7) setShowSuccessDialog(true);
+      } else {
+        toast.error(res.message || "Something went wrong");
+      }
+    } catch (err) {
+      toast.error(err?.message || "Something went wrong");
+    }
+  };
   // --- NEW: Final Accept Handler ---
   const handleFinalAccept = () => {
     console.log("Final Submission Data (Accepted):", formData);
@@ -1004,15 +953,6 @@ const InstructorOnboarding = () => {
                 />
               )}
 
-              {/* STEP 8: AGREEMENTS & SIGNATURE */}
-              {step === 8 && (
-                <StepEight
-                  formData={formData}
-                  handleChange={handleChange}
-                  validationErrors={validationErrors}
-                />
-              )}
-
               {/* FINAL STEP: VERIFICATION PENDING */}
               {isSubmitted && (
                 <div className="flex flex-col items-center justify-center text-center h-full py-10 animate-in zoom-in-95">
@@ -1031,7 +971,7 @@ const InstructorOnboarding = () => {
                     {Math.floor(Math.random() * 90000 + 10000)}
                   </p>
                   <button
-                    onClick={() => router.push("/")}
+                    onClick={() => router.push("/login")}
                     className="text-white bg-teal-600 px-6 py-3 rounded-xl font-semibold shadow-lg hover:bg-teal-700 transition-colors"
                   >
                     Return Home
