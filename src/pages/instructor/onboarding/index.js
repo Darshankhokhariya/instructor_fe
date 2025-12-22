@@ -143,7 +143,11 @@ const InstructorOnboarding = () => {
 
   useEffect(() => {
     if (defaultOnboardingStep?.step_completed !== undefined) {
-      setStep(defaultOnboardingStep.step_completed + 1);
+      setStep(
+        defaultOnboardingStep.step_completed === 0
+          ? 1
+          : defaultOnboardingStep.step_completed + 1
+      );
     }
   }, [defaultOnboardingStep]);
 
@@ -406,12 +410,13 @@ const InstructorOnboarding = () => {
         errors.introVideo = "Invalid video URL";
     }
 
+    console.log("data======", data);
     // Step 6: class selection
     if (
       step === 6 &&
-      !data.availableOneOnOne &&
+      !data.availablePrivateClass &&
       !data.availableGroupClass &&
-      !data.singleClass
+      !data.availableOnlineClass
     )
       errors.classType = "Select at least one class type";
     if (step === 6 && !data.days?.length)
@@ -652,7 +657,7 @@ const InstructorOnboarding = () => {
     const classTypes = [];
     if (formData.availableGroupClass) classTypes.push("GROUP");
     if (formData.availablePrivateClass) classTypes.push("PRIVATE");
-    if (formData.availableSingleClass) classTypes.push("ONLINE");
+    if (formData.availableOnlineClass) classTypes.push("ONLINE");
 
     // 2️⃣ Convert response time ("6h" → 6)
     const responseTimeHours = parseInt(formData.responseTime, 10) || 0;
@@ -689,7 +694,6 @@ const InstructorOnboarding = () => {
   // --- MODIFIED SUBMISSION HANDLER: Opens Dialog ---
   const handleSubmit = async (e) => {
     e.preventDefault();
-
 
     // const payloads = buildPayloadByStep(step, formData);
     const payload =
@@ -848,8 +852,8 @@ const InstructorOnboarding = () => {
 
   const isSubmitted = step === totalSteps + 1;
   const isGroupSelected = formData.availableGroupClass;
-  const isPrivateSelected = formData.availableOneOnOne;
-  const isSingleSelected = formData.singleClass;
+  const isPrivateSelected = formData.availablePrivateClass;
+  const isOnlineSelected = formData.availableOnlineClass;
 
   const saveButtonText = useMemo(() => {
     switch (saveStatus) {
@@ -994,7 +998,7 @@ const InstructorOnboarding = () => {
                   validationErrors={validationErrors}
                   isGroupSelected={isGroupSelected}
                   isPrivateSelected={isPrivateSelected}
-                  isSingleSelected={isSingleSelected}
+                  isOnlineSelected={isOnlineSelected}
                   trialOptions={trialOptions}
                 />
               )}
