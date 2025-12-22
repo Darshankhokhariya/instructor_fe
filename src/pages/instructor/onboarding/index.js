@@ -144,7 +144,8 @@ const InstructorOnboarding = () => {
   useEffect(() => {
     if (defaultOnboardingStep?.step_completed !== undefined) {
       setStep(
-        defaultOnboardingStep.step_completed === 0
+        defaultOnboardingStep.step_completed === null ||
+          defaultOnboardingStep.step_completed === 0
           ? 1
           : defaultOnboardingStep.step_completed + 1
       );
