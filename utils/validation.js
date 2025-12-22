@@ -31,6 +31,7 @@ export const FIELD_LABELS = {
   registerAs: "Registration Type",
   panCard: "PAN Card Number",
   aadharNumber: "Aadhaar Card Number",
+  taxIdentification: "Tax Identification",
   // Step 4
   instagram_link: "Instagram URL",
   facebook_link: "Facebook URL",
@@ -93,13 +94,21 @@ export const STEP_FIELDS = {
     "eRelation",
   ],
   2: ["collegeName", "qualification", "institute"],
+  3: ["registerAs", "panCard", "aadharNumber", "taxIdentification"],
+  4: ["instagram_link", "facebook_link", "linkdin_link", "youtube_link", "instructor_website"],
+  5: ["profileImage", "introVideo", "teaching_philosophy", "video_url"],
+  6: ["startTime", "endTime", "responseTime"],
+  7: [], // handled conditionally below
+  8: ["confirmAccurate", "ethicalStandards", "serviceMindset", "signature"],
 };
+
 export const REGEX = {
   url: /^(ftp|http|https):\/\/[^ "\s]+$/,
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   pan: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
   aadhar: /^\d{12}$/,
   positiveNumber: /^\d+(\.\d+)?$/,
+  gstin: /^[0-3][0-9][A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i,
 };
 
 export const isEmpty = (val) =>

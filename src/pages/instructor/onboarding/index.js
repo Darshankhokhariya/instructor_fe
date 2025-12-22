@@ -15,12 +15,23 @@ import {
   REGEX,
   STEP_FIELDS,
 } from "../../../../utils/validation";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import OnboardingFooter from "@/components/onboarding/OnboardingFooter";
 import { BiCheckCircleIcon, FaShieldAlt } from "../../../../utils/icon";
 import StepIndicator from "@/components/onboarding/StepIndicator";
 import { isTimeSlotValid } from "../../../../utils/onboarding";
 import SubmissionDialog from "@/components/onboarding/SubmissionDialog";
+import {
+  getOnboardingStep,
+  onboardingStepFive,
+  onboardingStepFour,
+  onboardingStepOne,
+  onboardingStepSixth,
+  onboardingStepThree,
+  onboardingStepTwo,
+  selectOnboardingStep,
+} from "@/redux/slices/onboardingSlice";
+import moment from "moment";
 
 const useRouter = () => ({
   push: (path) => console.log(`Simulating navigation to: ${path}`),
@@ -29,7 +40,7 @@ const useRouter = () => ({
 const InstructorOnboarding = () => {
   const totalSteps = 8;
   const DRAFT_KEY = "instructorOnboardingDraft";
-  const [step, setStep] = useState(1); // Start at Step 1
+
   const router = useRouter();
   const [isCurrentSameAsPermanent, setIsCurrentSameAsPermanent] =
     useState(false);
@@ -74,8 +85,9 @@ const InstructorOnboarding = () => {
       institute: "",
       registerAs: "individual", // Existing Field: default to individual
       panCard: "",
-      aadharNumber: "",
+      aadharNo: "",
       GSTIN: "",
+      taxIdentification: "",
       facebook_link: "",
       linkdin_link: "",
       instagram_link: "",
@@ -93,9 +105,9 @@ const InstructorOnboarding = () => {
       startTime: "07:00",
       endTime: "12:00",
       responseTime: "", // Existing Field
-      availableOneOnOne: false,
       availableGroupClass: false,
-      singleClass: false,
+      availablePrivateClass: false,
+      availableOnlineClass: false,
       group_class_rate: "",
       private_class_rate: "",
       single_class_rate: "",
@@ -119,51 +131,34 @@ const InstructorOnboarding = () => {
   const mobileNumber = parts?.slice(1)?.join("");
   const SecondMobileNumber = partsSecond?.slice(1)?.join("");
 
+  const defaultOnboardingStep = useSelector(selectOnboardingStep);
+  const [step, setStep] = useState(); // Start at Step 1
+  console.log("defaultOnboardingStep", defaultOnboardingStep);
+
   console.log("countryCode", countryCode);
 
-  // --- EFFECT TO LOAD DRAFT DATA ---
   useEffect(() => {
-    const draft = localStorage.getItem(DRAFT_KEY);
-    if (draft) {
-      try {
-        const draftData = JSON.parse(draft);
-        // Merge draft data with initial data, providing fallbacks for arrays
-        setFormData((prev) => ({
-          ...prev,
-          ...draftData,
-          // Do not load actual File objects (profileImage and cert.file) from localStorage
-          profileImage: null, // Reset as File object cannot be stored
-          certifications: (
-            draftData.certifications || [{ title: "", file: null }]
-          ).map((cert) => ({ ...cert, file: null })),
-          video_url: draftData.video_url || ["", ""],
-          yoga_style: draftData.yoga_style || [],
-          days: draftData.days || [],
-          times: draftData.times || [],
-          timeSlots: draftData.timeSlots || {},
-          language: draftData.language || [],
-        }));
-        if (draftData.isCurrentSameAsPermanent) {
-          setIsCurrentSameAsPermanent(true);
-        }
-      } catch (error) {
-        console.error("Failed to parse draft data:", error);
-      }
+    dispatch(getOnboardingStep());
+  }, []);
+
+  useEffect(() => {
+    if (defaultOnboardingStep?.step_completed !== undefined) {
+      setStep(defaultOnboardingStep.step_completed + 1);
     }
-  }, [initialFormData]);
+  }, [defaultOnboardingStep]);
 
   // --- EFFECT TO HANDLE PROFILE IMAGE PREVIEW ---
-  useEffect(() => {
-    if (formData.profileImage instanceof File) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfileImagePreview(reader.result);
-      };
-      reader.readAsDataURL(formData.profileImage);
-    } else {
-      setProfileImagePreview(null);
-    }
-  }, [formData.profileImage]);
+  // useEffect(() => {
+  //   if (formData.profileImage instanceof File) {
+  //     const reader = new FileReader();
+  //     reader.onloadend = () => {
+  //       setProfileImagePreview(reader.result);
+  //     };
+  //     reader.readAsDataURL(formData.profileImage);
+  //   } else {
+  //     setProfileImagePreview(null);
+  //   }
+  // }, [formData.profileImage]);
 
   // --- HANDLERS ---
 
@@ -177,30 +172,10 @@ const InstructorOnboarding = () => {
     });
 
     if (type === "checkbox") {
-      setFormData((prev) => {
-        const updatedData = { ...prev, [name]: checked };
-
-        // Logic for trialMode dependent on class availability
-        if (name === "availableOneOnOne" || name === "availableGroupClass") {
-          if (
-            !updatedData.availableOneOnOne &&
-            !updatedData.availableGroupClass
-          ) {
-            updatedData.trialMode = "none";
-          } else if (
-            updatedData.trialMode === "none" ||
-            updatedData.trialMode === ""
-          ) {
-            // Auto-select a default trial if one is now available
-            updatedData.trialMode = updatedData.availableOneOnOne
-              ? "1private"
-              : updatedData.availableGroupClass
-                ? "2group"
-                : "";
-          }
-        }
-        return updatedData;
-      });
+      setFormData((prev) => ({
+        ...prev,
+        [name]: checked,
+      }));
       return;
     }
 
@@ -213,27 +188,30 @@ const InstructorOnboarding = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   }, []);
 
-  const handleArrayToggle = useCallback((field, value, replaceArray = false) => {
-    setFormData((prev) => {
-      const current = prev[field];
-      // If replaceArray is true, replace the entire array with the new value
-      const updated = replaceArray ? value : (
-        current.includes(value)
+  const handleArrayToggle = useCallback(
+    (field, value, replaceArray = false) => {
+      setFormData((prev) => {
+        const current = prev[field];
+        // If replaceArray is true, replace the entire array with the new value
+        const updated = replaceArray
+          ? value
+          : current.includes(value)
           ? current.filter((i) => i !== value)
-          : [...current, value]
-      );
+          : [...current, value];
 
-      setValidationErrors((v) => {
-        if (v[field] && updated.length > 0) {
-          const newErrors = { ...v };
-          delete newErrors[field];
-          return newErrors;
-        }
-        return v;
+        setValidationErrors((v) => {
+          if (v[field] && updated.length > 0) {
+            const newErrors = { ...v };
+            delete newErrors[field];
+            return newErrors;
+          }
+          return v;
+        });
+        return { ...prev, [field]: updated };
       });
-      return { ...prev, [field]: updated };
-    });
-  }, []);
+    },
+    []
+  );
 
   const handleTimeSlotsChange = useCallback((newTimeSlots) => {
     setFormData((prev) => ({
@@ -358,12 +336,14 @@ const InstructorOnboarding = () => {
         "eRelation",
       ],
       2: ["collegeName", "qualification", "institute"],
-      3: ["registerAs", "panCard", "aadharNumber"],
-      5: ["profileImage", "introVideo", "teaching_philosophy"],
+      3: ["registerAs"],
+      5: ["profileImage", "introVideo", "teaching_philosophy", "video_url"],
       6: ["startTime", "endTime", "responseTime"],
       7: [], // handled conditionally below
       8: ["confirmAccurate", "ethicalStandards", "serviceMindset", "signature"],
     };
+
+    let fields = requiredFields[step] || [];
 
     // Step 1-8: required fields
     (requiredFields[step] || []).forEach((field) => {
@@ -389,15 +369,15 @@ const InstructorOnboarding = () => {
     // Regex validations
     if (step === 1 && data.email && !REGEX.email.test(data.email))
       errors.email = "Invalid email";
+
     if (step === 3) {
-      if (data.panCard && !REGEX.pan.test(data.panCard.toUpperCase()))
-        errors.panCard = "Invalid PAN format";
-      if (
-        data.aadharNumber &&
-        !REGEX.aadhar.test(data.aadharNumber.replace(/\s/g, ""))
-      )
-        errors.aadharNumber = "Invalid Aadhaar number";
+      if (formData.pCountry === "India") {
+        fields = [...fields, "panCard", "aadharNo", "GSTIN"];
+      } else {
+        fields = [...fields, "taxIdentification"];
+      }
     }
+
     if (step === 4) {
       [
         "instagram_link",
@@ -436,8 +416,8 @@ const InstructorOnboarding = () => {
       errors.classType = "Select at least one class type";
     if (step === 6 && !data.days?.length)
       errors.days = "Select at least one teaching day";
-    if (step === 6 && !data.times?.length)
-      errors.times = "Select at least one class time";
+    // if (step === 6 && !data.times?.length)
+    //   errors.times = "Select at least one class time";
 
     // Step 7: pricing
     if (step === 7) {
@@ -471,6 +451,31 @@ const InstructorOnboarding = () => {
   const validateStep = () => {
     const fieldErrors = validateFormFields(formData);
 
+    if (step === 3 && formData.registerAs) {
+      if (formData.registerAs === "individual") {
+        if (!formData.panCard) {
+          fieldErrors.panCard = "PAN is required";
+        } else if (!REGEX.pan.test(formData.panCard.toUpperCase())) {
+          fieldErrors.panCard = "Invalid PAN format";
+        }
+
+        if (!formData.aadharNo) {
+          fieldErrors.aadharNo = "Aadhaar number is required";
+        } else if (!REGEX.aadhar.test(formData.aadharNo.replace(/\s/g, ""))) {
+          fieldErrors.aadharNo = "Invalid Aadhaar number";
+        }
+        if (!formData.GSTIN) {
+          fieldErrors.GSTIN = "GST number is required";
+        } else if (!REGEX.gstin.test(formData.GSTIN.replace(/\s/g, ""))) {
+          fieldErrors.GSTIN = "Invalid GST number";
+        }
+      } else if (formData.registerAs === "business") {
+        if (!formData.taxIdentification) {
+          fieldErrors.taxIdentification = "Taxpayer ID is Required";
+        }
+      }
+    }
+
     let customError = null;
     if (step === 6 && formData.startTime && formData.endTime) {
       const isValidTime = isTimeSlotValid(formData.startTime, formData.endTime);
@@ -496,15 +501,15 @@ const InstructorOnboarding = () => {
   };
 
   const nextStep = (e) => {
-    // if (validateStep()) {
-    //   // Uncomment for mandatory validation
-    //   document
-    //     .getElementById("form-content-area")
-    //     ?.scrollTo({ top: 0, behavior: "smooth" });
-    setStep((prev) => Math.min(prev + 1, totalSteps));
+    if (validateStep()) {
+      //   // Uncomment for mandatory validation
+      //   document
+      //     .getElementById("form-content-area")
+      //     ?.scrollTo({ top: 0, behavior: "smooth" });
+      setStep((prev) => Math.min(prev + 1, totalSteps));
 
-    //   handleSubmit(e);
-    // }
+      handleSubmit(e);
+    }
   };
 
   const prevStep = () => {
@@ -513,7 +518,39 @@ const InstructorOnboarding = () => {
     document
       .getElementById("form-content-area")
       ?.scrollTo({ top: 0, behavior: "smooth" });
-    setStep((prev) => Math.max(prev - 1, 1));
+
+    setStep((prev) => {
+      const newStep = Math.max(prev - 1, 1);
+
+      if (newStep < prev) {
+        // Build payload for the step we're going back to
+        const payload = buildPayloadByStep(newStep, formData);
+
+        // Dynamically dispatch corresponding action
+        switch (newStep) {
+          case 1:
+            dispatch(onboardingStepOne(payload));
+            break;
+          case 2:
+            dispatch(onboardingStepTwo(payload));
+            break;
+          case 3:
+            dispatch(onboardingStepThree(payload));
+            break;
+          case 4:
+            dispatch(onboardingStepFour(payload));
+            break;
+          case 5:
+            dispatch(onboardingStepFive(payload));
+            break;
+          // add more steps here as needed
+          default:
+            break;
+        }
+      }
+
+      return newStep;
+    });
   };
 
   const handleClear = () => {
@@ -558,6 +595,10 @@ const InstructorOnboarding = () => {
     const payload = {};
 
     STEP_FIELDS[step]?.forEach((key) => {
+      if (key === "email") return;
+      if (key === "panCard") return;
+      if (key === "introVideo") return;
+      if (key === "profileImage") return;
       if (formData[key] !== undefined) {
         payload[key] = formData[key];
       }
@@ -567,64 +608,188 @@ const InstructorOnboarding = () => {
       payload.countryCode = countryCode;
       payload.primaryMobile = mobileNumber;
       payload.secondMobile = SecondMobileNumber;
+      payload.dateOfBirth = moment(formData.dateOfBirth).format("DD-MM-YYYY");
+    }
+
+    console.log("formData", formData);
+    if (step === 3) {
+      if (formData.registerAs === "individual") {
+        payload.registerAs = formData.registerAs;
+        payload.taxIdentification = formData.panCard;
+        payload.aadharNo = formData.aadharNo;
+        payload.GSTIN = formData.GSTIN;
+      } else {
+        payload.registerAs = formData.registerAs;
+        payload.taxIdentification = formData.taxIdentification;
+
+        delete payload.panCard;
+        delete payload.aadharNo;
+        delete payload.GSTIN;
+      }
+    }
+
+    if (step === 5) {
+      payload.profile_image = "uploads/profile_123.jpg";
+      payload.yoga_style = formData.yoga_style;
+      payload.certificates = [
+        {
+          certificate_name: "test",
+          file_url: "https://www.instagram.com/",
+        },
+        {
+          certificate_name: "Prenatal Yoga Certification",
+          file_url: "https://www.instagram.com/",
+        },
+      ];
+      payload.video_url = formData.video_url;
     }
 
     return payload;
   };
 
+  const buildClassAvailabilityPayload = (formData) => {
+    // 1️⃣ Build class types
+    const classTypes = [];
+    if (formData.availableGroupClass) classTypes.push("GROUP");
+    if (formData.availablePrivateClass) classTypes.push("PRIVATE");
+    if (formData.availableSingleClass) classTypes.push("ONLINE");
+
+    // 2️⃣ Convert response time ("6h" → 6)
+    const responseTimeHours = parseInt(formData.responseTime, 10) || 0;
+
+    // 3️⃣ Build availability map
+    const availability = {};
+
+    Object.entries(formData.timeSlots || {}).forEach(([day, slots]) => {
+      if (!slots?.length) return;
+
+      availability[day.charAt(0).toUpperCase() + day.slice(1)] = slots.flatMap(
+        (slot) =>
+          classTypes.map((classKey) => ({
+            class_key: classKey,
+            start_time: slot.start,
+            end_time: slot.end,
+          }))
+      );
+    });
+
+    // 4️⃣ Final payload
+    return {
+      class_availability: [
+        {
+          class_types: classTypes,
+          response_time_hours: responseTimeHours,
+          availability,
+        },
+      ],
+    };
+  };
+
+  console.log("formData", formData);
   // --- MODIFIED SUBMISSION HANDLER: Opens Dialog ---
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     let payload = {};
 
-    if (step === 1) {
-      payload.name = formData.name;
-      payload.dateOfBirth = formData.dateOfBirth;
-      payload.gender = formData.gender;
-      payload.countryCode = countryCode;
-      payload.primaryMobile = mobileNumber;
-      payload.secondMobile = SecondMobileNumber;
-      payload.language = formData.language;
-      // parmanat address
-      payload.pCountry = formData.pCountry;
-      payload.pState = formData.pState;
-      payload.pCity = formData.pCity;
-      payload.pPincode = formData.pPincode;
-      payload.pArea = formData.pArea;
-      payload.pBuilding = formData.pBuilding;
-      payload.pBlock = formData.pBlock;
-      // current address
-      payload.cCountry = formData.cCountry;
-      payload.cState = formData.cState;
-      payload.cCity = formData.cCity;
-      payload.cPincode = formData.cPincode;
-      payload.cArea = formData.cArea;
-      payload.cBuilding = formData.cBuilding;
-      payload.cBlock = formData.cBlock;
-      // Emergency Contact
-      payload.eName = formData.eName;
-      payload.eMobile = formData.eMobile;
-      payload.eRelation = formData.eRelation;
+    const payloads = buildPayloadByStep(step, formData);
+
+    if (step === 6) {
+      const payloadSixth = buildClassAvailabilityPayload(formData);
     }
 
+    if (step === 1) {
+      await dispatch(onboardingStepOne(payloads))
+        .unwrap()
+        .then((res) => {
+          if (res.status === 200) {
+            // handleClear();
+            toast.success(res.message || `User Onboarding succesfully!`);
+          } else {
+            toast.error(res.message || `Something went wrong`);
+          }
+        })
+        .catch((err) => {
+          toast.error(err || "Something went wrong");
+        });
+    }
     if (step === 2) {
-      // Education details
-      payload.collegeName = formData.collegeName;
-      payload.qualification = formData.qualification;
-      payload.institute = formData.institute;
+      await dispatch(onboardingStepTwo(payloads))
+        .unwrap()
+        .then((res) => {
+          if (res.status === 200) {
+            // handleClear();
+            toast.success(res.message || `User Onboarding succesfully!`);
+          } else {
+            toast.error(res.message || `Something went wrong`);
+          }
+        })
+        .catch((err) => {
+          toast.error(err || "Something went wrong");
+        });
     }
 
     if (step === 3) {
+      await dispatch(onboardingStepThree(payloads))
+        .unwrap()
+        .then((res) => {
+          if (res.status === 200) {
+            // handleClear();
+            toast.success(res.message || `User Onboarding succesfully!`);
+          } else {
+            toast.error(res.message || `Something went wrong`);
+          }
+        })
+        .catch((err) => {
+          toast.error(err || "Something went wrong");
+        });
     }
 
-    const payloads = buildPayloadByStep(step, formData, {
-      countryCode,
-      primaryMobile: mobileNumber,
-      secondMobile: SecondMobileNumber,
-    });
-    console.log("payload", payload);
-    console.log("payloads", payloads);
+    if (step === 4) {
+      await dispatch(onboardingStepFour(payloads))
+        .unwrap()
+        .then((res) => {
+          if (res.status === 200) {
+            // handleClear();
+            toast.success(res.message || `User Onboarding succesfully!`);
+          } else {
+            toast.error(res.message || `Something went wrong`);
+          }
+        })
+        .catch((err) => {
+          toast.error(err || "Something went wrong");
+        });
+    }
+    if (step === 5) {
+      await dispatch(onboardingStepFive(payloads))
+        .unwrap()
+        .then((res) => {
+          if (res.status === 200) {
+            // handleClear();
+            toast.success(res.message || `User Onboarding succesfully!`);
+          } else {
+            toast.error(res.message || `Something went wrong`);
+          }
+        })
+        .catch((err) => {
+          toast.error(err || "Something went wrong");
+        });
+    }
+    if (step === 6) {
+      await dispatch(onboardingStepSixth(payloads))
+        .unwrap()
+        .then((res) => {
+          if (res.status === 200) {
+            // handleClear();
+            toast.success(res.message || `User Onboarding succesfully!`);
+          } else {
+            toast.error(res.message || `Something went wrong`);
+          }
+        })
+        .catch((err) => {
+          toast.error(err || "Something went wrong");
+        });
+    }
 
     // const payload = {
     //   ...formData,
@@ -751,8 +916,9 @@ const InstructorOnboarding = () => {
             className="max-w-5xl mx-auto min-h-full"
           >
             <div
-              className={`transition-opacity duration-300 ease-out ${isSubmitted ? "opacity-100" : "opacity-100"
-                } pb-4`}
+              className={`transition-opacity duration-300 ease-out ${
+                isSubmitted ? "opacity-100" : "opacity-100"
+              } pb-4`}
             >
               {/* STEP 1: PERSONAL, ADDRESS, EMERGENCY CONTACT, LANGUAGES */}
               {step === 1 && (
@@ -781,6 +947,7 @@ const InstructorOnboarding = () => {
                   formData={formData}
                   handleChange={handleChange}
                   validationErrors={validationErrors}
+                  setFormData={setFormData}
                 />
               )}
 
@@ -804,6 +971,7 @@ const InstructorOnboarding = () => {
                   profileImagePreview={profileImagePreview}
                   addCertification={addCertification}
                   addSampleVideo={addSampleVideo}
+                  handleSampleVideoChange={handleSampleVideoChange}
                 />
               )}
 
@@ -881,6 +1049,7 @@ const InstructorOnboarding = () => {
             totalSteps={totalSteps}
             formData={formData}
             saveButtonText={saveButtonText}
+            handleSubmit={handleSubmit}
           />
         )}
       </div>

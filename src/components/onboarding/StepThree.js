@@ -3,6 +3,17 @@ import SectionHeader from "./SectionHeader";
 import Selector from "../common/Selector";
 import Input from "../common/Input";
 
+const options = [
+  {
+    label: "Individual (PAN/Aadhaar/GSTIN)",
+    value: "individual",
+  },
+  {
+    label: "Business (Foreign ID)",
+    value: "business",
+  },
+];
+
 const StepThree = ({ formData, handleChange, validationErrors }) => {
   return (
     <div className="space-y-6">
@@ -20,24 +31,15 @@ const StepThree = ({ formData, handleChange, validationErrors }) => {
           <Selector
             label="Register As"
             name="registerAs"
-            options={[
-              {
-                label: "Individual (PAN/Aadhaar/GSTIN)",
-                value: "individual",
-              },
-              {
-                label: "Business (Foreign ID)",
-                value: "business",
-              },
-            ]}
-            defaultValue={formData.pCountry === "india" ? "india" : "business" }
+            options={options}
             value={formData.registerAs}
             onChange={handleChange}
             required
             error={validationErrors.registerAs}
             placeholder="Select Registration Type"
           />
-          {formData.pCountry === "india" ? (
+          {formData.pCountry === "india" &&
+          formData.registerAs === "individual" ? (
             <>
               <Input
                 label="PAN Card Number"
@@ -50,12 +52,12 @@ const StepThree = ({ formData, handleChange, validationErrors }) => {
               />
               <Input
                 label="Aadhaar Card Number"
-                name="aadharNumber"
+                name="aadharNo"
                 placeholder="1234 5678 9012"
-                value={formData.aadharNumber}
+                value={formData.aadharNo}
                 onChange={handleChange}
                 required
-                error={validationErrors.aadharNumber}
+                error={validationErrors.aadharNo}
               />
               <Input
                 label="GSTIN"
@@ -70,12 +72,12 @@ const StepThree = ({ formData, handleChange, validationErrors }) => {
           ) : (
             <Input
               label="Taxpayer Identification Number(TIN)"
-              name="aadharNumber"
+              name="taxIdentification"
               placeholder="1234 5678 9012"
-              value={formData.aadharNumber}
+              value={formData.taxIdentification}
               onChange={handleChange}
               required
-              error={validationErrors.aadharNumber}
+              error={validationErrors.taxIdentification}
             />
           )}
         </div>

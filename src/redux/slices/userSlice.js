@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import { API_ENDPOINTS, postRequest } from "../api/apiRequest";
 
 const initialState = {
   loading: false,
@@ -10,85 +11,22 @@ const initialState = {
 
 export const userSignup = createAsyncThunk(
   "user/userSignup",
-  async (fields, { rejectWithValue }) => {
-    try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/user/signup`,
-        fields,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      if (response.data?.status === 200) {
-        return response.data;
-      } else {
-        return rejectWithValue(
-          response.data?.message || "Failed register user!"
-        );
-      }
-    } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Something went wrong"
-      );
-    }
+  async (fields) => {
+    return await postRequest(API_ENDPOINTS.AUTH.SIGNUP, fields);
   }
 );
 
 export const userLogin = createAsyncThunk(
   "user/userLogin",
-  async (fields, { rejectWithValue }) => {
-    try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/user/userLogin`,
-        fields,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      if (response.data?.status === 200) {
-        return response.data;
-      } else {
-        return rejectWithValue(
-          response.data?.message || "Failed register user!"
-        );
-      }
-    } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Something went wrong"
-      );
-    }
+  async (fields) => {
+    return await postRequest(API_ENDPOINTS.AUTH.LOGIN, fields);
   }
 );
 
 export const userVerifyOtp = createAsyncThunk(
-  "user/userVerifyOtp",
-  async (fields, { rejectWithValue }) => {
-    try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/user/otpVerify`,
-        fields,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      if (response.data?.status === 200) {
-        return response.data;
-      } else {
-        return rejectWithValue(
-          response.data?.message || "Failed register user!"
-        );
-      }
-    } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Something went wrong"
-      );
-    }
+  "user/userLogin",
+  async (fields) => {
+    return await postRequest(API_ENDPOINTS.AUTH.VERIFY_OTP, fields);
   }
 );
 

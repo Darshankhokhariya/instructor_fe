@@ -14,7 +14,8 @@ const StepFive = ({
   handleCertChange,
   profileImagePreview,
   addCertification,
-  addSampleVideo 
+  addSampleVideo ,
+  handleSampleVideoChange
 }) => {
   return (
     <div className="space-y-8">
@@ -35,7 +36,7 @@ const StepFive = ({
               onChange={handleChange}
               // ... (rest of the input className) ...
               accept="image/*"
-              required
+              // required
             />
             {formData.profileImage && (
               <p className="mt-2 text-xs text-slate-600">

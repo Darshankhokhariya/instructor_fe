@@ -2,7 +2,17 @@ import React from "react";
 import { BiChevronLeftIcon, BiChevronRightIcon } from "../../../utils/icon";
 import { BiSave } from "react-icons/bi";
 
-const OnboardingFooter = ({prevStep, nextStep , step, saveStatus, saveDraft, totalSteps, formData, saveButtonText}) => {
+const OnboardingFooter = ({
+  prevStep,
+  nextStep,
+  step,
+  saveStatus,
+  saveDraft,
+  totalSteps,
+  formData,
+  saveButtonText,
+  handleSubmit,
+}) => {
   return (
     <div className="flex-none px-6 py-6 border-t border-slate-100 bg-white rounded-b-3xl">
       <div className="flex items-center justify-between max-w-5xl mx-auto w-full">

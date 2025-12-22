@@ -25,21 +25,21 @@ const StepSixth = ({
       <div className="mt-4">
         <Label required>Available Class Types</Label>
         <CheckboxToggle
-          label="Available for One-on-One Private Session"
-          name="availableOneOnOne"
-          checked={formData.availableOneOnOne}
-          onChange={handleChange}
-        />
-        <CheckboxToggle
           label="Available for Group Class"
           name="availableGroupClass"
           checked={formData.availableGroupClass}
           onChange={handleChange}
         />
         <CheckboxToggle
-          label="Single Class"
-          name="singleClass"
-          checked={formData.singleClass}
+          label="Available for Private Class"
+          name="availablePrivateClass"
+          checked={formData.availablePrivateClass}
+          onChange={handleChange}
+        />
+        <CheckboxToggle
+          label="Available for Online Class"
+          name="availableOnlineClass"
+          checked={formData.availableOnlineClass}
           onChange={handleChange}
         />
         {validationErrors.classType && (
