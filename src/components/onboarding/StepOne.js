@@ -40,6 +40,11 @@ const StepOne = ({
             value={formData.dateOfBirth}
             onChange={handleChange}
             required
+            max={
+              new Date(new Date().setFullYear(new Date().getFullYear() - 18))
+                .toISOString()
+                .split("T")[0]
+            }
             error={validationErrors.dateOfBirth}
           />
           <Selector
@@ -142,8 +147,7 @@ const StepOne = ({
         {/* Permanent Address */}
         <div className="p-4  rounded-xl border border-slate-200">
           <h4 className="text-md font-bold text-teal-900 mb-3 flex items-center">
-            Permanent
-            Address
+            Permanent Address
           </h4>
           <div className="grid grid-cols-1 gap-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -223,7 +227,6 @@ const StepOne = ({
               placeholder="Enter Pincode / Zip"
             />
           </div>
-
         </div>
 
         {/* Current Address */}
@@ -326,7 +329,6 @@ const StepOne = ({
                 />
               </div>
             </div>
-
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
               <Input

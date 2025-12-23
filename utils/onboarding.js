@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export const isTimeSlotValid = (start, end) => {
   if (!start || !end) return true;
   const [startH, startM] = start.split(":").map(Number);
@@ -25,3 +27,9 @@ export const languageOptions = [
   "Bengali",
   "Other"
 ];
+
+
+export const formatDOB = (dob) => {
+  if (!dob) return "";
+  return moment(dob, "DD-MM-YYYY").format("YYYY-MM-DD");
+};

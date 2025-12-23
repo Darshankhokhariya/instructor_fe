@@ -95,7 +95,13 @@ export const STEP_FIELDS = {
   ],
   2: ["collegeName", "qualification", "institute"],
   3: ["registerAs", "panCard", "aadharNumber", "taxIdentification"],
-  4: ["instagram_link", "facebook_link", "linkdin_link", "youtube_link", "instructor_website"],
+  4: [
+    "instagram_link",
+    "facebook_link",
+    "linkdin_link",
+    "youtube_link",
+    "instructor_website",
+  ],
   5: ["profileImage", "introVideo", "teaching_philosophy", "video_url"],
   6: ["startTime", "endTime", "responseTime"],
   7: [], // handled conditionally below
@@ -105,7 +111,7 @@ export const STEP_FIELDS = {
 export const REGEX = {
   url: /^(ftp|http|https):\/\/[^ "\s]+$/,
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  yopmail: /^[^\s@]+@yopmail\.com$/i,  
+  yopmail: /^[^\s@]+@yopmail\.com$/i,
   pan: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
   aadhar: /^\d{12}$/,
   positiveNumber: /^\d+(\.\d+)?$/,
@@ -117,3 +123,23 @@ export const isEmpty = (val) =>
   val === null ||
   (typeof val === "string" && !val.trim()) ||
   (Array.isArray(val) && val.length === 0);
+
+  
+export const isAdult = (dob) => {
+  if (!dob) return false;
+
+  const today = new Date();
+  const birthDate = new Date(dob);
+
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < birthDate.getDate())
+  ) {
+    age--;
+  }
+
+  return age >= 18;
+};

@@ -11,6 +11,7 @@ import StepSeven from "@/components/onboarding/StepSeven";
 import StepEight from "@/components/onboarding/StepEight";
 import {
   FIELD_LABELS,
+  isAdult,
   isEmpty,
   REGEX,
   STEP_FIELDS,
@@ -19,7 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import OnboardingFooter from "@/components/onboarding/OnboardingFooter";
 import { BiCheckCircleIcon, FaShieldAlt } from "../../../../utils/icon";
 import StepIndicator from "@/components/onboarding/StepIndicator";
-import { isTimeSlotValid, languageOptions } from "../../../../utils/onboarding";
+import { formatDOB, isTimeSlotValid, languageOptions } from "../../../../utils/onboarding";
 import SubmissionDialog from "@/components/onboarding/SubmissionDialog";
 import {
   getOnboardingStep,
@@ -216,8 +217,11 @@ const InstructorOnboarding = () => {
   };
 
   useEffect(() => {
-    if (step === 1 && defaultOnboardingStepData) {
-      const apiLanguages = defaultOnboardingStepData?.data?.language || [];
+    const data = defaultOnboardingStepData?.data;
+
+    console.log("data", data);
+    if (step === 1 && data) {
+      const apiLanguages = data?.language || [];
 
       const selectedLanguages = [];
       let otherLanguage = "";
@@ -230,90 +234,85 @@ const InstructorOnboarding = () => {
           otherLanguage = lang; // fill input
         }
       });
-      const countryCode = defaultOnboardingStepData?.data?.countryCode || "+91";
-      const primaryMobile = defaultOnboardingStepData?.data?.primaryMobile
-        ? `${countryCode} ${defaultOnboardingStepData?.data?.primaryMobile}`
+      const countryCode = data?.countryCode || "+91";
+      const primaryMobile = data?.primaryMobile
+        ? `${countryCode} ${data?.primaryMobile}`
         : "";
-      const secondMobile = defaultOnboardingStepData?.data?.secondMobile
-        ? `${countryCode} ${defaultOnboardingStepData?.data?.secondMobile}`
+      const secondMobile = data?.secondMobile
+        ? `${countryCode} ${data?.secondMobile}`
         : "";
       setFormData((prev) => ({
         ...prev,
-        name: defaultOnboardingStepData?.data?.name,
-        dateOfBirth: moment(defaultOnboardingStep?.data?.dateOfBirth).format(
-          "YYYY-MM-DD"
-        ),
-        gender: defaultOnboardingStepData?.data?.gender,
+        name: data?.name,
+        dateOfBirth: formatDOB(data.dateOfBirth),
+        gender: data?.gender,
         primaryMobile,
         secondMobile,
         language: selectedLanguages,
-        pBlock: defaultOnboardingStepData?.data?.pBlock,
-        pBuilding: defaultOnboardingStepData?.data?.pBuilding,
-        pArea: defaultOnboardingStepData?.data?.pArea,
-        pCity: defaultOnboardingStepData?.data?.pCity,
-        pState: defaultOnboardingStepData?.data?.pState,
-        pCountry: defaultOnboardingStepData?.data?.pCountry,
-        pPincode: defaultOnboardingStepData?.data?.pPincode,
+        pBlock: data?.pBlock,
+        pBuilding: data?.pBuilding,
+        pArea: data?.pArea,
+        pCity: data?.pCity,
+        pState: data?.pState,
+        pCountry: data?.pCountry,
+        pPincode: data?.pPincode,
 
-        cBlock: defaultOnboardingStepData?.data?.cBlock,
-        cBuilding: defaultOnboardingStepData?.data?.cBuilding,
-        cArea: defaultOnboardingStepData?.data?.cArea,
-        cCity: defaultOnboardingStepData?.data?.cCity,
-        cState: defaultOnboardingStepData?.data?.cState,
-        cCountry: defaultOnboardingStepData?.data?.cCountry,
-        cPincode: defaultOnboardingStepData?.data?.cPincode,
+        cBlock: data?.cBlock,
+        cBuilding: data?.cBuilding,
+        cArea: data?.cArea,
+        cCity: data?.cCity,
+        cState: data?.cState,
+        cCountry: data?.cCountry,
+        cPincode: data?.cPincode,
 
-        eName: defaultOnboardingStepData?.data?.eName,
-        eMobile: defaultOnboardingStepData?.data?.eMobile,
-        eRelation: defaultOnboardingStepData?.data?.eRelation,
+        eName: data?.eName,
+        eMobile: data?.eMobile,
+        eRelation: data?.eRelation,
       }));
     }
 
-    if (step === 2 && defaultOnboardingStepData) {
+    if (step === 2 && data) {
       setFormData((prev) => ({
         ...prev,
-        collegeName: defaultOnboardingStepData?.data?.collegeName,
-        qualification: defaultOnboardingStepData?.data?.qualification,
-        institute: defaultOnboardingStepData?.data?.institute,
+        collegeName: data?.collegeName,
+        qualification: data?.qualification,
+        institute: data?.institute,
       }));
     }
 
-    if (step === 3 && defaultOnboardingStepData) {
+    if (step === 3 && data) {
       setFormData((prev) => ({
         ...prev,
-        registerAs: defaultOnboardingStepData?.data?.registerAs,
-        taxIdentification: defaultOnboardingStepData?.data?.taxIdentification,
-        panCard: defaultOnboardingStepData?.data?.taxIdentification,
-        aadharNo: defaultOnboardingStepData?.data?.aadharNo,
-        GSTIN: defaultOnboardingStepData?.data?.GSTIN,
+        registerAs: data?.registerAs,
+        taxIdentification: data?.taxIdentification,
+        panCard: data?.taxIdentification,
+        aadharNo: data?.aadharNo,
+        GSTIN: data?.GSTIN,
       }));
     }
 
-    if (step === 4 && defaultOnboardingStepData) {
+    if (step === 4 && data) {
       setFormData((prev) => ({
         ...prev,
-        instagram_link: defaultOnboardingStepData?.data?.instagram_link,
-        linkdin_link: defaultOnboardingStepData?.data?.linkdin_link,
-        instructor_website: defaultOnboardingStepData?.data?.instructor_website,
-        facebook_link: defaultOnboardingStepData?.data?.facebook_link,
-        youtube_link: defaultOnboardingStepData?.data?.youtube_link,
+        instagram_link: data?.instagram_link,
+        linkdin_link: data?.linkdin_link,
+        instructor_website: data?.instructor_website,
+        facebook_link: data?.facebook_link,
+        youtube_link: data?.youtube_link,
       }));
     }
 
-    if (step === 5 && defaultOnboardingStepData) {
+    if (step === 5 && data) {
       setFormData((prev) => ({
         ...prev,
-        yoga_style: defaultOnboardingStepData?.data?.yoga_style || [],
-        video_url: defaultOnboardingStepData?.data?.video_url || [],
-        instructor_website: defaultOnboardingStepData?.data?.instructor_website,
-        teaching_philosophy:
-          defaultOnboardingStepData?.data?.teaching_philosophy,
+        yoga_style: data?.yoga_style || [],
+        video_url: data?.video_url || [],
+        instructor_website: data?.instructor_website,
+        teaching_philosophy: data?.teaching_philosophy,
       }));
     }
-    if (step === 6 && defaultOnboardingStepData?.data) {
-      const mappedData = mapClassAvailabilityToFormData(
-        defaultOnboardingStepData.data
-      );
+    if (step === 6 && data) {
+      const mappedData = mapClassAvailabilityToFormData(data);
 
       setFormData((prev) => ({
         ...prev,
@@ -321,23 +320,17 @@ const InstructorOnboarding = () => {
       }));
     }
 
-    if (step === 7 && defaultOnboardingStepData) {
+    if (step === 7 && data) {
       setFormData((prev) => ({
         ...prev,
-        group_class_rate:
-          defaultOnboardingStepData?.data?.pricing_agreement?.group_class_rate,
-        private_class_rate:
-          defaultOnboardingStepData?.data?.pricing_agreement
-            ?.private_class_rate,
-        single_class_rate:
-          defaultOnboardingStepData?.data?.pricing_agreement?.single_class_rate,
-        trial_period_days:
-          defaultOnboardingStepData?.data?.pricing_agreement?.trial_period_days,
-        signature:
-          defaultOnboardingStepData?.data?.pricing_agreement?.signature,
+        group_class_rate: data?.pricing_agreement?.group_class_rate,
+        private_class_rate: data?.pricing_agreement?.private_class_rate,
+        single_class_rate: data?.pricing_agreement?.single_class_rate,
+        trial_period_days: data?.pricing_agreement?.trial_period_days,
+        signature: data?.pricing_agreement?.signature,
       }));
 
-      if (defaultOnboardingStep?.data?.pricing_agreement?.isAgree === true) {
+      if (data?.pricing_agreement?.isAgree === true) {
         setFormData((prev) => ({
           confirmAccurate: true,
           ethicalStandards: true,
@@ -345,7 +338,7 @@ const InstructorOnboarding = () => {
         }));
       }
     }
-  }, [step, defaultOnboardingStepData]);
+  }, [step, defaultOnboardingStepData?.data]);
 
   // --- EFFECT TO HANDLE PROFILE IMAGE PREVIEW ---
   useEffect(() => {
@@ -363,14 +356,16 @@ const InstructorOnboarding = () => {
   // --- HANDLERS ---
 
   const handleChange = useCallback((e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type, checked, files } = e.target;
 
+    // Clear existing error for this field
     setValidationErrors((prev) => {
       const newErrors = { ...prev };
       delete newErrors[name];
       return newErrors;
     });
 
+    // Checkbox
     if (type === "checkbox") {
       setFormData((prev) => ({
         ...prev,
@@ -379,13 +374,30 @@ const InstructorOnboarding = () => {
       return;
     }
 
+    // File input
     if (type === "file") {
-      // [MODIFIED] Handles file input for both profileImage and certification files
-      setFormData((prev) => ({ ...prev, [name]: e.target.files[0] }));
+      setFormData((prev) => ({
+        ...prev,
+        [name]: files[0],
+      }));
       return;
     }
 
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    // Date of Birth validation (18+)
+    if (name === "dateOfBirth") {
+      if (!isAdult(value)) {
+        setValidationErrors((prev) => ({
+          ...prev,
+          dateOfBirth: "You must be at least 18 years old",
+        }));
+      }
+    }
+
+    // Default input handler
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   }, []);
 
   const handleArrayToggle = useCallback(
@@ -499,6 +511,7 @@ const InstructorOnboarding = () => {
       return { ...prev, video_url: updated };
     });
   }, []);
+
   const addSampleVideo = () =>
     formData.video_url.length < 10 &&
     setFormData((prev) => ({
@@ -566,14 +579,36 @@ const InstructorOnboarding = () => {
     }
 
     // Regex validations
-    if (step === 1 && data.email) {
-      const isNormalEmail = REGEX.email.test(data.email);
-      const isYopmail = REGEX.yopmail.test(data.email);
+    if (step === 1) {
+      if (data.email) {
+        const isNormalEmail = REGEX.email.test(data.email);
+        const isYopmail = REGEX.yopmail.test(data.email);
 
-      if (!isNormalEmail && !isYopmail) {
-        errors.email = "Invalid email";
+        if (!isNormalEmail && !isYopmail) {
+          errors.email = "Invalid email";
+        }
+      }
+
+      if (data.dateOfBirth) {
+        const today = new Date();
+        const dob = new Date(data.dateOfBirth);
+
+        let age = today.getFullYear() - dob.getFullYear();
+        const monthDiff = today.getMonth() - dob.getMonth();
+
+        if (
+          monthDiff < 0 ||
+          (monthDiff === 0 && today.getDate() < dob.getDate())
+        ) {
+          age--;
+        }
+
+        if (age < 18) {
+          errors.dateOfBirth = "You must be at least 18 years old";
+        }
       }
     }
+
     if (step === 3) {
       if (formData.pCountry === "India") {
         fields = [...fields, "instructor_website", "aadharNo", "GSTIN"];
