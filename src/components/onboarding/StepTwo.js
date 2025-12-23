@@ -15,6 +15,7 @@ const StepTwo = ({ formData, handleChange, validationErrors }) => {
         value={formData.collegeName}
         onChange={handleChange}
         required
+        placeholder="School / College Name"
         error={validationErrors.collegeName}
       />
       <Input
@@ -32,6 +33,7 @@ const StepTwo = ({ formData, handleChange, validationErrors }) => {
         value={formData.institute}
         onChange={handleChange}
         required
+        placeholder="University / Institution Name"
         error={validationErrors.institute}
       />
     </div>

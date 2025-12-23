@@ -23,4 +23,5 @@ export const languageOptions = [
   "Gujarati",
   "Marathi",
   "Bengali",
+  "Other"
 ];

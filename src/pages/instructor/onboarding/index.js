@@ -214,6 +214,7 @@ const InstructorOnboarding = () => {
       responseTime: response_time_hours ? `${response_time_hours}h` : "",
     };
   };
+
   useEffect(() => {
     if (step === 1 && defaultOnboardingStepData) {
       const apiLanguages = defaultOnboardingStepData?.data?.language || [];
@@ -302,8 +303,8 @@ const InstructorOnboarding = () => {
     if (step === 5 && defaultOnboardingStepData) {
       setFormData((prev) => ({
         ...prev,
-        yoga_style: defaultOnboardingStepData?.data?.yoga_style,
-        video_url: defaultOnboardingStepData?.data?.video_url,
+        yoga_style: defaultOnboardingStepData?.data?.yoga_style || [],
+        video_url: defaultOnboardingStepData?.data?.video_url || [],
         instructor_website: defaultOnboardingStepData?.data?.instructor_website,
         teaching_philosophy:
           defaultOnboardingStepData?.data?.teaching_philosophy,
