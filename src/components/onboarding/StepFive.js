@@ -199,7 +199,7 @@ const StepFive = ({
           Sample Video URLs (Minimum 2)
         </label>
         <div className="space-y-4">
-          {formData.video_url.map((video, index) => (
+          {formData && formData?.video_url?.map((video, index) => (
             <div key={index} className="flex gap-2 items-center w-full">
               <div className="flex-1 w-full">
                 <Input
@@ -231,7 +231,7 @@ const StepFive = ({
             {validationErrors.video_url}
           </p>
         )}
-        {formData.video_url.length < 10 && (
+        {formData?.video_url?.length < 10 && (
           <button
             type="button"
             onClick={addSampleVideo}

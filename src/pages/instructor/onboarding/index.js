@@ -35,10 +35,7 @@ import {
   selectOnboardingStepData,
 } from "@/redux/slices/onboardingSlice";
 import moment from "moment";
-
-const useRouter = () => ({
-  push: (path) => console.log(`Simulating navigation to: ${path}`),
-});
+import { useRouter } from "next/navigation";
 
 const InstructorOnboarding = () => {
   const totalSteps = 7;
@@ -51,7 +48,6 @@ const InstructorOnboarding = () => {
   const [timeError, setTimeError] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
 
-  console.log("validationErrors", validationErrors);
   // NEW STATE: For Dialog and Image Preview
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [profileImagePreview, setProfileImagePreview] = useState(null);
@@ -135,7 +131,6 @@ const InstructorOnboarding = () => {
   const defaultOnboardingStep = useSelector(selectOnboardingStep);
   const defaultOnboardingStepData = useSelector(selectOnboardingStepData);
   const [step, setStep] = useState(); // Start at Step 1
-  console.log("defaultOnboardingStepData", defaultOnboardingStepData);
 
   useEffect(() => {
     const storedEmail = localStorage.getItem("email");
@@ -175,14 +170,51 @@ const InstructorOnboarding = () => {
     fetchOnboardingStep();
   }, []);
 
-  console.log("step", step);
 
   useEffect(() => {
-    if (step) {
+    if (step < totalSteps) {
       dispatch(getOnboardingStepData(step));
     }
   }, [step]);
 
+  const mapClassAvailabilityToFormData = (apiData) => {
+    const classAvailability = apiData?.class_availability?.[0];
+    if (!classAvailability) return {};
+
+    const {
+      class_types = [],
+      availability = {},
+      response_time_hours,
+    } = classAvailability;
+
+    // class types
+    const availableGroupClass = class_types.includes("GROUP");
+    const availablePrivateClass = class_types.includes("PRIVATE");
+    const availableOnlineClass = class_types.includes("ONLINE");
+
+    // days + timeSlots
+    const days = [];
+    const timeSlots = {};
+
+    Object.entries(availability).forEach(([day, slots]) => {
+      const lowerDay = day.toLowerCase();
+      days.push(lowerDay);
+
+      timeSlots[lowerDay] = slots.map((slot) => ({
+        start: slot.start_time,
+        end: slot.end_time,
+      }));
+    });
+
+    return {
+      availableGroupClass,
+      availablePrivateClass,
+      availableOnlineClass,
+      days,
+      timeSlots,
+      responseTime: response_time_hours ? `${response_time_hours}h` : "",
+    };
+  };
   useEffect(() => {
     if (step === 1 && defaultOnboardingStepData) {
       const apiLanguages = defaultOnboardingStepData?.data?.language || [];
@@ -245,6 +277,74 @@ const InstructorOnboarding = () => {
         institute: defaultOnboardingStepData?.data?.institute,
       }));
     }
+
+    if (step === 3 && defaultOnboardingStepData) {
+      setFormData((prev) => ({
+        ...prev,
+        registerAs: defaultOnboardingStepData?.data?.registerAs,
+        taxIdentification: defaultOnboardingStepData?.data?.taxIdentification,
+        panCard: defaultOnboardingStepData?.data?.taxIdentification,
+        aadharNo: defaultOnboardingStepData?.data?.aadharNo,
+        GSTIN: defaultOnboardingStepData?.data?.GSTIN,
+      }));
+    }
+
+    if (step === 4 && defaultOnboardingStepData) {
+      setFormData((prev) => ({
+        ...prev,
+        instagram_link: defaultOnboardingStepData?.data?.instagram_link,
+        linkdin_link: defaultOnboardingStepData?.data?.linkdin_link,
+        instructor_website: defaultOnboardingStepData?.data?.instructor_website,
+        facebook_link: defaultOnboardingStepData?.data?.facebook_link,
+        youtube_link: defaultOnboardingStepData?.data?.youtube_link,
+      }));
+    }
+
+    if (step === 5 && defaultOnboardingStepData) {
+      setFormData((prev) => ({
+        ...prev,
+        yoga_style: defaultOnboardingStepData?.data?.yoga_style,
+        video_url: defaultOnboardingStepData?.data?.video_url,
+        instructor_website: defaultOnboardingStepData?.data?.instructor_website,
+        teaching_philosophy:
+          defaultOnboardingStepData?.data?.teaching_philosophy,
+      }));
+    }
+    if (step === 6 && defaultOnboardingStepData?.data) {
+      const mappedData = mapClassAvailabilityToFormData(
+        defaultOnboardingStepData.data
+      );
+
+      setFormData((prev) => ({
+        ...prev,
+        ...mappedData,
+      }));
+    }
+
+    if (step === 7 && defaultOnboardingStepData) {
+      setFormData((prev) => ({
+        ...prev,
+        group_class_rate:
+          defaultOnboardingStepData?.data?.pricing_agreement?.group_class_rate,
+        private_class_rate:
+          defaultOnboardingStepData?.data?.pricing_agreement
+            ?.private_class_rate,
+        single_class_rate:
+          defaultOnboardingStepData?.data?.pricing_agreement?.single_class_rate,
+        trial_period_days:
+          defaultOnboardingStepData?.data?.pricing_agreement?.trial_period_days,
+        signature:
+          defaultOnboardingStepData?.data?.pricing_agreement?.signature,
+      }));
+
+      if (defaultOnboardingStep?.data?.pricing_agreement?.isAgree === true) {
+        setFormData((prev) => ({
+          confirmAccurate: true,
+          ethicalStandards: true,
+          serviceMindset: true,
+        }));
+      }
+    }
   }, [step, defaultOnboardingStepData]);
 
   // --- EFFECT TO HANDLE PROFILE IMAGE PREVIEW ---
@@ -296,8 +396,8 @@ const InstructorOnboarding = () => {
         const updated = replaceArray
           ? value
           : current.includes(value)
-            ? current.filter((i) => i !== value)
-            : [...current, value];
+          ? current.filter((i) => i !== value)
+          : [...current, value];
 
         setValidationErrors((v) => {
           if (v[field] && updated.length > 0) {
@@ -476,7 +576,7 @@ const InstructorOnboarding = () => {
     }
     if (step === 3) {
       if (formData.pCountry === "India") {
-        fields = [...fields, "panCard", "aadharNo", "GSTIN"];
+        fields = [...fields, "instructor_website", "aadharNo", "GSTIN"];
       } else {
         fields = [...fields, "taxIdentification"];
       }
@@ -510,7 +610,6 @@ const InstructorOnboarding = () => {
         errors.introVideo = "Invalid video URL";
     }
 
-    console.log("data======", data);
     // Step 6: class selection
     if (
       step === 6 &&
@@ -624,39 +723,53 @@ const InstructorOnboarding = () => {
       .getElementById("form-content-area")
       ?.scrollTo({ top: 0, behavior: "smooth" });
 
-    setStep((prev) => {
-      const newStep = Math.max(prev - 1, 1);
+    let payload;
+    setStep((prevStep) => prevStep - 1);
+    // setStep((prev) => {
+    //   const newStep = Math.max(prev - 1, 1);
 
-      if (newStep < prev) {
-        // Build payload for the step we're going back to
-        const payload = buildPayloadByStep(newStep, formData);
+    //   if (newStep < prev) {
+    //     // Build payload for the step we're going back to
 
-        // Dynamically dispatch corresponding action
-        switch (newStep) {
-          case 1:
-            dispatch(onboardingStepOne(payload));
-            dispatch(getOnboardingStepData(1));
-            break;
-          case 2:
-            dispatch(onboardingStepTwo(payload));
-            break;
-          case 3:
-            dispatch(onboardingStepThree(payload));
-            break;
-          case 4:
-            dispatch(onboardingStepFour(payload));
-            break;
-          case 5:
-            dispatch(onboardingStepFive(payload));
-            break;
-          // add more steps here as needed
-          default:
-            break;
-        }
-      }
+    //     if (newStep === 6) {
+    //       payload = buildClassAvailabilityPayload(formData);
+    //     } else {
+    //       payload = buildPayloadByStep(newStep, formData);
+    //     }
 
-      return newStep;
-    });
+    //     console.log("payload", payload);
+
+    //     // Dynamically dispatch corresponding action
+    //     switch (newStep) {
+    //       case 1:
+    //         dispatch(onboardingStepOne(payload));
+    //         break;
+    //       case 2:
+    //         dispatch(onboardingStepTwo(payload));
+    //         break;
+    //       case 3:
+    //         dispatch(onboardingStepThree(payload));
+    //         break;
+    //       case 4:
+    //         dispatch(onboardingStepFour(payload));
+    //         break;
+    //       case 5:
+    //         dispatch(onboardingStepFive(payload));
+    //         break;
+    //       case 6:
+    //         dispatch(onboardingStepSixth(payload));
+    //         break;
+    //       case 7:
+    //         dispatch(onboardingStepSeven(payload));
+    //         break;
+    //       // add more steps here as needed
+    //       default:
+    //         break;
+    //     }
+    //   }
+
+    //   return newStep;
+    // });
   };
 
   const handleClear = () => {
@@ -697,6 +810,7 @@ const InstructorOnboarding = () => {
       });
   };
 
+
   const buildPayloadByStep = (step, formData, extra = {}) => {
     const payload = {};
     const finalLanguages = formData?.language?.map((lang) =>
@@ -720,7 +834,6 @@ const InstructorOnboarding = () => {
       payload.dateOfBirth = moment(formData.dateOfBirth).format("DD-MM-YYYY");
     }
 
-    console.log("payload", payload);
 
     if (step === 3) {
       if (formData.registerAs === "individual") {
@@ -773,14 +886,18 @@ const InstructorOnboarding = () => {
     Object.entries(formData.timeSlots || {}).forEach(([day, slots]) => {
       if (!slots?.length) return;
 
-      availability[day.charAt(0).toUpperCase() + day.slice(1)] = slots.flatMap(
-        (slot) =>
-          classTypes.map((classKey) => ({
+      const dayName = day.charAt(0).toUpperCase() + day.slice(1);
+      availability[dayName] = [];
+
+      slots.forEach((slot) => {
+        classTypes.forEach((classKey) => {
+          availability[dayName].push({
             class_key: classKey,
-            start_time: slot.start,
-            end_time: slot.end,
-          }))
-      );
+            start_time: slot.start || formData.startTime, // fallback if slot.start is empty
+            end_time: slot.end || formData.endTime, // fallback if slot.end is empty
+          });
+        });
+      });
     });
 
     // 4️⃣ Final payload
@@ -795,7 +912,6 @@ const InstructorOnboarding = () => {
     };
   };
 
-  console.log("formData", formData);
   // --- MODIFIED SUBMISSION HANDLER: Opens Dialog ---
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -856,7 +972,6 @@ const InstructorOnboarding = () => {
   };
   // --- NEW: Final Accept Handler ---
   const handleFinalAccept = () => {
-    console.log("Final Submission Data (Accepted):", formData);
     localStorage.removeItem(DRAFT_KEY);
     setShowSuccessDialog(false);
     setStep(totalSteps + 1); // Move to the final 'Submitted' screen
@@ -947,8 +1062,9 @@ const InstructorOnboarding = () => {
             className="max-w-5xl mx-auto min-h-full"
           >
             <div
-              className={`transition-opacity duration-300 ease-out ${isSubmitted ? "opacity-100" : "opacity-100"
-                } pb-4`}
+              className={`transition-opacity duration-300 ease-out ${
+                isSubmitted ? "opacity-100" : "opacity-100"
+              } pb-4`}
             >
               {/* STEP 1: PERSONAL, ADDRESS, EMERGENCY CONTACT, LANGUAGES */}
               {step === 1 && (
@@ -1050,8 +1166,8 @@ const InstructorOnboarding = () => {
                     {Math.floor(Math.random() * 90000 + 10000)}
                   </p>
                   <button
-                    onClick={() => router.push("/login")}
-                    className="text-white bg-teal-600 px-6 py-3 rounded-xl font-semibold shadow-lg hover:bg-teal-700 transition-colors"
+                    onClick={() => router.push("/verification")}
+                    className="text-white cursor-pointer bg-teal-600 px-6 py-3 rounded-xl font-semibold shadow-lg hover:bg-teal-700 transition-colors"
                   >
                     Return Home
                   </button>
