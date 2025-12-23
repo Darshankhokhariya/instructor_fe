@@ -41,7 +41,6 @@ const OtpVerification = ({ phoneNumber = "+91 12345 67890" }) => {
 
   const email = useSelector((state) => state.user.email);
 
-  console.log("email", email);
   // --- Core OTP Handling Logic ---
 
   const handleChange = useCallback(

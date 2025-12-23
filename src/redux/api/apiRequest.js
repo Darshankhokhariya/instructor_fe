@@ -44,7 +44,6 @@ export const getRequest = async (url, params = {}) => {
       },
     });
 
-    console.log('response===', response)
 
     return response;
   } catch (error) {

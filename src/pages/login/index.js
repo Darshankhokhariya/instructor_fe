@@ -68,7 +68,6 @@ export default function Login() {
         .unwrap()
         .then((res) => {
           if (res.status === 200) {
-            console.log("res?.data", res?.data);
 
             localStorage.setItem("role", res?.data?.role);
             localStorage.setItem("token", res.data.token);
@@ -91,7 +90,6 @@ export default function Login() {
               return;
             }
 
-            console.log('res?.data', res?.data)
 
             router.push("/dashboard");
             toast.success(res.message || `User login succesfully!`);

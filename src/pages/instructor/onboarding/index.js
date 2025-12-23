@@ -219,7 +219,6 @@ const InstructorOnboarding = () => {
   useEffect(() => {
     const data = defaultOnboardingStepData?.data;
 
-    console.log("data", data);
     if (step === 1 && data) {
       const apiLanguages = data?.language || [];
 

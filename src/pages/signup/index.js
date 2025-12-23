@@ -83,7 +83,6 @@ export default function Register() {
     dispatch(setOtpEmail(fields?.email));
   };
 
-  console.log("initialState", initialState);
 
   /* if success redirect on /instructor/onboarding */
   const handleSubmit = async () => {
