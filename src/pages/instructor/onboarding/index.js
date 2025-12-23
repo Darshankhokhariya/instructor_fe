@@ -248,17 +248,17 @@ const InstructorOnboarding = () => {
   }, [step, defaultOnboardingStepData]);
 
   // --- EFFECT TO HANDLE PROFILE IMAGE PREVIEW ---
-  // useEffect(() => {
-  //   if (formData.profileImage instanceof File) {
-  //     const reader = new FileReader();
-  //     reader.onloadend = () => {
-  //       setProfileImagePreview(reader.result);
-  //     };
-  //     reader.readAsDataURL(formData.profileImage);
-  //   } else {
-  //     setProfileImagePreview(null);
-  //   }
-  // }, [formData.profileImage]);
+  useEffect(() => {
+    if (formData.profileImage instanceof File) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImagePreview(reader.result);
+      };
+      reader.readAsDataURL(formData.profileImage);
+    } else {
+      setProfileImagePreview(null);
+    }
+  }, [formData.profileImage]);
 
   // --- HANDLERS ---
 
@@ -296,8 +296,8 @@ const InstructorOnboarding = () => {
         const updated = replaceArray
           ? value
           : current.includes(value)
-          ? current.filter((i) => i !== value)
-          : [...current, value];
+            ? current.filter((i) => i !== value)
+            : [...current, value];
 
         setValidationErrors((v) => {
           if (v[field] && updated.length > 0) {
@@ -799,8 +799,6 @@ const InstructorOnboarding = () => {
   // --- MODIFIED SUBMISSION HANDLER: Opens Dialog ---
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Determine payload for current step
     let payload;
     if (step === 6) {
       payload = buildClassAvailabilityPayload(formData);
@@ -839,7 +837,6 @@ const InstructorOnboarding = () => {
       // toast.error("Invalid step!");
       return;
     }
-    console.log("payload=====", payload);
 
     try {
       const res = await dispatch(stepThunk(payload)).unwrap();
@@ -950,9 +947,8 @@ const InstructorOnboarding = () => {
             className="max-w-5xl mx-auto min-h-full"
           >
             <div
-              className={`transition-opacity duration-300 ease-out ${
-                isSubmitted ? "opacity-100" : "opacity-100"
-              } pb-4`}
+              className={`transition-opacity duration-300 ease-out ${isSubmitted ? "opacity-100" : "opacity-100"
+                } pb-4`}
             >
               {/* STEP 1: PERSONAL, ADDRESS, EMERGENCY CONTACT, LANGUAGES */}
               {step === 1 && (
@@ -1006,6 +1002,8 @@ const InstructorOnboarding = () => {
                   addCertification={addCertification}
                   addSampleVideo={addSampleVideo}
                   handleSampleVideoChange={handleSampleVideoChange}
+                  removeCertification={removeCertification}
+                  removeSampleVideo={removeSampleVideo}
                 />
               )}
 

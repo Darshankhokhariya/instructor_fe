@@ -124,6 +124,12 @@ const StepOne = ({
             />
           )}
         </div>
+
+        {validationErrors.language && (
+          <span className="text-xs font-medium text-red-500">
+            {validationErrors.language}
+          </span>
+        )}
       </div>
 
       <div className="space-y-6 pt-4">
@@ -134,7 +140,7 @@ const StepOne = ({
         />
 
         {/* Permanent Address */}
-        <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+        <div className="p-4  rounded-xl border border-slate-200">
           <h4 className="text-md font-bold text-teal-900 mb-3 flex items-center">
             Permanent
             Address
@@ -142,7 +148,7 @@ const StepOne = ({
           <div className="grid grid-cols-1 gap-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Input
-                label="Block / Door No."
+                label="House No./Floor"
                 name="pBlock"
                 value={formData.pBlock}
                 onChange={handleChange}
@@ -151,7 +157,7 @@ const StepOne = ({
                 placeholder="Enter Block / Door Number"
               />
               <Input
-                label="Building Name"
+                label="Building Name & Block No."
                 name="pBuilding"
                 value={formData.pBuilding}
                 onChange={handleChange}
@@ -160,7 +166,7 @@ const StepOne = ({
                 placeholder="Enter Building Name"
               />
               <Input
-                label="Area"
+                label="Landmark / Area Name"
                 name="pArea"
                 value={formData.pArea}
                 onChange={handleChange}
@@ -216,7 +222,6 @@ const StepOne = ({
               error={validationErrors.pPincode}
               placeholder="Enter Pincode / Zip"
             />
-
           </div>
 
         </div>
@@ -248,46 +253,81 @@ const StepOne = ({
             disabled={isCurrentSameAsPermanent}
             className={isCurrentSameAsPermanent ? "opacity-60" : "opacity-100"}
           >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Input
-                label="City"
-                name="cCity"
-                value={formData.cCity}
-                onChange={handleChange}
-                required={!isCurrentSameAsPermanent}
-                disabled={isCurrentSameAsPermanent}
-                error={validationErrors.cCity}
-                placeholder="Enter City"
-              />
+            <div className="flex flex-col gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <Input
+                  label="House No./Floor"
+                  name="cBlock"
+                  value={formData.cBlock}
+                  onChange={handleChange}
+                  required={!isCurrentSameAsPermanent}
+                  disabled={isCurrentSameAsPermanent}
+                  error={validationErrors.cBlock}
+                  placeholder="Enter Block / Door Number"
+                />
+                <Input
+                  label="Building Name & Block No."
+                  name="cBuilding"
+                  value={formData.cBuilding}
+                  onChange={handleChange}
+                  required={!isCurrentSameAsPermanent}
+                  disabled={isCurrentSameAsPermanent}
+                  error={validationErrors.cBuilding}
+                  placeholder="Enter Building Name"
+                />
+                <Input
+                  label="Landmark / Area Name"
+                  name="cArea"
+                  value={formData.cArea}
+                  onChange={handleChange}
+                  required={!isCurrentSameAsPermanent}
+                  disabled={isCurrentSameAsPermanent}
+                  error={validationErrors.cArea}
+                  placeholder="Enter Area"
+                />
+              </div>
 
-              <Input
-                label="State"
-                name="cState"
-                value={formData.cState}
-                onChange={handleChange}
-                required={!isCurrentSameAsPermanent}
-                disabled={isCurrentSameAsPermanent}
-                error={validationErrors.cState}
-                placeholder="Enter State"
-              />
-
-              <Selector
-                label="Country"
-                name="cCountry"
-                options={[
-                  { label: "India", value: "india" },
-                  { label: "USA", value: "usa" },
-                  { label: "UK", value: "uk" },
-                  { label: "Other", value: "other" },
-                ]}
-                value={formData.cCountry}
-                onChange={handleChange}
-                required={!isCurrentSameAsPermanent}
-                placeholder="Select Country"
-                disabled={isCurrentSameAsPermanent}
-                error={validationErrors.cCountry}
-              />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <Input
+                  label="City"
+                  name="cCity"
+                  value={formData.cCity}
+                  onChange={handleChange}
+                  required={!isCurrentSameAsPermanent}
+                  disabled={isCurrentSameAsPermanent}
+                  error={validationErrors.cCity}
+                  placeholder="Enter City"
+                />
+                <Input
+                  label="State"
+                  name="cState"
+                  value={formData.cState}
+                  onChange={handleChange}
+                  required={!isCurrentSameAsPermanent}
+                  disabled={isCurrentSameAsPermanent}
+                  error={validationErrors.cState}
+                  placeholder="Enter State"
+                />
+                <Selector
+                  label="Country"
+                  name="cCountry"
+                  options={[
+                    { label: "India", value: "india" },
+                    { label: "USA", value: "usa" },
+                    { label: "UK", value: "uk" },
+                    { label: "Other", value: "other" },
+                  ]}
+                  value={formData.cCountry}
+                  onChange={handleChange}
+                  required={!isCurrentSameAsPermanent}
+                  placeholder="Select Country"
+                  disabled={isCurrentSameAsPermanent}
+                  error={validationErrors.cCountry}
+                />
+              </div>
             </div>
+
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
               <Input
                 label="Pincode / Zip"
@@ -298,29 +338,6 @@ const StepOne = ({
                 disabled={isCurrentSameAsPermanent}
                 error={validationErrors.cPincode}
                 placeholder="Enter Pincode / Zip"
-              />
-              <Input
-                label="Area"
-                name="cArea"
-                value={formData.cArea}
-                onChange={handleChange}
-                required={!isCurrentSameAsPermanent}
-                disabled={isCurrentSameAsPermanent}
-                error={validationErrors.cArea}
-                placeholder="Enter Area"
-              />
-
-            </div>
-            <div className="mt-4">
-              <Input
-                label="Block / Door No."
-                name="cBlock"
-                value={formData.cBlock}
-                onChange={handleChange}
-                required={!isCurrentSameAsPermanent}
-                disabled={isCurrentSameAsPermanent}
-                error={validationErrors.cBlock}
-                placeholder="Enter Block / Door Number"
               />
             </div>
           </fieldset>
@@ -333,7 +350,7 @@ const StepOne = ({
             subtitle="In case of urgent issues, who should we contact?"
             className="mt-6"
           />
-          <div className="p-6 bg-red-50 rounded-xl border border-red-200 space-y-4">
+          <div className="p-6  rounded-xl border border-slate-200 space-y-4">
             <Input
               label="Full Name"
               name="eName"
@@ -343,15 +360,22 @@ const StepOne = ({
               placeholder="Emergency Contact Full Name"
               error={validationErrors.eName}
             />
-            <PhoneInput
-              label="Phone Number"
-              name="eMobile"
-              value={formData.eMobile}
-              onChange={handleChange}
-              required
-              placeholder="Emergency contact number"
-              error={validationErrors.eMobile}
-            />
+            <div>
+              <PhoneInput
+                label="Phone Number"
+                name="eMobile"
+                value={formData.eMobile}
+                onChange={handleChange}
+                required
+                placeholder="Emergency contact number"
+                error={validationErrors.eMobile}
+              />
+              {validationErrors.eMobile && (
+                <span className="text-xs font-medium text-red-500">
+                  {validationErrors.eMobile}
+                </span>
+              )}
+            </div>
             <Input
               label="Relationship"
               name="eRelation"

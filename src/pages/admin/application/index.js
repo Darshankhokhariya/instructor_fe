@@ -102,12 +102,7 @@ export default function SubmittedFormsPage() {
                                         {item.fullName}
                                         <div className="text-xs text-gray-500">{item.experience}</div>
                                     </td>
-
                                     <td className="py-4 px-6 text-gray-700">{item.email}</td>
-
-
-
-
                                     <td className="py-4 px-">
                                         <button
                                             onClick={() => handleApproval(item.id, "managerApproval")}
@@ -118,7 +113,6 @@ export default function SubmittedFormsPage() {
                                             {item.managerApproval ? "Approved" : "Pending"}
                                         </button>
                                     </td>
-
                                     <td className="py-4 px-6 ">
                                         <button
                                             onClick={() => handleApproval(item.id, "adminApproval")}
@@ -133,7 +127,6 @@ export default function SubmittedFormsPage() {
                             ))}
                         </tbody>
                     </table>
-
                     {filteredData.length === 0 && (
                         <p className="text-center text-gray-500 py-5">No applications found.</p>
                     )}

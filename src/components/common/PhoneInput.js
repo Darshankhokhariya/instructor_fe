@@ -59,7 +59,7 @@ const PhoneInput = ({
         <select
           value={selectedCode}
           onChange={handleCodeChange}
-          className="w-28 px-2 py-2 border rounded-lg bg-white text-gray-700"
+          className="w-28 px-2 py-2 border border-slate-200 rounded-lg bg-white text-gray-700"
         >
           {countryCodes.map((item) => (
             <option key={item.code} value={item.code}>
@@ -73,7 +73,7 @@ const PhoneInput = ({
           type="tel"
           value={phoneOnly}
           onChange={handlePhoneChange}
-          className="flex-1 px-3 py-2 border rounded-lg"
+          className="flex-1 px-3 py-2 border border-slate-200 rounded-lg"
           placeholder={placeholder}
           required={required}
           maxLength={selectedCountry.maxLength}

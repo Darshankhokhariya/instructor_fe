@@ -3,7 +3,7 @@ import SectionHeader from "./SectionHeader";
 import Label from "./Label";
 import SmartSelect from "../common/SmartSelect";
 import Input from "../common/Input";
-import { BiPlusCircle } from "react-icons/bi";
+import { BiPlusCircle, BiTrash } from "react-icons/bi";
 import TextArea from "../common/TextArea";
 
 const StepFive = ({
@@ -14,8 +14,10 @@ const StepFive = ({
   handleCertChange,
   profileImagePreview,
   addCertification,
-  addSampleVideo ,
-  handleSampleVideoChange
+  addSampleVideo,
+  handleSampleVideoChange,
+  removeCertification,
+  removeSampleVideo,
 }) => {
   return (
     <div className="space-y-8">
@@ -36,7 +38,7 @@ const StepFive = ({
               onChange={handleChange}
               // ... (rest of the input className) ...
               accept="image/*"
-              // required
+            // required
             />
             {formData.profileImage && (
               <p className="mt-2 text-xs text-slate-600">
@@ -135,11 +137,10 @@ const StepFive = ({
                         e.target.files[0]
                       )
                     }
-                    className={`block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-teal-100 file:text-teal-700 hover:file:bg-teal-200 cursor-pointer rounded-xl ${
-                      validationErrors[`certifications[${index}].file`]
-                        ? "border-red-500 border-2"
-                        : "border-slate-300 border"
-                    }`}
+                    className={`block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-teal-100 file:text-teal-700 hover:file:bg-teal-200 cursor-pointer rounded-xl ${validationErrors[`certifications[${index}].file`]
+                      ? "border-red-500 border-2"
+                      : "border-slate-300 border"
+                      }`}
                     required={index === 0}
                     accept="application/pdf,image/*"
                   />
@@ -199,8 +200,8 @@ const StepFive = ({
         </label>
         <div className="space-y-4">
           {formData.video_url.map((video, index) => (
-            <div key={index} className="flex gap-2 items-center">
-              <div className="flex-1">
+            <div key={index} className="flex gap-2 items-center w-full">
+              <div className="flex-1 w-full">
                 <Input
                   label={`Video ${index + 1}`}
                   name={`video_url[${index}]`}
@@ -219,7 +220,7 @@ const StepFive = ({
                   onClick={() => removeSampleVideo(index)}
                   className="p-3 text-slate-400 hover:text-red-500"
                 >
-                  <BiTrash size={14} />
+                  <BiTrash size={20} />
                 </button>
               )}
             </div>
@@ -240,16 +241,18 @@ const StepFive = ({
           </button>
         )}
 
-        <TextArea
-          label="Your Teaching Philosophy (Required)"
-          name="teaching_philosophy"
-          rows={5}
-          value={formData.teaching_philosophy}
-          onChange={handleChange}
-          required
-          placeholder="Describe your approach, values, and why you teach yoga."
-          error={validationErrors.teaching_philosophy}
-        />
+        <div className="my-6 ">
+          <TextArea
+            label="Your Teaching Philosophy (Required)"
+            name="teaching_philosophy"
+            rows={5}
+            value={formData.teaching_philosophy}
+            onChange={handleChange}
+            required
+            placeholder="Describe your approach, values, and why you teach yoga."
+            error={validationErrors.teaching_philosophy}
+          />
+        </div>
       </div>
     </div>
   );

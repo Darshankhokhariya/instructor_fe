@@ -35,7 +35,7 @@ const Selector = ({
                     defaultValue={defaultValue}
                     onChange={onChange}
                     disabled={disabled}
-                    className={`w-full appearance-none rounded-lg border bg-white px-4 py-2 pr-10 text-gray-800 transition-all shadow-sm
+                    className={`w-full appearance-none rounded-lg border bg-white px-4 py-2 pr-10 text-gray-800 transition-all
                         focus:outline-none 
                         ${disabled ? "bg-gray-100 text-gray-400 cursor-not-allowed" : ""}
                         ${error ? "border-red-500 focus:ring-2 focus:ring-red-300" : "border-gray-300 focus:ring-2 focus:ring-primary/40"}

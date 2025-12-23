@@ -3,18 +3,18 @@ import SectionHeader from "./SectionHeader";
 import Selector from "../common/Selector";
 import Input from "../common/Input";
 
-const options = [
-  {
-    label: "Individual (PAN/Aadhaar/GSTIN)",
-    value: "individual",
-  },
-  {
-    label: "Business (Foreign ID)",
-    value: "business",
-  },
-];
 
 const StepThree = ({ formData, handleChange, validationErrors }) => {
+  const options = [
+    {
+      label: formData.pCountry === "india" ? "Individual (PAN/Aadhaar/GSTIN)" : "Individual (SSN/TIN)",
+      value: "individual",
+    },
+    {
+      label: "Business (Foreign ID)",
+      value: "business",
+    },
+  ];
   return (
     <div className="space-y-6">
       <SectionHeader
@@ -23,10 +23,6 @@ const StepThree = ({ formData, handleChange, validationErrors }) => {
       />
       <div className="p-6 rounded-xl border border-orange-300 bg-orange-50 transition-all duration-300 ">
         <div className="space-y-4 animate-in fade-in">
-          <div className="flex items-center gap-2 mb-2 text-orange-800 font-semibold text-sm">
-            <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
-            Indian Tax Residency Required for PAN/Aadhaar
-          </div>
           {/* New Field: Registration Type */}
           <Selector
             label="Register As"
@@ -39,7 +35,7 @@ const StepThree = ({ formData, handleChange, validationErrors }) => {
             placeholder="Select Registration Type"
           />
           {formData.pCountry === "india" &&
-          formData.registerAs === "individual" ? (
+            formData.registerAs === "individual" ? (
             <>
               <Input
                 label="PAN Card Number"

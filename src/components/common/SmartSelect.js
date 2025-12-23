@@ -1,5 +1,5 @@
 const SmartSelect = ({ label, options, selectedValues = [], onToggle }) => (
-    <div className="mb-4">
+    <div className="mb-2">
         <label className="mb-1 block text-sm font-medium text-gray-700">
             {label}
         </label>
@@ -17,8 +17,8 @@ const SmartSelect = ({ label, options, selectedValues = [], onToggle }) => (
                         type="button"
                         onClick={() => onToggle(value)}
                         className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors border ${isSelected
-                                ? "bg-primary text-white border-primary"
-                                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                            ? "bg-primary text-white border-primary"
+                            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
                             }`}
                     >
                         {displayLabel}
