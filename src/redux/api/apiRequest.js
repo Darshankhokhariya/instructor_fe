@@ -23,7 +23,7 @@ export const postRequest = async (url, data) => {
       return response.data;
     }
 
-    throw new Error(response.data?.message || "Request failed");
+    return new Error(response.data?.message || "Request failed");
   } catch (error) {
     throw new Error(
       error.response?.data?.message || error.message || "Something went wrong"

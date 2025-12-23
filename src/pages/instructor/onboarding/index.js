@@ -170,7 +170,6 @@ const InstructorOnboarding = () => {
     fetchOnboardingStep();
   }, []);
 
-
   useEffect(() => {
     if (step < totalSteps) {
       dispatch(getOnboardingStepData(step));
@@ -810,7 +809,6 @@ const InstructorOnboarding = () => {
       });
   };
 
-
   const buildPayloadByStep = (step, formData, extra = {}) => {
     const payload = {};
     const finalLanguages = formData?.language?.map((lang) =>
@@ -833,7 +831,6 @@ const InstructorOnboarding = () => {
       payload.language = finalLanguages;
       payload.dateOfBirth = moment(formData.dateOfBirth).format("DD-MM-YYYY");
     }
-
 
     if (step === 3) {
       if (formData.registerAs === "individual") {
@@ -958,11 +955,13 @@ const InstructorOnboarding = () => {
       const res = await dispatch(stepThunk(payload)).unwrap();
 
       if (res.status === 200) {
-        toast.success(res.message || `User Onboarding successfully!`);
         if (step < totalSteps) {
           setStep((prev) => prev + 1); // ✅ SAFE
         }
-        if (step === 7) setShowSuccessDialog(true);
+        if (step === 7) {
+          setShowSuccessDialog(true);
+          toast.success(res.message || `User Onboarding successfully!`);
+        }
       } else {
         toast.error(res.message || "Something went wrong");
       }
