@@ -105,6 +105,7 @@ export const STEP_FIELDS = {
 export const REGEX = {
   url: /^(ftp|http|https):\/\/[^ "\s]+$/,
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  yopmail: /^[^\s@]+@yopmail\.com$/i,  
   pan: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
   aadhar: /^\d{12}$/,
   positiveNumber: /^\d+(\.\d+)?$/,

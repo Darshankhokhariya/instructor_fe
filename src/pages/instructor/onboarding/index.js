@@ -19,10 +19,11 @@ import { useDispatch, useSelector } from "react-redux";
 import OnboardingFooter from "@/components/onboarding/OnboardingFooter";
 import { BiCheckCircleIcon, FaShieldAlt } from "../../../../utils/icon";
 import StepIndicator from "@/components/onboarding/StepIndicator";
-import { isTimeSlotValid } from "../../../../utils/onboarding";
+import { isTimeSlotValid, languageOptions } from "../../../../utils/onboarding";
 import SubmissionDialog from "@/components/onboarding/SubmissionDialog";
 import {
   getOnboardingStep,
+  getOnboardingStepData,
   onboardingStepFive,
   onboardingStepFour,
   onboardingStepOne,
@@ -31,6 +32,7 @@ import {
   onboardingStepThree,
   onboardingStepTwo,
   selectOnboardingStep,
+  selectOnboardingStepData,
 } from "@/redux/slices/onboardingSlice";
 import moment from "moment";
 
@@ -124,8 +126,6 @@ const InstructorOnboarding = () => {
   const [formData, setFormData] = useState(initialFormData);
   const dispatch = useDispatch();
 
-  console.log("formData", formData);
-
   const parts = formData?.primaryMobile?.trim().split(/\s+/);
   const partsSecond = formData?.secondMobile?.trim().split(/\s+/);
   const countryCode = parts?.[0];
@@ -133,20 +133,25 @@ const InstructorOnboarding = () => {
   const SecondMobileNumber = partsSecond?.slice(1)?.join("");
 
   const defaultOnboardingStep = useSelector(selectOnboardingStep);
+  const defaultOnboardingStepData = useSelector(selectOnboardingStepData);
   const [step, setStep] = useState(); // Start at Step 1
-  console.log("defaultOnboardingStep", defaultOnboardingStep);
+  console.log("defaultOnboardingStepData", defaultOnboardingStepData);
 
-  console.log("countryCode", countryCode);
-
-  console.log("formData", formData);
+  useEffect(() => {
+    const storedEmail = localStorage.getItem("email");
+    if (storedEmail) {
+      setFormData((prev) => ({
+        ...prev,
+        email: storedEmail,
+      }));
+    }
+  }, []);
 
   useEffect(() => {
     const fetchOnboardingStep = async () => {
       try {
         const response = await dispatch(getOnboardingStep());
-        const stepCompleted = response?.data?.step_completed;
-
-        console.log("response", response);
+        const stepCompleted = response?.payload?.data?.data?.step_completed;
 
         if (
           stepCompleted === null ||
@@ -162,16 +167,86 @@ const InstructorOnboarding = () => {
       } catch (err) {
         // err is now the full object from API
         console.error("Full API Error:", err);
-
-        toast.error(err.message || "Failed to fetch onboarding step");
-
-        // Default to Step 1
         setStep(1);
+        toast.error(err.message || "Failed to fetch onboarding step");
       }
     };
 
     fetchOnboardingStep();
   }, []);
+
+  console.log("step", step);
+
+  useEffect(() => {
+    if (step) {
+      dispatch(getOnboardingStepData(step));
+    }
+  }, [step]);
+
+  useEffect(() => {
+    if (step === 1 && defaultOnboardingStepData) {
+      const apiLanguages = defaultOnboardingStepData?.data?.language || [];
+
+      const selectedLanguages = [];
+      let otherLanguage = "";
+
+      apiLanguages.forEach((lang) => {
+        if (languageOptions.includes(lang)) {
+          selectedLanguages.push(lang);
+        } else if (lang && lang.trim() !== "") {
+          selectedLanguages.push("Other"); // select Other tab
+          otherLanguage = lang; // fill input
+        }
+      });
+      const countryCode = defaultOnboardingStepData?.data?.countryCode || "+91";
+      const primaryMobile = defaultOnboardingStepData?.data?.primaryMobile
+        ? `${countryCode} ${defaultOnboardingStepData?.data?.primaryMobile}`
+        : "";
+      const secondMobile = defaultOnboardingStepData?.data?.secondMobile
+        ? `${countryCode} ${defaultOnboardingStepData?.data?.secondMobile}`
+        : "";
+      setFormData((prev) => ({
+        ...prev,
+        name: defaultOnboardingStepData?.data?.name,
+        dateOfBirth: moment(defaultOnboardingStep?.data?.dateOfBirth).format(
+          "YYYY-MM-DD"
+        ),
+        gender: defaultOnboardingStepData?.data?.gender,
+        primaryMobile,
+        secondMobile,
+        language: selectedLanguages,
+        pBlock: defaultOnboardingStepData?.data?.pBlock,
+        pBuilding: defaultOnboardingStepData?.data?.pBuilding,
+        pArea: defaultOnboardingStepData?.data?.pArea,
+        pCity: defaultOnboardingStepData?.data?.pCity,
+        pState: defaultOnboardingStepData?.data?.pState,
+        pCountry: defaultOnboardingStepData?.data?.pCountry,
+        pPincode: defaultOnboardingStepData?.data?.pPincode,
+
+        cBlock: defaultOnboardingStepData?.data?.cBlock,
+        cBuilding: defaultOnboardingStepData?.data?.cBuilding,
+        cArea: defaultOnboardingStepData?.data?.cArea,
+        cCity: defaultOnboardingStepData?.data?.cCity,
+        cState: defaultOnboardingStepData?.data?.cState,
+        cCountry: defaultOnboardingStepData?.data?.cCountry,
+        cPincode: defaultOnboardingStepData?.data?.cPincode,
+
+        eName: defaultOnboardingStepData?.data?.eName,
+        eMobile: defaultOnboardingStepData?.data?.eMobile,
+        eRelation: defaultOnboardingStepData?.data?.eRelation,
+      }));
+    }
+
+    if (step === 2 && defaultOnboardingStepData) {
+      setFormData((prev) => ({
+        ...prev,
+        collegeName: defaultOnboardingStepData?.data?.collegeName,
+        qualification: defaultOnboardingStepData?.data?.qualification,
+        institute: defaultOnboardingStepData?.data?.institute,
+      }));
+    }
+  }, [step, defaultOnboardingStepData]);
+
   // --- EFFECT TO HANDLE PROFILE IMAGE PREVIEW ---
   // useEffect(() => {
   //   if (formData.profileImage instanceof File) {
@@ -346,7 +421,6 @@ const InstructorOnboarding = () => {
         "name",
         "dateOfBirth",
         "gender",
-        "email",
         "primaryMobile",
         "language",
         "pCountry",
@@ -392,9 +466,14 @@ const InstructorOnboarding = () => {
     }
 
     // Regex validations
-    if (step === 1 && data.email && !REGEX.email.test(data.email))
-      errors.email = "Invalid email";
+    if (step === 1 && data.email) {
+      const isNormalEmail = REGEX.email.test(data.email);
+      const isYopmail = REGEX.yopmail.test(data.email);
 
+      if (!isNormalEmail && !isYopmail) {
+        errors.email = "Invalid email";
+      }
+    }
     if (step === 3) {
       if (formData.pCountry === "India") {
         fields = [...fields, "panCard", "aadharNo", "GSTIN"];
@@ -532,9 +611,7 @@ const InstructorOnboarding = () => {
       //   document
       //     .getElementById("form-content-area")
       //     ?.scrollTo({ top: 0, behavior: "smooth" });
-      if (step < totalSteps) {
-        setStep((prev) => Math.min(prev + 1, totalSteps));
-      }
+      if (!validateStep()) return;
 
       handleSubmit(e);
     }
@@ -558,6 +635,7 @@ const InstructorOnboarding = () => {
         switch (newStep) {
           case 1:
             dispatch(onboardingStepOne(payload));
+            dispatch(getOnboardingStepData(1));
             break;
           case 2:
             dispatch(onboardingStepTwo(payload));
@@ -621,8 +699,8 @@ const InstructorOnboarding = () => {
 
   const buildPayloadByStep = (step, formData, extra = {}) => {
     const payload = {};
-    const finalLanguages = formData.language.map((lang) =>
-      lang === "Other" ? formData.otherLanguage.trim() : lang
+    const finalLanguages = formData?.language?.map((lang) =>
+      lang === "Other" ? formData?.otherLanguage?.trim() : lang
     );
     STEP_FIELDS[step]?.forEach((key) => {
       if (key === "email") return;
@@ -768,6 +846,9 @@ const InstructorOnboarding = () => {
 
       if (res.status === 200) {
         toast.success(res.message || `User Onboarding successfully!`);
+        if (step < totalSteps) {
+          setStep((prev) => prev + 1); // ✅ SAFE
+        }
         if (step === 7) setShowSuccessDialog(true);
       } else {
         toast.error(res.message || "Something went wrong");

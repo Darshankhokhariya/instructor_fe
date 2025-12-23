@@ -6,6 +6,7 @@ import SmartSelect from "../common/SmartSelect";
 import SectionHeader from "./SectionHeader";
 import { FaMapMarkerAlt, FaRoad } from "react-icons/fa";
 import { BiWorldIcon } from "../../../utils/icon";
+import { languageOptions } from "../../../utils/onboarding";
 
 const StepOne = ({
   formData,
@@ -64,6 +65,7 @@ const StepOne = ({
             value={formData.email}
             onChange={handleChange}
             required
+            disabled
             placeholder="name@example.com"
             error={validationErrors.email}
           />
@@ -99,19 +101,7 @@ const StepOne = ({
           <SmartSelect
             label="Languages Spoken (Required)"
             name="language"
-            options={[
-              "English",
-              "Hindi",
-              "Sanskrit",
-              "Tamil",
-              "Telugu",
-              "Kannada",
-              "Malayalam",
-              "Gujarati",
-              "Marathi",
-              "Bengali",
-              "Other",
-            ]}
+            options={languageOptions}
             selectedValues={formData.language}
             onToggle={(val) => handleArrayToggle("language", val)}
             required

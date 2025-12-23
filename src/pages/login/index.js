@@ -72,6 +72,7 @@ export default function Login() {
 
             localStorage.setItem("role", res?.data?.role);
             localStorage.setItem("token", res.data.token);
+            localStorage.setItem("email", fields?.email);
             if (res?.data?.isVerified === 0) {
               router.push("/otp");
               return;

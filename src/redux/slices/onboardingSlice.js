@@ -209,12 +209,12 @@ const onboardingSlice = createSlice({
       });
     builder
       .addCase(getOnboardingStepData.pending, (state) => {
-        state.loading.getOnboardingStepData = true;
+        state.loading.onboardingStepData = true;
         state.error = null;
       })
       .addCase(getOnboardingStepData.fulfilled, (state, action) => {
         state.loading.getOnboardingStepData = false;
-        state.onboardingStep = action.payload.data;
+        state.onboardingStepData = action.payload.data;
       })
       .addCase(getOnboardingStepData.rejected, (state, action) => {
         state.loading.getOnboardingStepData = false;
