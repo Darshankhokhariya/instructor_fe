@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import SectionHeader from "./SectionHeader";
 import Label from "./Label";
 import SmartSelect from "../common/SmartSelect";
 import Input from "../common/Input";
 import { BiPlusCircle, BiTrash } from "react-icons/bi";
 import TextArea from "../common/TextArea";
+import CameraCapture from "./CameraCapture";
 
 const StepFive = ({
   formData,
+  setFormData,
   handleChange,
   validationErrors,
   handleArrayToggle,
@@ -16,9 +18,12 @@ const StepFive = ({
   addCertification,
   addSampleVideo,
   handleSampleVideoChange,
+  setProfileImagePreview,
   removeCertification,
   removeSampleVideo,
 }) => {
+
+  const [showCamera, setShowCamera] = useState(true);
   return (
     <div className="space-y-8">
       {/* Profile Image Upload [NEW SECTION] */}
@@ -31,15 +36,34 @@ const StepFive = ({
         <div className="p-4 bg-teal-50 rounded-xl border border-teal-200 mb-6 flex justify-between items-center">
           <div>
             <Label required>Profile Image (250px X 250px Recommended)</Label>
-            <input
+            {/* <input
               type="file"
               id="profileImage"
               name="profileImage"
-              onChange={handleChange}
-              // ... (rest of the input className) ...
               accept="image/*"
-            // required
-            />
+              capture="user"   // opens front camera (use "environment" for back camera)
+              onChange={handleChange}
+              className="block w-full text-sm text-slate-600
+             file:mr-4 file:py-2 file:px-4
+             file:rounded-lg file:border-0
+             file:text-sm file:font-semibold
+             file:bg-teal-100 file:text-teal-700
+             hover:file:bg-teal-200"
+            /> */}
+            {showCamera && (
+              <CameraCapture
+                onCapture={({ file, preview }) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    profileImage: file,
+                  }));
+
+                  setProfileImagePreview(preview);
+                  setShowCamera(false); // 👈 THIS hides CameraCapture
+                }}
+              />
+            )}
+
             {formData.profileImage && (
               <p className="mt-2 text-xs text-slate-600">
                 Selected: **{formData.profileImage.name}**
@@ -47,22 +71,32 @@ const StepFive = ({
             )}
           </div>
           <div>
-            {profileImagePreview && (
-              <div className="mt-3 flex flex-col md:flex-row justify-center items-center m-auto gap-3">
-                <img
-                  src={profileImagePreview}
-                  alt="Preview"
-                  className="w-[250px] h-[250px]  rounded-full object-cover border border-slate-200"
-                />
-              </div>
+            {!showCamera && profileImagePreview && (
+              <img
+                src={profileImagePreview}
+                alt="Captured"
+                className="w-[250px] h-[250px] rounded-full object-cover border"
+              />
             )}
-            {validationErrors.profileImage && (
-              <p className="mt-1 text-xs text-red-500">
-                {validationErrors.profileImage}
-              </p>
+            {!showCamera && (
+              <button
+                onClick={() => {
+                  setShowCamera(true);
+                  setProfileImagePreview(null);
+                }}
+                className="mt-3 px-4 py-2 bg-slate-600 text-white rounded-lg"
+              >
+                Retake Photo
+              </button>
             )}
+
           </div>
         </div>
+        {validationErrors.profileImage && (
+          <p className="mt-1 text-xs text-red-500">
+            {validationErrors.profileImage}
+          </p>
+        )}
       </div>
 
       {/* Yoga Styles */}

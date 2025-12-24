@@ -32,30 +32,30 @@ export default function ApproveModal({ data, onClose }) {
                     <TwoCol label="Date of Birth" value={data?.dob} />
                     <TwoCol label="Gender" value={data?.gender} />
                     <TwoCol label="Email" value={data?.email} />
-                    <TwoCol label="Phone" value={data?.phone} />
+                    <TwoCol label="Primary Phone " value={data?.phone} />
                     <TwoCol label="Alternate Phone" value={data?.alternatePhone} />
                 </Section>
 
                 {/* Permanent Address */}
                 <Section title="Permanent Address">
-                    <TwoCol label="Country" value={data?.permanentCountry} />
-                    <TwoCol label="State" value={data?.permanentState} />
+                    <TwoCol label="House No./Floor." value={data?.permanentBlock} />
+                    <TwoCol label="Building Name & Block No." value={data?.permanentBuilding} />
+                    <TwoCol label="Landmark / Area Name" value={data?.permanentArea} />
                     <TwoCol label="City" value={data?.permanentCity} />
+                    <TwoCol label="State" value={data?.permanentState} />
+                    <TwoCol label="Country" value={data?.permanentCountry} />
                     <TwoCol label="Pincode" value={data?.permanentPincode} />
-                    <TwoCol label="Area" value={data?.permanentArea} />
-                    <TwoCol label="Building" value={data?.permanentBuilding} />
-                    <TwoCol label="Block / House No." value={data?.permanentBlock} />
                 </Section>
 
                 {/* Current Address */}
                 <Section title="Current Address">
-                    <TwoCol label="Country" value={data?.currentCountry} />
-                    <TwoCol label="State" value={data?.currentState} />
+                    <TwoCol label="House No./Floor." value={data?.currentBlock} />
+                    <TwoCol label="Building Name & Block No." value={data?.currentBuilding} />
+                    <TwoCol label="Landmark / Area Name" value={data?.currentArea} />
                     <TwoCol label="City" value={data?.currentCity} />
+                    <TwoCol label="State" value={data?.currentState} />
+                    <TwoCol label="Country" value={data?.currentCountry} />
                     <TwoCol label="Pincode" value={data?.currentPincode} />
-                    <TwoCol label="Area" value={data?.currentArea} />
-                    <TwoCol label="Building" value={data?.currentBuilding} />
-                    <TwoCol label="Block / House No." value={data?.currentBlock} />
                 </Section>
 
                 {/* Emergency Contact */}
@@ -85,6 +85,7 @@ export default function ApproveModal({ data, onClose }) {
                     <TwoCol label="LinkedIn" value={data?.socialLi} />
                     <TwoCol label="Instagram" value={data?.socialInsta} />
                     <TwoCol label="YouTube" value={data?.socialYt} />
+
                 </Section>
 
                 {/* Qualifications */}

@@ -407,8 +407,8 @@ const InstructorOnboarding = () => {
         const updated = replaceArray
           ? value
           : current.includes(value)
-          ? current.filter((i) => i !== value)
-          : [...current, value];
+            ? current.filter((i) => i !== value)
+            : [...current, value];
 
         setValidationErrors((v) => {
           if (v[field] && updated.length > 0) {
@@ -739,13 +739,13 @@ const InstructorOnboarding = () => {
   };
 
   const nextStep = (e) => {
+    console.log('e', e)
     if (validateStep()) {
       //   // Uncomment for mandatory validation
       //   document
       //     .getElementById("form-content-area")
       //     ?.scrollTo({ top: 0, behavior: "smooth" });
       if (!validateStep()) return;
-
       handleSubmit(e);
     }
   };
@@ -1096,9 +1096,8 @@ const InstructorOnboarding = () => {
             className="max-w-5xl mx-auto min-h-full"
           >
             <div
-              className={`transition-opacity duration-300 ease-out ${
-                isSubmitted ? "opacity-100" : "opacity-100"
-              } pb-4`}
+              className={`transition-opacity duration-300 ease-out ${isSubmitted ? "opacity-100" : "opacity-100"
+                } pb-4`}
             >
               {/* STEP 1: PERSONAL, ADDRESS, EMERGENCY CONTACT, LANGUAGES */}
               {step === 1 && (
@@ -1144,7 +1143,9 @@ const InstructorOnboarding = () => {
               {step === 5 && (
                 <StepFive
                   formData={formData}
+                  setFormData={setFormData}
                   handleChange={handleChange}
+                  setProfileImagePreview={setProfileImagePreview}
                   validationErrors={validationErrors}
                   handleArrayToggle={handleArrayToggle}
                   handleCertChange={handleCertChange}
