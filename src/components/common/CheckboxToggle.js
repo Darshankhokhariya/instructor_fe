@@ -1,8 +1,8 @@
 import React from "react";
 
 const CheckboxToggle = ({ label, name, checked, onChange }) => (
-  <div
-    className={`mb-4 flex items-center justify-between rounded-lg border p-3 transition-colors ${
+  <label
+    className={`mb-4 flex cursor-pointer items-center justify-between rounded-lg border p-3 transition-colors ${
       checked ? "border-teal-400 bg-teal-50" : "border-gray-300 bg-white"
     }`}
   >
@@ -14,7 +14,7 @@ const CheckboxToggle = ({ label, name, checked, onChange }) => (
       onChange={onChange}
       className="h-4 w-4 text-teal-600"
     />
-  </div>
+  </label>
 );
 
 export default CheckboxToggle;

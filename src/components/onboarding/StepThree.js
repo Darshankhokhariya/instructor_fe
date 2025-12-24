@@ -3,10 +3,11 @@ import SectionHeader from "./SectionHeader";
 import Selector from "../common/Selector";
 import Input from "../common/Input";
 
-const StepThree = ({ formData, handleChange, validationErrors }) => {
+const StepThree = ({ formData, handleChange, validationErrors, }) => {
   const isIndia = formData.pCountry === "india";
   const isIndividual = formData.registerAs === "individual";
   const isBusiness = formData.registerAs === "business";
+
 
   const registrationOptions = [
     {
@@ -37,24 +38,24 @@ const StepThree = ({ formData, handleChange, validationErrors }) => {
       {/* Aadhaar */}
       <Input
         label="Aadhaar Card Number"
-        name="aadhaarNo"
+        name="aadharNo"
         placeholder="1234 5678 9012"
-        value={formData.aadhaarNo}
+        value={formData.aadharNo}
         onChange={handleChange}
         required
-        error={validationErrors.aadhaarNo}
+        error={validationErrors.aadharNo}
       />
 
       {/* GSTIN only for Business */}
       {isBusiness && (
         <Input
           label="GSTIN"
-          name="gstin"
+          name="GSTIN"
           placeholder="22AAAAA0000A1Z5"
-          value={formData.gstin}
+          value={formData.GSTIN}
           onChange={handleChange}
           required
-          error={validationErrors.gstin}
+          error={validationErrors.GSTIN}
         />
       )}
     </>

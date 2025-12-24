@@ -20,7 +20,11 @@ import { useDispatch, useSelector } from "react-redux";
 import OnboardingFooter from "@/components/onboarding/OnboardingFooter";
 import { BiCheckCircleIcon, FaShieldAlt } from "../../../../utils/icon";
 import StepIndicator from "@/components/onboarding/StepIndicator";
-import { formatDOB, isTimeSlotValid, languageOptions } from "../../../../utils/onboarding";
+import {
+  formatDOB,
+  isTimeSlotValid,
+  languageOptions,
+} from "../../../../utils/onboarding";
 import SubmissionDialog from "@/components/onboarding/SubmissionDialog";
 import {
   getOnboardingStep,
@@ -305,7 +309,7 @@ const InstructorOnboarding = () => {
       setFormData((prev) => ({
         ...prev,
         yoga_style: data?.yoga_style || [],
-        video_url: data?.video_url || [],
+        video_url: data?.video_url || [""],
         instructor_website: data?.instructor_website,
         teaching_philosophy: data?.teaching_philosophy,
       }));
@@ -407,8 +411,8 @@ const InstructorOnboarding = () => {
         const updated = replaceArray
           ? value
           : current.includes(value)
-            ? current.filter((i) => i !== value)
-            : [...current, value];
+          ? current.filter((i) => i !== value)
+          : [...current, value];
 
         setValidationErrors((v) => {
           if (v[field] && updated.length > 0) {
@@ -609,13 +613,21 @@ const InstructorOnboarding = () => {
     }
 
     if (step === 3) {
-      if (formData.pCountry === "India") {
-        fields = [...fields, "instructor_website", "aadharNo", "GSTIN"];
-      } else {
-        fields = [...fields, "taxIdentification"];
+      const isIndia = data.pCountry === "india";
+      const isIndividual = data.registerAs === "individual";
+      const isBusiness = data.registerAs === "business";
+
+      if (isIndia) {
+        if (!data.panCard) errors.panCard = "PAN number is required";
+        if (!data.aadharNo) errors.aadharNo = "Aadhaar number is required";
+        if (isBusiness && !data.gstin) errors.gstin = "GST number is required";
+      }
+
+      if (!isIndia && !isIndividual) {
+        if (!data.taxIdentification)
+          errors.taxIdentification = "Tax Identification Number is required";
       }
     }
-
     if (step === 4) {
       [
         "instagram_link",
@@ -685,12 +697,17 @@ const InstructorOnboarding = () => {
   });
 
   // --- END OF VALIDATION LOGIC ---
-
   const validateStep = () => {
     const fieldErrors = validateFormFields(formData);
+    console.log('fieldErrors', fieldErrors)
 
     if (step === 3 && formData.registerAs) {
-      if (formData.registerAs === "individual") {
+      const isIndia = formData.pCountry === "india";
+      const isIndividual = formData.registerAs === "individual";
+      const isBusiness = formData.registerAs === "business";
+
+      // 🇮🇳 INDIA
+      if (isIndia) {
         if (!formData.panCard) {
           fieldErrors.panCard = "PAN is required";
         } else if (!REGEX.pan.test(formData.panCard.toUpperCase())) {
@@ -702,18 +719,23 @@ const InstructorOnboarding = () => {
         } else if (!REGEX.aadhar.test(formData.aadharNo.replace(/\s/g, ""))) {
           fieldErrors.aadharNo = "Invalid Aadhaar number";
         }
-        if (!formData.GSTIN) {
-          fieldErrors.GSTIN = "GST number is required";
-        } else if (!REGEX.gstin.test(formData.GSTIN.replace(/\s/g, ""))) {
-          fieldErrors.GSTIN = "Invalid GST number";
+
+        if (isBusiness) {
+          if (!formData.GSTIN) {
+            fieldErrors.GSTIN = "GST number is required";
+          } else if (!REGEX.gstin.test(formData.GSTIN.replace(/\s/g, ""))) {
+            fieldErrors.GSTIN = "Invalid GST number";
+          }
         }
-      } else if (formData.registerAs === "business") {
+      }
+
+      // 🌍 NON-INDIA
+      if (!isIndia && isBusiness) {
         if (!formData.taxIdentification) {
-          fieldErrors.taxIdentification = "Taxpayer ID is Required";
+          fieldErrors.taxIdentification = "Taxpayer ID is required";
         }
       }
     }
-
     let customError = null;
     if (step === 6 && formData.startTime && formData.endTime) {
       const isValidTime = isTimeSlotValid(formData.startTime, formData.endTime);
@@ -739,7 +761,6 @@ const InstructorOnboarding = () => {
   };
 
   const nextStep = (e) => {
-    console.log('e', e)
     if (validateStep()) {
       //   // Uncomment for mandatory validation
       //   document
@@ -757,53 +778,7 @@ const InstructorOnboarding = () => {
       .getElementById("form-content-area")
       ?.scrollTo({ top: 0, behavior: "smooth" });
 
-    let payload;
     setStep((prevStep) => prevStep - 1);
-    // setStep((prev) => {
-    //   const newStep = Math.max(prev - 1, 1);
-
-    //   if (newStep < prev) {
-    //     // Build payload for the step we're going back to
-
-    //     if (newStep === 6) {
-    //       payload = buildClassAvailabilityPayload(formData);
-    //     } else {
-    //       payload = buildPayloadByStep(newStep, formData);
-    //     }
-
-    //     console.log("payload", payload);
-
-    //     // Dynamically dispatch corresponding action
-    //     switch (newStep) {
-    //       case 1:
-    //         dispatch(onboardingStepOne(payload));
-    //         break;
-    //       case 2:
-    //         dispatch(onboardingStepTwo(payload));
-    //         break;
-    //       case 3:
-    //         dispatch(onboardingStepThree(payload));
-    //         break;
-    //       case 4:
-    //         dispatch(onboardingStepFour(payload));
-    //         break;
-    //       case 5:
-    //         dispatch(onboardingStepFive(payload));
-    //         break;
-    //       case 6:
-    //         dispatch(onboardingStepSixth(payload));
-    //         break;
-    //       case 7:
-    //         dispatch(onboardingStepSeven(payload));
-    //         break;
-    //       // add more steps here as needed
-    //       default:
-    //         break;
-    //     }
-    //   }
-
-    //   return newStep;
-    // });
   };
 
   const handleClear = () => {
@@ -868,18 +843,37 @@ const InstructorOnboarding = () => {
     }
 
     if (step === 3) {
-      if (formData.registerAs === "individual") {
-        payload.registerAs = formData.registerAs;
-        payload.taxIdentification = formData.panCard;
-        payload.aadharNo = formData.aadharNo;
-        payload.GSTIN = formData.GSTIN;
-      } else {
-        payload.registerAs = formData.registerAs;
-        payload.taxIdentification = formData.taxIdentification;
+      const isIndia = formData.pCountry === "india";
+      const isIndividual = formData.registerAs === "individual";
+      const isBusiness = formData.registerAs === "business";
 
-        delete payload.panCard;
-        delete payload.aadharNo;
-        delete payload.GSTIN;
+      payload.registerAs = formData.registerAs;
+
+      // Clear all tax fields first (prevents stale data bugs)
+      delete payload.panCard;
+      delete payload.aadharNo;
+      delete payload.GSTIN;
+      delete payload.taxIdentification;
+
+      // 🇮🇳 INDIA
+      if (isIndia) {
+        // PAN always required in India
+        payload.taxIdentification = formData.panCard;
+
+        // Aadhaar only for India
+        payload.aadharNo = formData.aadharNo;
+
+        // GSTIN ONLY for business
+        if (isBusiness) {
+          payload.GSTIN = formData.GSTIN;
+        }
+      }
+
+      // 🌍 NON-INDIA
+      if (!isIndia) {
+        // Only business requires tax ID
+        payload.taxIdentification = formData.taxIdentification;
+        // Individual + non-India → NOTHING sent
       }
     }
 
@@ -1027,6 +1021,7 @@ const InstructorOnboarding = () => {
     [formData]
   );
 
+
   const isSubmitted = step === totalSteps + 1;
   const isGroupSelected = formData.availableGroupClass;
   const isPrivateSelected = formData.availablePrivateClass;
@@ -1096,8 +1091,9 @@ const InstructorOnboarding = () => {
             className="max-w-5xl mx-auto min-h-full"
           >
             <div
-              className={`transition-opacity duration-300 ease-out ${isSubmitted ? "opacity-100" : "opacity-100"
-                } pb-4`}
+              className={`transition-opacity duration-300 ease-out ${
+                isSubmitted ? "opacity-100" : "opacity-100"
+              } pb-4`}
             >
               {/* STEP 1: PERSONAL, ADDRESS, EMERGENCY CONTACT, LANGUAGES */}
               {step === 1 && (
@@ -1127,6 +1123,7 @@ const InstructorOnboarding = () => {
                   handleChange={handleChange}
                   validationErrors={validationErrors}
                   setFormData={setFormData}
+                  defaultOnboardingStep={defaultOnboardingStep}
                 />
               )}
 
