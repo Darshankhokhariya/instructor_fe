@@ -10,7 +10,6 @@ export default function ApproveModal({ data, onClose }) {
   const [managerApprove, setManagerApprove] = useState(false);
   const [adminApprove, setAdminApprove] = useState(false);
 
-  console.log("data", data);
 
   if (!data) return null;
 
