@@ -138,13 +138,22 @@ const InstructorOnboarding = () => {
   const [step, setStep] = useState(); // Start at Step 1
 
   useEffect(() => {
-    const storedEmail = localStorage.getItem("email");
-    if (storedEmail) {
-      setFormData((prev) => ({
-        ...prev,
-        email: storedEmail,
-      }));
-    }
+    setFormData((prev) => {
+      let updated = { ...prev };
+
+      // ✅ set email from localStorage (only once)
+      const storedEmail = localStorage.getItem("email");
+      if (storedEmail && !prev.email) {
+        updated.email = storedEmail;
+      }
+
+      // ✅ default registerAs for India
+      if (updated.pCountry === "india" && !updated.registerAs) {
+        updated.registerAs = "individual";
+      }
+
+      return updated;
+    });
   }, []);
 
   useEffect(() => {
@@ -699,7 +708,7 @@ const InstructorOnboarding = () => {
   // --- END OF VALIDATION LOGIC ---
   const validateStep = () => {
     const fieldErrors = validateFormFields(formData);
-    console.log('fieldErrors', fieldErrors)
+    console.log("fieldErrors", fieldErrors);
 
     if (step === 3 && formData.registerAs) {
       const isIndia = formData.pCountry === "india";
@@ -1020,7 +1029,6 @@ const InstructorOnboarding = () => {
     },
     [formData]
   );
-
 
   const isSubmitted = step === totalSteps + 1;
   const isGroupSelected = formData.availableGroupClass;

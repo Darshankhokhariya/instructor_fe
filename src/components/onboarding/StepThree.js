@@ -3,17 +3,21 @@ import SectionHeader from "./SectionHeader";
 import Selector from "../common/Selector";
 import Input from "../common/Input";
 
-const StepThree = ({ formData, handleChange, validationErrors, }) => {
+const StepThree = ({ formData, handleChange, validationErrors }) => {
   const isIndia = formData.pCountry === "india";
   const isIndividual = formData.registerAs === "individual";
   const isBusiness = formData.registerAs === "business";
 
+  console.log("formData", formData);
 
+  console.log("isIndia", isIndia);
+  console.log("isIndividual", isIndividual);
+  console.log("isBusiness", isBusiness);
+
+  console.log("isIndia", isIndia);
   const registrationOptions = [
     {
-      label: isIndia
-        ? "Individual (PAN / Aadhaar)"
-        : "Individual (SSN / TIN)",
+      label: isIndia ? "Individual (PAN / Aadhaar)" : "Individual (SSN / TIN)",
       value: "individual",
     },
     {
@@ -21,6 +25,8 @@ const StepThree = ({ formData, handleChange, validationErrors, }) => {
       value: "business",
     },
   ];
+
+  console.log("ormData.registerAs", formData.registerAs);
 
   const renderIndianFields = () => (
     <>
@@ -75,7 +81,7 @@ const StepThree = ({ formData, handleChange, validationErrors, }) => {
             label="Register As"
             name="registerAs"
             options={registrationOptions}
-            value={formData.registerAs}
+            value={formData.registerAs || (isIndia ? "individual" : "individual")}
             onChange={handleChange}
             required
             error={validationErrors.registerAs}

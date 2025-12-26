@@ -1,7 +1,7 @@
 "use client";
 import RecentApplications from "@/components/admin/RecentApplications";
 import Layout from "@/components/layout/Layout";
-import { getUsers, selectUsers } from "@/redux/slices/userSlice";
+import { getSingleUser, getUsers, selectUsers } from "@/redux/slices/userSlice";
 import React, { useEffect, useState } from "react";
 import {
   FaClipboardList,
@@ -88,11 +88,11 @@ export default function AdminDashboard() {
 
   const users = useSelector(selectUsers);
 
-  console.log("users", users?.data);
-
   useEffect(() => {
     dispatch(getUsers({ page, limit }));
   }, [page, limit]);
+
+
 
   return (
     <Layout>

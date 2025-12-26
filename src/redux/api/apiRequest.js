@@ -61,6 +61,7 @@ export const API_ENDPOINTS = {
 
   USER: {
     GET_USERS: (page, limit) => `/user/getAllUsers?page=${page}&limit=${limit}`,
+    GET_SINGLE_USERS: (id) => `/user/getSingleUsers?id=${id}`,
   },
   
   ADMIN: {

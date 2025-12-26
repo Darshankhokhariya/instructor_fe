@@ -13,7 +13,8 @@ const initialState = {
   },
   loading: {
     approve: false
-  }
+  },
+  user: null
 };
 
 export const userSignup = createAsyncThunk(
@@ -45,6 +46,13 @@ export const getUsers = createAsyncThunk(
   "user/getUsers",
   async ({ page, limit }) => {
     return await getRequest(API_ENDPOINTS.USER.GET_USERS(page, limit));
+  }
+);
+
+export const getSingleUser = createAsyncThunk(
+  "user/getSingleUser",
+  async (id) => {
+    return await getRequest(API_ENDPOINTS.USER.GET_SINGLE_USERS(id));
   }
 );
 
@@ -136,11 +144,25 @@ const userSlice = createSlice({
         state.loading.approve = false;
         state.error = action.payload;
       });
+    builder
+      .addCase(getSingleUser.pending, (state) => {
+        state.loading.approve = true;
+        state.error = null;
+      })
+      .addCase(getSingleUser.fulfilled, (state, action) => {
+        state.loading.approve = false;
+        state.user = action.payload.data.data
+      })
+      .addCase(getSingleUser.rejected, (state, action) => {
+        state.loading.approve = false;
+        state.error = action.payload;
+      });
   },
 });
 
 export const { setOtpEmail, clearOtpEmail } = userSlice.actions;
 export const selectUsers = (state) => state.user.users;
 export const selectStatusLoading = (state) => state.user.loading.approve;
+export const selectUser = (state) => state.user.user;
 
 export default userSlice.reducer;

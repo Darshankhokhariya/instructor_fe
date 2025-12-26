@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ApproveModal from "../modal/Admin/ApproveModel";
 import { BiCheckCircle } from "react-icons/bi";
 import { BiCheckCircleIcon } from "../../../utils/icon";
@@ -8,9 +8,10 @@ import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import {
   changeUserStatus,
+  getSingleUser,
   selectStatusLoading,
+  selectUser,
 } from "@/redux/slices/userSlice";
-
 
 export default function RecentApplications({ data }) {
   const [modalData, setModalData] = useState(null);
@@ -25,6 +26,9 @@ export default function RecentApplications({ data }) {
   });
 
   const loading = useSelector(selectStatusLoading);
+  const userData = useSelector(selectUser);
+
+  console.log("userData", userData);
 
   // Filter applications based on active tab
   const filteredApplications =
@@ -40,7 +44,6 @@ export default function RecentApplications({ data }) {
             : false
         );
 
-
   const handleOpenApprovelModal = (data) => {
     setApproveModal(true);
     setUser(data);
@@ -50,9 +53,7 @@ export default function RecentApplications({ data }) {
 
     if (!formData.status.trim()) errors.status = "Status is required";
 
-    if (
-      !formData.reason.trim()
-    ) {
+    if (!formData.reason.trim()) {
       errors.reason = "Reason is required when rejecting";
     }
 
@@ -97,7 +98,6 @@ export default function RecentApplications({ data }) {
     setValidationErrors({});
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -123,6 +123,12 @@ export default function RecentApplications({ data }) {
       toast.error(error?.message || error || "Something went wrong");
     }
   };
+
+  useEffect(() => {
+    if (modalData?.id) {
+      dispatch(getSingleUser(modalData?.id));
+    }
+  }, [modalData?.id]);
 
   return (
     <>
@@ -212,7 +218,7 @@ export default function RecentApplications({ data }) {
 
       {/* Modal */}
       {modalData && (
-        <ApproveModal data={modalData} onClose={() => setModalData(null)} />
+        <ApproveModal data={userData} onClose={() => setModalData(null)} />
       )}
 
       {approveModal && (
