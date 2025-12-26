@@ -28,8 +28,6 @@ export default function RecentApplications({ data }) {
   const loading = useSelector(selectStatusLoading);
   const userData = useSelector(selectUser);
 
-  console.log("userData", userData);
-
   // Filter applications based on active tab
   const filteredApplications =
     activeTab === "All"

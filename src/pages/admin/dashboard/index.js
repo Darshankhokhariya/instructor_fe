@@ -103,7 +103,7 @@ export default function AdminDashboard() {
 
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {dashboardStats.map((stat) => (
+          {dashboardStats?.map((stat) => (
             <div
               key={stat.id}
               className={`${stat.bgColor} text-white p-6 rounded-2xl shadow-lg relative overflow-hidden hover:scale-105 transform transition`}

@@ -50,12 +50,18 @@ export default function ApproveModal({ data, onClose }) {
 
         {/* Permanent Address */}
         <Section title="Permanent Address">
-          <TwoCol label="House No./Floor." value={data?.onboarding?.step1?.pBlock} />
+          <TwoCol
+            label="House No./Floor."
+            value={data?.onboarding?.step1?.pBlock}
+          />
           <TwoCol
             label="Building Name & Block No."
             value={data?.onboarding?.step1?.pBuilding}
           />
-          <TwoCol label="Landmark / Area Name" value={data?.onboarding?.step1?.pArea} />
+          <TwoCol
+            label="Landmark / Area Name"
+            value={data?.onboarding?.step1?.pArea}
+          />
           <TwoCol label="City" value={data?.onboarding?.step1?.pCity} />
           <TwoCol label="State" value={data?.onboarding?.step1?.pState} />
           <TwoCol label="Country" value={data?.onboarding?.step1?.pCountry} />
@@ -64,12 +70,18 @@ export default function ApproveModal({ data, onClose }) {
 
         {/* Current Address */}
         <Section title="Current Address">
-         <TwoCol label="House No./Floor." value={data?.onboarding?.step1?.cBlock} />
+          <TwoCol
+            label="House No./Floor."
+            value={data?.onboarding?.step1?.cBlock}
+          />
           <TwoCol
             label="Building Name & Block No."
             value={data?.onboarding?.step1?.cBuilding}
           />
-          <TwoCol label="Landmark / Area Name" value={data?.onboarding?.step1?.cArea} />
+          <TwoCol
+            label="Landmark / Area Name"
+            value={data?.onboarding?.step1?.cArea}
+          />
           <TwoCol label="City" value={data?.onboarding?.step1?.cCity} />
           <TwoCol label="State" value={data?.onboarding?.step1?.cState} />
           <TwoCol label="Country" value={data?.onboarding?.step1?.cCountry} />
@@ -89,46 +101,74 @@ export default function ApproveModal({ data, onClose }) {
             label="School / College"
             value={data?.onboarding?.step2?.collegeName}
           />
-          <TwoCol label="Degree" value={data?.onboarding?.step2?.qualification} />
-          <TwoCol label="University" value={data?.onboarding?.step2?.institute} />
+          <TwoCol
+            label="Degree"
+            value={data?.onboarding?.step2?.qualification}
+          />
+          <TwoCol
+            label="University"
+            value={data?.onboarding?.step2?.institute}
+          />
         </Section>
 
         {/* Taxation */}
         <Section title="Taxation">
-          <TwoCol label="PAN Number" value={data?.onboarding?.step3?.taxIdentification} />
-          <TwoCol label="Aadhar Number" value={data?.onboarding?.step3?.GSTIN} />
-          <TwoCol label="GSTIN" value={data?.gstin} />
+          <TwoCol
+            label="PAN Number"
+            value={data?.onboarding?.step3?.taxIdentification}
+          />
+          <TwoCol
+            label="Aadhar Number"
+            value={data?.onboarding?.step3?.aadharNo}
+          />
+          <TwoCol label="GSTIN" value={data?.onboarding?.step3?.GSTIN} />
         </Section>
 
         {/* Social Media */}
         <Section title="Social Media">
-          <TwoCol label="Facebook" value={data?.socialFb} />
-          <TwoCol label="LinkedIn" value={data?.socialLi} />
-          <TwoCol label="Instagram" value={data?.socialInsta} />
-          <TwoCol label="YouTube" value={data?.socialYt} />
+          <TwoCol
+            label="Facebook"
+            value={data?.onboarding?.step4?.facebook_link}
+          />
+          <TwoCol
+            label="LinkedIn"
+            value={data?.onboarding?.step4?.linkdin_link}
+          />
+          <TwoCol
+            label="Instagram"
+            value={data?.onboarding?.step4?.instagram_link}
+          />
+          <TwoCol
+            label="YouTube"
+            value={data?.onboarding?.step4?.youtube_link}
+          />
         </Section>
 
         {/* Qualifications */}
         <Section title="Qualifications">
-          <TwoCol label="Philosophy" value={data?.philosophy} />
+          <TwoCol
+            label="Philosophy"
+            value={data?.onboarding?.step5?.teaching_philosophy}
+          />
           <div>
             <p className="text-xs text-gray-500">Yoga Styles</p>
             <p className="font-medium">
-              {(data?.yogaStyles || []).join(", ") || "—"}
+              {(data?.onboarding?.step5?.yoga_style || []).join(", ") || "—"}
             </p>
           </div>
           <div>
             <p className="text-xs text-gray-500">Certifications</p>
-            {data?.certifications?.map((c, i) => (
+            {data?.onboarding?.step5?.certificates?.map((c, i) => (
               <p key={i} className="font-medium">
-                {c.title} — {c.file ? "Uploaded" : "Not Uploaded"}
+                {c?.certificate_name} —{" "}
+                {c?.file_url ? "Uploaded" : "Not Uploaded"}
               </p>
             ))}
           </div>
           <TwoCol label="Intro Video" value={data?.introVideo} />
           <div>
             <p className="text-xs text-gray-500">Sample Videos</p>
-            {(data?.sampleVideos || []).map((v, i) => (
+            {(data?.onboarding?.step5?.video_url || []).map((v, i) => (
               <p key={i}>{v}</p>
             ))}
           </div>
@@ -136,34 +176,72 @@ export default function ApproveModal({ data, onClose }) {
 
         {/* Availability */}
         <Section title="Availability">
-          <TwoCol label="Days" value={(data?.days || []).join(", ")} />
-          <TwoCol label="Times" value={(data?.times || []).join(", ")} />
-          <TwoCol label="Start Time" value={data?.startTime} />
-          <TwoCol label="End Time" value={data?.endTime} />
+          <div className="grid grid-cols-4 gap-4 font-medium text-gray-700">
+            <div>Day</div>
+            <div>Start Time</div>
+            <div>End Time</div>
+            <div>Class Type</div>
+
+            {data?.onboarding?.step6?.class_availability?.[0]?.availability &&
+              Object.entries(
+                data.onboarding.step6.class_availability[0].availability
+              ).map(([day, slots]) =>
+                slots.map((slot, index) => (
+                  <React.Fragment key={`${day}-${index}`}>
+                    <div>{day}</div>
+                    <div>{slot.start_time}</div>
+                    <div>{slot.end_time}</div>
+                    <div>{slot.class_key}</div>
+                  </React.Fragment>
+                ))
+              )}
+          </div>
         </Section>
 
         {/* Pricing */}
         <Section title="Pricing">
-          <TwoCol label="Group Rate" value={data?.groupRate} />
-          <TwoCol label="Private Rate" value={data?.privateRate} />
-          <TwoCol label="Trial Mode" value={data?.trialMode} />
+          <TwoCol
+            label="Group Rate"
+            value={data?.onboarding?.step7?.pricing_agreement?.group_class_rate}
+          />
+          <TwoCol
+            label="Private Rate"
+            value={
+              data?.onboarding?.step7?.pricing_agreement?.private_class_rate
+            }
+          />
+          <TwoCol
+            label="Trial Mode"
+            value={
+              data?.onboarding?.step7?.pricing_agreement?.trial_period_days
+            }
+          />
         </Section>
 
         {/* Agreements */}
         <Section title="Agreements">
           <TwoCol
             label="Information Accurate"
-            value={data?.confirmAccurate ? "Yes" : "No"}
+            value={
+              data?.onboarding?.step7?.pricing_agreement?.isAgree ? "Yes" : "No"
+            }
           />
           <TwoCol
             label="Ethical Standards"
-            value={data?.ethicalStandards ? "Yes" : "No"}
+            value={
+              data?.onboarding?.step7?.pricing_agreement?.isAgree ? "Yes" : "No"
+            }
           />
           <TwoCol
             label="Service Mindset"
-            value={data?.serviceMindset ? "Yes" : "No"}
+            value={
+              data?.onboarding?.step7?.pricing_agreement?.isAgree ? "Yes" : "No"
+            }
           />
-          <TwoCol label="Signature" value={data?.signature} />
+          <TwoCol
+            label="Signature"
+            value={data?.onboarding?.step7?.pricing_agreement?.signature}
+          />
         </Section>
 
         {/* Interview & Approvals */}
