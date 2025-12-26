@@ -68,7 +68,6 @@ export default function Login() {
         .unwrap()
         .then((res) => {
           if (res.status === 200) {
-
             localStorage.setItem("role", res?.data?.role);
             localStorage.setItem("token", res.data.token);
             localStorage.setItem("email", fields?.email);
@@ -83,16 +82,15 @@ export default function Login() {
             ) {
               if (res?.data?.role === "instructor") {
                 router.push("/instructor/onboarding");
-                toast.success(res.message || `User login succesfully!`);  
+                toast.success(res.message || `login succesfully!`);
+              } else if (res?.data?.role === "admin") {
+                router.push("/admin/dashboard");
+                toast.success(res.message || `login succesfully!`);
               } else {
                 router.push("/onboarding");
               }
               return;
             }
-
-
-            router.push("/dashboard");
-            toast.success(res.message || `User login succesfully!`);
             handleClear();
           } else {
             toast.error(res.message || `User not login!`);

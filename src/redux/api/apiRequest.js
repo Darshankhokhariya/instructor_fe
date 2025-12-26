@@ -44,12 +44,9 @@ export const getRequest = async (url, params = {}) => {
       },
     });
 
-
     return response;
   } catch (error) {
-    throw (
-      error
-    );
+    throw error;
   }
 };
 
@@ -60,6 +57,14 @@ export const API_ENDPOINTS = {
     LOGIN: "/user/userLogin",
     SIGNUP: "/user/signup",
     VERIFY_OTP: "/user/otpVerify",
+  },
+
+  USER: {
+    GET_USERS: (page, limit) => `/user/getAllUsers?page=${page}&limit=${limit}`,
+  },
+  
+  ADMIN: {
+    CHANGE_STATUS: `/admin/approveInstructor`,
   },
 
   ONBOARDING: {
