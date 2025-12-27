@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import { API_ENDPOINTS, getRequest, postRequest } from "../api/apiRequest";
+import { API_ENDPOINTS, getRequest, postRequest, putRequest } from "../api/apiRequest";
 
 const initialState = {
   getUsers: false,
@@ -12,9 +12,10 @@ const initialState = {
     data: null,
   },
   loading: {
-    approve: false
+    approve: false,
+    sheduleInterview: false
   },
-  user: null
+  user: null,
 };
 
 export const userSignup = createAsyncThunk(
@@ -81,6 +82,13 @@ export const userOnboarding = createAsyncThunk(
         error.response?.data?.message || "Something went wrong"
       );
     }
+  }
+);
+
+export const sheduleInterview = createAsyncThunk(
+  "admin/sheduleInterview",
+  async (fields) => {
+    return await putRequest(API_ENDPOINTS.ADMIN.SHEDULE_INTERVIEW, fields);
   }
 );
 
@@ -151,9 +159,21 @@ const userSlice = createSlice({
       })
       .addCase(getSingleUser.fulfilled, (state, action) => {
         state.loading.approve = false;
-        state.user = action.payload.data.data
+        state.user = action.payload.data.data;
       })
       .addCase(getSingleUser.rejected, (state, action) => {
+        state.loading.approve = false;
+        state.error = action.payload;
+      });
+    builder
+      .addCase(sheduleInterview.pending, (state) => {
+        state.loading.approve = true;
+        state.error = null;
+      })
+      .addCase(sheduleInterview.fulfilled, (state, action) => {
+        state.loading.sheduleInterview = false;
+      })
+      .addCase(sheduleInterview.rejected, (state, action) => {
         state.loading.approve = false;
         state.error = action.payload;
       });
@@ -163,6 +183,7 @@ const userSlice = createSlice({
 export const { setOtpEmail, clearOtpEmail } = userSlice.actions;
 export const selectUsers = (state) => state.user.users;
 export const selectStatusLoading = (state) => state.user.loading.approve;
+export const selectScheduleLoading = (state) => state.user.loading.sheduleInterview;
 export const selectUser = (state) => state.user.user;
 
 export default userSlice.reducer;

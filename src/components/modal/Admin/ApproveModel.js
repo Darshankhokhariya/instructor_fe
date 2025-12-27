@@ -1,15 +1,26 @@
 "use client";
+import { sheduleInterview } from "@/redux/slices/userSlice";
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 import { AiOutlineClose } from "react-icons/ai";
 
-export default function ApproveModal({ data, onClose }) {
-  const [interviewDate, setInterviewDate] = useState("");
-  const [interviewTime, setInterviewTime] = useState("");
-  const [recordingLink, setRecordingLink] = useState("");
+export default function ApproveModal({
+  data,
+  onClose,
+  interviewDate,
+  interviewTime,
+  meetingLink,
+  setInterviewDate,
+  setInterviewTime,
+  setRecordingLink,
+  onChange,
+  onSubmit,
+  errors,
+  loading
+}) {
   const [decision, setDecision] = useState("");
   const [managerApprove, setManagerApprove] = useState(false);
   const [adminApprove, setAdminApprove] = useState(false);
-
 
   if (!data) return null;
 
@@ -249,7 +260,7 @@ export default function ApproveModal({ data, onClose }) {
           interviewTime={interviewTime}
           setInterviewDate={setInterviewDate}
           setInterviewTime={setInterviewTime}
-          recordingLink={recordingLink}
+          meetingLink={meetingLink}
           setRecordingLink={setRecordingLink}
           decision={decision}
           setDecision={setDecision}
@@ -257,6 +268,10 @@ export default function ApproveModal({ data, onClose }) {
           setManagerApprove={setManagerApprove}
           adminApprove={adminApprove}
           setAdminApprove={setAdminApprove}
+          onChange={onChange}
+          handleSubmit={onSubmit}
+          errors={errors}
+          loading={loading}
         />
       </div>
     </div>
@@ -288,48 +303,67 @@ function TwoCol({ label, value }) {
 function InterviewSection({
   interviewDate,
   interviewTime,
-  setInterviewDate,
-  setInterviewTime,
-  recordingLink,
-  setRecordingLink,
-  decision,
-  setDecision,
-  managerApprove,
-  setManagerApprove,
-  adminApprove,
-  setAdminApprove,
+  meetingLink,
+  onChange,
+  handleSubmit,
+  errors,
+  loading 
 }) {
   return (
     <div className="mt-8 p-6 rounded-xl bg-gradient-to-r from-blue-50 to-white shadow-md border border-gray-200">
       <h3 className="text-xl font-semibold mb-4 text-gray-700">Interview </h3>
 
-      {/* Date & Time */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <input
-          type="date"
-          className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
-          value={interviewDate}
-          onChange={(e) => setInterviewDate(e.target.value)}
-        />
-        <input
-          type="time"
-          className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
-          value={interviewTime}
-          onChange={(e) => setInterviewTime(e.target.value)}
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+        <div>
+          <input
+            type="date"
+            name="interviewDate"
+            value={interviewDate}
+            onChange={onChange}
+            min={new Date().toISOString().split("T")[0]}
+            className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+          />
+          {errors.interviewDate && (
+            <p className="text-sm text-red-500 mt-1">{errors.interviewDate}</p>
+          )}
+        </div>
+
+        <div>
+          <input
+            type="time"
+            name="interviewTime"
+            value={interviewTime}
+            onChange={onChange}
+            className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+          />
+          {errors.interviewTime && (
+            <p className="text-sm text-red-500 mt-1">{errors.interviewTime}</p>
+          )}
+        </div>
       </div>
 
       {/* Recording Link */}
-      <input
-        type="text"
-        placeholder="Interview meeting link"
-        className="w-full border border-gray-300 p-3 rounded-lg mb-4 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-        value={recordingLink}
-        onChange={(e) => setRecordingLink(e.target.value)}
-      />
+      <div className="mb-5">
+        <input
+          type="text"
+          name="meetingLink"
+          placeholder="Interview meeting link"
+          value={meetingLink}
+          onChange={onChange}
+          className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+        />
+        {errors.meetingLink && (
+          <p className="text-sm text-red-500 mt-1">{errors.meetingLink}</p>
+        )}
+      </div>
 
       {/* Save Button */}
-      <button className="w-full py-3 rounded-lg font-semibold bg-primary text-white hover:bg-primary/90 transition">
+      <button
+        type="submit"
+        disabled={loading}
+        onClick={handleSubmit}
+        className="w-full py-3 rounded-lg cursor-pointer font-semibold bg-primary disabled:bg-primary/50 disabled:cursor-not-allowed text-white hover:bg-primary/90 transition"
+      >
         Schedule Interview
       </button>
     </div>

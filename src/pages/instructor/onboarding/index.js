@@ -708,7 +708,6 @@ const InstructorOnboarding = () => {
   // --- END OF VALIDATION LOGIC ---
   const validateStep = () => {
     const fieldErrors = validateFormFields(formData);
-    console.log("fieldErrors", fieldErrors);
 
     if (step === 3 && formData.registerAs) {
       const isIndia = formData.pCountry === "india";

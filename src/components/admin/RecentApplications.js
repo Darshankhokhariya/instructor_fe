@@ -9,12 +9,15 @@ import toast from "react-hot-toast";
 import {
   changeUserStatus,
   getSingleUser,
+  selectScheduleLoading,
   selectStatusLoading,
   selectUser,
+  sheduleInterview,
 } from "@/redux/slices/userSlice";
 
 export default function RecentApplications({ data }) {
   const [modalData, setModalData] = useState(null);
+  const [interviewModal, setInterviewModal] = useState(false);
   const [user, setUser] = useState({});
   const [approveModal, setApproveModal] = useState(false);
   const [activeTab, setActiveTab] = useState("All"); // Tabs: All, Pending, Interview, Approved
@@ -24,9 +27,27 @@ export default function RecentApplications({ data }) {
     status: "",
     reason: "",
   });
+  const [interviewDate, setInterviewDate] = useState("");
+  const [interviewTime, setInterviewTime] = useState("");
+  const [meetingLink, setMeetingLink] = useState("");
 
+  const loadingSchedule = useSelector(selectScheduleLoading);
   const loading = useSelector(selectStatusLoading);
+
   const userData = useSelector(selectUser);
+  const [errors, setErrors] = useState({});
+
+  const handleCloseInterview = () => {
+    setInterviewDate("");
+    setInterviewTime("");
+    setMeetingLink("");
+    setInterviewModal(false);
+  };
+
+  const handleOpenInterview = (data) => {
+    setInterviewModal(true);
+    setModalData(data);
+  };
 
   // Filter applications based on active tab
   const filteredApplications =
@@ -41,6 +62,33 @@ export default function RecentApplications({ data }) {
             ? app.overallApprovalStatus === "approved"
             : false
         );
+
+  const validateField = (name, value) => {
+    let error = "";
+
+    if (!value) {
+      error = "This field is required";
+    }
+
+    if (name === "interviewDate" && value) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const selectedDate = new Date(value);
+
+      if (selectedDate < today) {
+        error = "Interview date cannot be in the past";
+      }
+    }
+
+    if (name === "meetingLink" && value) {
+      const urlRegex = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- ./?%&=]*)?$/;
+      if (!urlRegex.test(value)) {
+        error = "Enter a valid URL";
+      }
+    }
+
+    return error;
+  };
 
   const handleOpenApprovelModal = (data) => {
     setApproveModal(true);
@@ -122,6 +170,58 @@ export default function RecentApplications({ data }) {
     }
   };
 
+  const handleSubmitInterview = async (e) => {
+    e.preventDefault();
+
+    const newErrors = {
+      interviewDate: validateField("interviewDate", interviewDate),
+      interviewTime: validateField("interviewTime", interviewTime),
+      meetingLink: validateField("meetingLink", meetingLink),
+    };
+
+    setErrors(newErrors);
+
+    const hasError = Object.values(newErrors).some((error) => error !== "");
+
+    if (hasError) return;
+
+    // ✅ Submit payload
+    const payload = {
+      id: modalData?.id,
+      interviewDate,
+      interviewTime,
+      interviewMeetLink: meetingLink,
+    };
+
+    try {
+      const res = await dispatch(sheduleInterview(payload)).unwrap();
+
+      if (res?.status === 200) {
+        toast.success(res?.message || "Interview scheduled successfully!");
+        handleCloseInterview();
+      } else {
+        toast.error(res?.message || "Something went wrong");
+      }
+    } catch (error) {
+      toast.error(error?.message || error || "Something went wrong");
+    }
+  };
+
+  const handleChangeInterview = (e) => {
+    const { name, value } = e.target;
+
+    if (name === "interviewDate") setInterviewDate(value);
+    if (name === "interviewTime") setInterviewTime(value);
+    if (name === "meetingLink") setMeetingLink(value);
+
+    const error = validateField(name, value);
+
+    setErrors((prev) => ({
+      ...prev,
+      [name]: error,
+    }));
+  };
+
   useEffect(() => {
     if (modalData?.id) {
       dispatch(getSingleUser(modalData?.id));
@@ -195,13 +295,13 @@ export default function RecentApplications({ data }) {
                 <td className="py-3 px-4 text-center">
                   <div className="flex gap-2">
                     <button
-                      className="px-4 py-1 bg-primary text-white rounded-md hover:bg-primary/90 transition"
-                      onClick={() => setModalData(row)}
+                      className="px-4 py-1 cursor-pointer bg-primary text-white rounded-md hover:bg-primary/90 transition"
+                      onClick={() => handleOpenInterview(row)}
                     >
                       View
                     </button>
                     <button
-                      className="px-4 py-1 bg-primary cursor-pointer text-white rounded-md hover:bg-primary/90 transition"
+                      className="px-4 py-1 cursor-pointer bg-primary text-white rounded-md hover:bg-primary/90 transition"
                       onClick={() => handleOpenApprovelModal(row)}
                     >
                       <BiCheckCircleIcon />
@@ -215,8 +315,21 @@ export default function RecentApplications({ data }) {
       </div>
 
       {/* Modal */}
-      {modalData && (
-        <ApproveModal data={userData} onClose={() => setModalData(null)} />
+      {interviewModal && (
+        <ApproveModal
+          data={userData}
+          onClose={handleCloseInterview}
+          interviewDate={interviewDate}
+          interviewTime={interviewTime}
+          meetingLink={meetingLink}
+          onChange={handleChangeInterview}
+          onSubmit={handleSubmitInterview}
+          errors={errors}
+          setInterviewDate={setInterviewDate}
+          setInterviewTime={setInterviewTime}
+          setMeetingLink={setMeetingLink}
+          loading={loadingSchedule}
+        />
       )}
 
       {approveModal && (

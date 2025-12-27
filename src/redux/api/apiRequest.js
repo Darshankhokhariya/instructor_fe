@@ -31,6 +31,30 @@ export const postRequest = async (url, data) => {
   }
 };
 
+export const putRequest = async (url, data) => {
+  try {
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+    const response = await api.put(url, data, {
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    });
+
+    if (response.data?.status === 200) {
+      return response.data;
+    }
+
+    return new Error(response.data?.message || "Request failed");
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message || error.message || "Something went wrong"
+    );
+  }
+};
+
 export const getRequest = async (url, params = {}) => {
   try {
     const token =
@@ -66,6 +90,7 @@ export const API_ENDPOINTS = {
   
   ADMIN: {
     CHANGE_STATUS: `/admin/approveInstructor`,
+    SHEDULE_INTERVIEW: `/admin/editScheduleLink`,
   },
 
   ONBOARDING: {
