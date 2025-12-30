@@ -320,12 +320,9 @@ export default function RecentApplications({ data }) {
           interviewDate={interviewDate}
           interviewTime={interviewTime}
           meetingLink={meetingLink}
-          onChange={handleChangeInterview}
+          handleChangeInterview={handleChangeInterview}
           onSubmit={handleSubmitInterview}
           errors={errors}
-          setInterviewDate={setInterviewDate}
-          setInterviewTime={setInterviewTime}
-          setMeetingLink={setMeetingLink}
           loading={loadingSchedule}
         />
       )}

@@ -10,9 +10,7 @@ export default function ApproveModal({
   interviewDate,
   interviewTime,
   meetingLink,
-  setInterviewDate,
-  setInterviewTime,
-  onChange,
+  handleChangeInterview,
   onSubmit,
   errors,
   loading,
@@ -20,8 +18,6 @@ export default function ApproveModal({
   const [decision, setDecision] = useState("");
   const [managerApprove, setManagerApprove] = useState(false);
   const [adminApprove, setAdminApprove] = useState(false);
-  const [recordingLink, setRecordingLink] = useState("");
-
 
   if (!data) return null;
 
@@ -81,7 +77,10 @@ export default function ApproveModal({
 
         {/* Current Address */}
         <Section title="Current Address">
-          <TwoCol label="House No./Floor." value={data?.onboarding?.step1?.cBlock} />
+          <TwoCol
+            label="House No./Floor."
+            value={data?.onboarding?.step1?.cBlock}
+          />
           <TwoCol
             label="Building Name & Block No."
             value={data?.onboarding?.step1?.cBuilding}
@@ -256,17 +255,14 @@ export default function ApproveModal({
         <InterviewSection
           interviewDate={interviewDate}
           interviewTime={interviewTime}
-          setInterviewDate={setInterviewDate}
-          setInterviewTime={setInterviewTime}
           meetingLink={meetingLink}
-          setRecordingLink={setRecordingLink}
           decision={decision}
           setDecision={setDecision}
           managerApprove={managerApprove}
           setManagerApprove={setManagerApprove}
           adminApprove={adminApprove}
           setAdminApprove={setAdminApprove}
-          onChange={onChange}
+          onChange={handleChangeInterview}
           handleSubmit={onSubmit}
           errors={errors}
           loading={loading}
@@ -305,7 +301,7 @@ function InterviewSection({
   onChange,
   handleSubmit,
   errors,
-  loading
+  loading,
 }) {
   return (
     <div className="mt-8 p-6 rounded-xl bg-gradient-to-r from-blue-50 to-white shadow-md border border-gray-200">
@@ -339,51 +335,23 @@ function InterviewSection({
           )}
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        {/* Recording Link */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Instructor Email
-          </label>
-          <input
-            type="text"
-            placeholder="Instructor email"
-            className="w-full border border-gray-300 p-3 rounded-lg mb-4 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-            value={meetingLink}
-            onChange={(e) => setRecordingLink(e.target.value)}
-          />
-        </div>
 
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Manager Email
-          </label>
-          <input
-            type="text"
-            placeholder="Manager email"
-            className="w-full border border-gray-300 p-3 rounded-lg mb-4 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-            value={meetingLink}
-            onChange={(e) => setRecordingLink(e.target.value)}
-          />
-        </div>
-      </div>
-
-      <div>
+      <div className="mb-3">
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Invitation Link
         </label>
         <input
           type="text"
+          name="meetingLink"
           placeholder="Interview meeting link"
-          className="w-full border border-gray-300 p-3 rounded-lg mb-4 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+          className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
           value={meetingLink}
-          onChange={(e) => setRecordingLink(e.target.value)}
+          onChange={onChange}
         />
+        {errors.meetingLink && (
+          <p className="text-sm text-red-500 mt-1">{errors.meetingLink}</p>
+        )}
       </div>
-
-
-
 
       {/* Save Button */}
       <button
@@ -394,6 +362,6 @@ function InterviewSection({
       >
         Schedule Interview
       </button>
-    </div >
+    </div>
   );
 }
