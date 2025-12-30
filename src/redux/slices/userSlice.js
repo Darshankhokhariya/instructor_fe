@@ -11,9 +11,14 @@ const initialState = {
     loading: false,
     data: null,
   },
+  managers: {
+    loading: false,
+    data: null,
+  },
   loading: {
     approve: false,
-    sheduleInterview: false
+    sheduleInterview: false,
+    createManager: false,
   },
   user: null,
 };
@@ -89,6 +94,20 @@ export const sheduleInterview = createAsyncThunk(
   "admin/sheduleInterview",
   async (fields) => {
     return await putRequest(API_ENDPOINTS.ADMIN.SHEDULE_INTERVIEW, fields);
+  }
+);
+
+export const createManager = createAsyncThunk(
+  "admin/createManager",
+  async (fields) => {
+    return await postRequest(API_ENDPOINTS.ADMIN.ADMIN_SIGNUP, fields);
+  }
+);
+
+export const getManagers = createAsyncThunk(
+  "admin/getManagers",
+  async ({ page, limit, role = "manager" }) => {
+    return await getRequest(API_ENDPOINTS.ADMIN.GET_MANAGERS_BY_ROLE(page, limit, role));
   }
 );
 
@@ -177,13 +196,40 @@ const userSlice = createSlice({
         state.loading.approve = false;
         state.error = action.payload;
       });
+    builder
+      .addCase(createManager.pending, (state) => {
+        state.loading.createManager = true;
+        state.error = null;
+      })
+      .addCase(createManager.fulfilled, (state, action) => {
+        state.loading.createManager = false;
+      })
+      .addCase(createManager.rejected, (state, action) => {
+        state.loading.createManager = false;
+        state.error = action.payload;
+      });
+    builder
+      .addCase(getManagers.pending, (state) => {
+        state.managers.loading = true;
+        state.error = null;
+      })
+      .addCase(getManagers.fulfilled, (state, action) => {
+        state.managers.loading = false;
+        state.managers.data = action.payload?.data?.data ?? [];
+      })
+      .addCase(getManagers.rejected, (state, action) => {
+        state.managers.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
 export const { setOtpEmail, clearOtpEmail } = userSlice.actions;
 export const selectUsers = (state) => state.user.users;
+export const selectManagers = (state) => state.user.managers;
 export const selectStatusLoading = (state) => state.user.loading.approve;
 export const selectScheduleLoading = (state) => state.user.loading.sheduleInterview;
+export const selectCreateManagerLoading = (state) => state.user.loading.createManager;
 export const selectUser = (state) => state.user.user;
 
 export default userSlice.reducer;

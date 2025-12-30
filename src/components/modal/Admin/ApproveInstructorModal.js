@@ -1,4 +1,5 @@
 "use client";
+import Modal from "@/components/common/Modal";
 import Selector from "@/components/common/Selector";
 import TextArea from "@/components/common/TextArea";
 import React, { useState } from "react";
@@ -11,41 +12,34 @@ export default function ApproveInstructorModal({
   validationErrors,
   handleSubmit,
   loading,
+  setApproveModal,
+  approveModal
 }) {
 
-  console.log('validationErrors', validationErrors)
   return (
-    <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50 p-4">
-      <div className="bg-white w-full max-w-5xl rounded-2xl shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto">
-        {/* Close Button */}
-        <button
-          className="absolute right-5 top-5 text-gray-400 hover:text-gray-800 transition"
-          onClick={onClose}
-        >
-          <AiOutlineClose size={24} />
-        </button>
+    <Modal title="Approve Instructor" isOpen={approveModal} onClose={onClose}>
 
-        <h2 className="text-xl font-medium text-gray-800 mb-6 border-b pb-3">
-          Approve Instructor
-        </h2>
+      <h2 className="text-xl font-medium text-gray-800 mb-6 border-b pb-3">
+        Approve Instructor
+      </h2>
 
-        <form onSubmit={handleSubmit}>
-          <div className="py-5">
-            <Selector
-              label="Status"
-              name="status"
-              options={[
-                { label: "Approved", value: "approved" },
-                { label: "Rejected", value: "rejected" },
-              ]}
-              value={formData.status}
-              onChange={onChange}
-              required
-              placeholder="Select Status"
-              error={validationErrors.status}
-            />
-          </div>
-
+      <form onSubmit={handleSubmit}>
+        <div className="py-5">
+          <Selector
+            label="Status"
+            name="status"
+            options={[
+              { label: "Approved", value: "approved" },
+              { label: "Rejected", value: "rejected" },
+            ]}
+            value={formData.status}
+            onChange={onChange}
+            required
+            placeholder="Select Status"
+            error={validationErrors.status}
+          />
+        </div>
+        {formData.status === "rejected" && (
           <div>
             <TextArea
               label="Reason"
@@ -56,17 +50,17 @@ export default function ApproveInstructorModal({
               error={validationErrors.reason}
             />
           </div>
+        )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-teal-600 disabled:bg-teal-200 disabled:cursor-not-allowed cursor-pointer transition-all duration-300 transform hover:bg-teal-700 text-white px-4 py-2 rounded-lg mt-5"
-          >
-            {loading ? "Submiting..." : "Submit"}
-          </button>
-          {/* Personal Information */}
-        </form>
-      </div>
-    </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-teal-600 disabled:bg-teal-200 disabled:cursor-not-allowed cursor-pointer transition-all duration-300 transform hover:bg-teal-700 text-white px-4 py-2 rounded-lg mt-5"
+        >
+          {loading ? "Submiting..." : "Submit"}
+        </button>
+        {/* Personal Information */}
+      </form>
+    </Modal >
   );
-}
+} 

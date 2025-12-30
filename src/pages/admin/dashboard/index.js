@@ -1,6 +1,6 @@
 "use client";
-import RecentApplications from "@/components/admin/RecentApplications";
 import Layout from "@/components/layout/Layout";
+import RecentApplications from "@/components/manager/RecentApplications";
 import { getSingleUser, getUsers, selectUsers } from "@/redux/slices/userSlice";
 import React, { useEffect, useState } from "react";
 import {

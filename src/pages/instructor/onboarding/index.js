@@ -420,8 +420,8 @@ const InstructorOnboarding = () => {
         const updated = replaceArray
           ? value
           : current.includes(value)
-          ? current.filter((i) => i !== value)
-          : [...current, value];
+            ? current.filter((i) => i !== value)
+            : [...current, value];
 
         setValidationErrors((v) => {
           if (v[field] && updated.length > 0) {
@@ -629,7 +629,7 @@ const InstructorOnboarding = () => {
       if (isIndia) {
         if (!data.panCard) errors.panCard = "PAN number is required";
         if (!data.aadharNo) errors.aadharNo = "Aadhaar number is required";
-        if (isBusiness && !data.gstin) errors.gstin = "GST number is required";
+        if (isBusiness && !data.GSTIN) errors.GSTIN = "GST number is required";
       }
 
       if (!isIndia && !isIndividual) {
@@ -769,6 +769,7 @@ const InstructorOnboarding = () => {
   };
 
   const nextStep = (e) => {
+    console.log('e', e)
     if (validateStep()) {
       //   // Uncomment for mandatory validation
       //   document
@@ -1064,20 +1065,20 @@ const InstructorOnboarding = () => {
   }, [isPrivateSelected, isGroupSelected]);
 
   return (
-    <div className="h-screen w-full bg-slate-50 flex flex-col items-center justify-center p-2 md:p-6 font-sans text-slate-800 overflow-hidden">
-      <div className="w-full max-w-6xl bg-white rounded-3xl shadow-2xl border border-slate-100 flex flex-col max-h-screen h-full md:h-auto md:min-h-[650px]">
+    <div className="min-h-screen w-full bg-slate-50 flex flex-col items-center justify-center p-0 sm:p-2 md:p-6 font-sans text-slate-800 overflow-hidden">
+      <div className="w-full max-w-6xl bg-white sm:rounded-3xl shadow-2xl border-0 sm:border border-slate-100 flex flex-col h-screen sm:max-h-screen sm:h-auto md:min-h-[650px]">
         {/* HEADER */}
-        <div className="flex-none px-4 py-6 md:px-10 border-b border-slate-100 bg-white rounded-t-3xl z-10">
-          <div className="flex justify-between items-start mb-6">
+        <div className="flex-none px-4 py-4 sm:py-6 md:px-10 border-b border-slate-100 bg-white sm:rounded-t-3xl z-10">
+          <div className="flex justify-between items-start mb-4 sm:mb-6">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-teal-900">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-teal-900">
                 Yogalink Instructor
               </h1>
-              <p className="text-slate-500 text-sm">Join the collective.</p>
+              <p className="text-slate-500 text-xs sm:text-sm">Join the collective.</p>
             </div>
-            <div className="text-right hidden sm:block">
-              <span className="text-xs font-bold text-teal-600 bg-teal-50 px-3 py-1 rounded-full uppercase">
-                {isSubmitted ? "Complete" : `Step ${step} of ${totalSteps}`}
+            <div className="text-right">
+              <span className="text-[10px] sm:text-xs font-bold text-teal-600 bg-teal-50 px-2 sm:px-3 py-1 rounded-full uppercase">
+                {isSubmitted ? "Complete" : `${step}/${totalSteps}`}
               </span>
             </div>
           </div>
@@ -1090,7 +1091,7 @@ const InstructorOnboarding = () => {
         {/* SCROLLABLE CONTENT */}
         <div
           id="form-content-area"
-          className="flex-1 overflow-y-auto px-6 py-6 md:px-12 scroll-smooth custom-scrollbar"
+          className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 md:px-12 scroll-smooth custom-scrollbar touch-pan-y"
         >
           <form
             id="onboarding-form"
@@ -1098,9 +1099,8 @@ const InstructorOnboarding = () => {
             className="max-w-5xl mx-auto min-h-full"
           >
             <div
-              className={`transition-opacity duration-300 ease-out ${
-                isSubmitted ? "opacity-100" : "opacity-100"
-              } pb-4`}
+              className={`transition-opacity duration-300 ease-out ${isSubmitted ? "opacity-100" : "opacity-100"
+                } pb-4`}
             >
               {/* STEP 1: PERSONAL, ADDRESS, EMERGENCY CONTACT, LANGUAGES */}
               {step === 1 && (

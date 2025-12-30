@@ -83,10 +83,14 @@ export default function Login() {
               if (res?.data?.role === "instructor") {
                 router.push("/instructor/onboarding");
                 toast.success(res.message || `login succesfully!`);
+              } else if (res?.data?.role === "manager") {
+                router.push("/manager/dashboard");
+                toast.success(res.message || `login succesfully!`);
               } else if (res?.data?.role === "admin") {
                 router.push("/admin/dashboard");
                 toast.success(res.message || `login succesfully!`);
-              } else {
+              }
+              else {
                 router.push("/onboarding");
               }
               return;

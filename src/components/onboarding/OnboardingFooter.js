@@ -14,38 +14,21 @@ const OnboardingFooter = ({
   handleSubmit,
 }) => {
   return (
-    <div className="flex-none px-6 py-6 border-t border-slate-100 bg-white rounded-b-3xl">
-      <div className="flex items-center justify-between max-w-5xl mx-auto w-full">
-        {/* Back Button and Draft Button Group */}
-        <div className="flex items-center gap-4">
+    <div className="flex-none px-4 py-4 sm:px-6 sm:py-6 border-t border-slate-100 bg-white sm:rounded-b-3xl">
+      <div className="flex items-center justify-between max-w-5xl mx-auto w-full gap-3">
+        {/* Back Button */}
+        <div className="flex items-center gap-2 sm:gap-4">
           <button
             type="button"
             onClick={prevStep}
             disabled={step === 1}
-            className={`flex items-center px-6 py-3 border border-slate-200 rounded-xl font-medium transition-all ${
-              step === 1
+            className={`flex items-center justify-center min-h-[44px] px-4 sm:px-6 py-2.5 sm:py-3 border border-slate-200 rounded-xl font-medium transition-all ${step === 1
                 ? "opacity-0 cursor-default pointer-events-none"
-                : "text-slate-500 hover:bg-slate-50"
-            }`}
+                : "text-slate-500 hover:bg-slate-50 active:bg-slate-100"
+              }`}
           >
-            <BiChevronLeftIcon className="w-5 h-5 mr-1" size={16} /> Back
-          </button>
-
-          <button
-            type="button"
-            onClick={saveDraft}
-            disabled={saveStatus === "saving"}
-            className={`flex items-center px-6 py-3 rounded-xl font-semibold transition-colors text-sm ${
-              saveStatus === "saving"
-                ? "bg-amber-100 text-amber-700 cursor-not-allowed"
-                : saveStatus === "saved"
-                ? "bg-green-100 text-green-700"
-                : saveStatus === "error"
-                ? "bg-red-100 text-red-700"
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-            }`}
-          >
-            <BiSave className="w-4 h-4 mr-2" size={16} /> {saveButtonText}
+            <BiChevronLeftIcon className="w-5 h-5 sm:mr-1" size={16} />
+            <span className="hidden sm:inline">Back</span>
           </button>
         </div>
 
@@ -54,16 +37,21 @@ const OnboardingFooter = ({
           <button
             type="button"
             onClick={nextStep}
-            className="flex items-center bg-teal-600 text-white px-8 py-3 rounded-xl font-semibold shadow-md hover:bg-teal-700 transition-colors"
+            className="flex items-center justify-center min-h-[44px] bg-teal-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-semibold shadow-md hover:bg-teal-700 active:bg-teal-800 transition-colors text-sm sm:text-base"
           >
-            {step === totalSteps - 1 ? "Review & Sign" : "Next"}{" "}
-            <BiChevronRightIcon className="w-5 h-5 ml-1" size={16} />
+            <span className="hidden sm:inline">
+              {step === totalSteps - 1 ? "Review & Sign" : "Next"}
+            </span>
+            <span className="sm:hidden">
+              {step === totalSteps - 1 ? "Review" : "Next"}
+            </span>
+            <BiChevronRightIcon className="w-5 h-5 sm:ml-1" size={16} />
           </button>
         ) : (
           <button
             type="submit"
             onClick={handleSubmit}
-            className="flex items-center bg-teal-600 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center justify-center min-h-[44px] bg-teal-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-bold shadow-md hover:bg-teal-700 active:bg-teal-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
             disabled={
               !formData.confirmAccurate ||
               !formData.ethicalStandards ||
@@ -72,7 +60,9 @@ const OnboardingFooter = ({
               Object.keys(validationErrors).length > 0
             }
           >
-            Submit Application <BiSave className="w-4 h-4 ml-2" size={16} />
+            <span className="hidden sm:inline">Submit Application</span>
+            <span className="sm:hidden">Submit</span>
+            <BiSave className="w-4 h-4 ml-2" size={16} />
           </button>
         )}
       </div>

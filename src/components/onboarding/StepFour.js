@@ -9,9 +9,9 @@ const StepFour = ({ formData, handleChange, validationErrors }) => {
     <div className="space-y-6">
       <SectionHeader
         title="Social Media Profiles & Website"
-        subtitle="Connect your platforms to showcase your digital presence."
+        subtitle="For better approval chances, please ensure that the maximum number of relevant links is added."
       />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         <Input
           label="Instagram Link"
           name="instagram_link"

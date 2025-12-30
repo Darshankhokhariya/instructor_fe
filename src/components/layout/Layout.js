@@ -1,9 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from './Header'; // Import the Header component
 import Sidebar from './Sidebar'; // Import the Sidebar component
 
 const Layout = ({ children }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [userRole, setUserRole] = useState('admin');
+
+    useEffect(() => {
+        // Determine user role based on current pathname
+        if (typeof window !== 'undefined') {
+            const pathname = window.location.pathname;
+            if (pathname.startsWith('/manager')) {
+                setUserRole('manager');
+            } else if (pathname.startsWith('/admin')) {
+                setUserRole('admin');
+            }
+        }
+    }, []);
 
     // Function to toggle the sidebar state
     const toggleSidebar = () => {
@@ -17,7 +30,7 @@ const Layout = ({ children }) => {
 
             <div className="flex ">
 
-                <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+                <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} userRole={userRole} />
 
                 <div className='flex flex-col h-screen w-full'>
                     <Header onToggleSidebar={toggleSidebar} />

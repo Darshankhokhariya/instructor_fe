@@ -33,7 +33,7 @@ const StepFive = ({
           subtitle="Upload a professional photo and select your teaching styles."
         />
         {/* Profile Image Upload [NEW SECTION] */}
-        <div className="p-4 bg-teal-50 rounded-xl border border-teal-200 mb-6 flex justify-between items-center">
+        <div className="p-4 sm:p-6 bg-teal-50 rounded-xl border border-teal-200 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <Label required>Profile Image (250px X 250px Recommended)</Label>
             {/* <input
@@ -84,7 +84,7 @@ const StepFive = ({
                   setShowCamera(true);
                   setProfileImagePreview(null);
                 }}
-                className="mt-3 px-4 py-2 bg-slate-600 text-white rounded-lg"
+                className="mt-3 px-4 py-2 bg-slate-600 text-white rounded-lg text-sm sm:text-base min-h-[44px]"
               >
                 Retake Photo
               </button>
@@ -137,7 +137,7 @@ const StepFive = ({
           {formData.certifications.map((cert, index) => (
             <div
               key={index}
-              className="flex flex-col md:flex-row gap-4 items-end bg-slate-50 p-4 rounded-xl border border-slate-200"
+              className="flex flex-col sm:flex-row gap-4 items-end bg-slate-50 p-4 rounded-xl border border-slate-200"
             >
               <div className="flex-1 w-full">
                 <Input
@@ -189,7 +189,7 @@ const StepFive = ({
                 <button
                   type="button"
                   onClick={() => removeCertification(index)}
-                  className="p-3 text-red-500 bg-white border border-red-100 rounded-lg mb-[2px] hover:bg-red-50"
+                  className="p-3 text-red-500 bg-white border border-red-100 rounded-lg mb-[2px] hover:bg-red-50 min-h-[44px] min-w-[44px] flex items-center justify-center"
                 >
                   <BiTrash size={14} />
                 </button>
@@ -205,7 +205,7 @@ const StepFive = ({
             <button
               type="button"
               onClick={addCertification}
-              className="flex items-center text-teal-600 font-semibold hover:text-teal-700 mt-2"
+              className="flex items-center text-teal-600 font-semibold hover:text-teal-700 mt-2 min-h-[44px] text-sm sm:text-base"
             >
               <BiPlusCircle className="mr-2" size={14} /> Add Certificate
             </button>
@@ -234,7 +234,7 @@ const StepFive = ({
         </label>
         <div className="space-y-4">
           {formData && formData?.video_url?.map((video, index) => (
-            <div key={index} className="flex gap-2 items-center w-full">
+            <div key={index} className="flex flex-col sm:flex-row gap-2 items-start sm:items-center w-full">
               <div className="flex-1 w-full">
                 <Input
                   label={`Video ${index + 1}`}
@@ -252,7 +252,7 @@ const StepFive = ({
                 <button
                   type="button"
                   onClick={() => removeSampleVideo(index)}
-                  className="p-3 text-slate-400 hover:text-red-500"
+                  className="p-3 text-slate-400 hover:text-red-500 min-h-[44px] min-w-[44px] flex items-center justify-center"
                 >
                   <BiTrash size={20} />
                 </button>
@@ -269,7 +269,7 @@ const StepFive = ({
           <button
             type="button"
             onClick={addSampleVideo}
-            className="mt-3 flex items-center text-teal-600 font-semibold"
+            className="mt-3 flex items-center text-teal-600 font-semibold min-h-[44px] text-sm sm:text-base"
           >
             <BiPlusCircle className="mr-2" size={14} /> Add Video URL
           </button>

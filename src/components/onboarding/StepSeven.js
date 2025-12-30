@@ -18,7 +18,7 @@ const StepSeven = ({
         <SectionHeader title="Pricing Structure" subtitle="" />
 
         {/* Conditional Pricing Inputs */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           {isGroupSelected && (
             <Input
               label="Group Class Rate (per person/hour)"
@@ -63,7 +63,7 @@ const StepSeven = ({
           )}
 
           {!isGroupSelected && !isPrivateSelected && !isOnlineSelected && (
-            <div className="md:col-span-2 p-6 bg-red-50 rounded-xl border border-red-200 text-red-800 font-semibold">
+            <div className="sm:col-span-2 p-4 sm:p-6 bg-red-50 rounded-xl border border-red-200 text-red-800 font-semibold text-sm sm:text-base">
               <p>
                 ⚠️ Please go back to the **Availability** step and select at
                 least one class type (One-on-One, Group Class, or Single Class)
@@ -75,7 +75,7 @@ const StepSeven = ({
 
         {/* Conditional Trial Policy */}
         {(isPrivateSelected || isGroupSelected) && (
-          <div className="mt-6 p-6 bg-slate-50 rounded-xl border border-slate-200">
+          <div className="mt-6 p-4 sm:p-6 bg-slate-50 rounded-xl border border-slate-200">
             <Selector
               label="Trial Policy (Required)"
               name="trialMode"
@@ -94,13 +94,13 @@ const StepSeven = ({
         )}
       </div>
 
-      
+
       <div className="space-y-6 pt-5">
         <SectionHeader
           title="Service Agreements"
           subtitle="Please read and confirm the following legal and ethical standards."
         />
-        <div className="bg-slate-50 p-6 rounded-xl space-y-4 border border-slate-200">
+        <div className="bg-slate-50 p-4 sm:p-6 rounded-xl space-y-4 border border-slate-200">
           {[
             {
               label:
@@ -126,16 +126,14 @@ const StepSeven = ({
                 checked={formData[item.name]}
                 onChange={handleChange}
                 required
-                className={`mt-1 h-5 w-5 rounded border-gray-300 text-teal-600 focus:ring-teal-500 ${
-                  validationErrors[item.name]
-                    ? "border-red-500 ring-red-500"
-                    : ""
-                }`}
+                className={`mt-1 h-5 w-5 sm:h-6 sm:w-6 rounded border-gray-300 text-teal-600 focus:ring-teal-500 cursor-pointer flex-shrink-0 ${validationErrors[item.name]
+                  ? "border-red-500 ring-red-500"
+                  : ""
+                  }`}
               />
               <label
                 htmlFor={item.name}
-                className="ml-3 text-sm text-slate-600 cursor-pointer"
-              >
+                className="ml-3 text-xs sm:text-sm text-slate-600 cursor-pointer leading-relaxed">
                 {item.label}
               </label>
               {validationErrors[item.name] && (
@@ -157,11 +155,10 @@ const StepSeven = ({
             onChange={handleChange}
             placeholder="Type your full legal name to sign"
             required
-            className={`w-full border-b-2 bg-transparent py-3 text-2xl font-serif italic text-teal-900 outline-none ${
-              validationErrors.signature
-                ? "border-red-500"
-                : "border-slate-300 focus:border-teal-600"
-            }`}
+            className={`w-full border-b-2 bg-transparent py-3 text-xl sm:text-2xl font-serif italic text-teal-900 outline-none ${validationErrors.signature
+              ? "border-red-500"
+              : "border-slate-300 focus:border-teal-600"
+              }`}
           />
           <p className="text-xs text-slate-400 mt-1">
             Typing your name constitutes a legally binding electronic signature.{" "}

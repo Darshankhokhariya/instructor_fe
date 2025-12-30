@@ -17,7 +17,7 @@ const StepOne = ({
   handleSameAsPermanentToggle,
 }) => {
   return (
-    <div className="space-y-10">
+    <div className="space-y-6 sm:space-y-10">
       <div className="space-y-4">
         <SectionHeader
           title="1. Basic Personal Details"
@@ -32,7 +32,7 @@ const StepOne = ({
           placeholder="Your full legal name"
           error={validationErrors.name}
         />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <Input
             label="Date of Birth"
             name="dateOfBirth"
@@ -62,7 +62,7 @@ const StepOne = ({
             error={validationErrors.gender}
           />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <Input
             label="Email"
             name="email"
@@ -137,7 +137,7 @@ const StepOne = ({
         )}
       </div>
 
-      <div className="space-y-6 pt-4">
+      <div className="space-y-4 sm:space-y-6 pt-4">
         <SectionHeader
           title="2. Permanent & Current Address"
           subtitle="Ensure addresses are accurate for legal and tax purposes."
@@ -145,12 +145,12 @@ const StepOne = ({
         />
 
         {/* Permanent Address */}
-        <div className="p-4  rounded-xl border border-slate-200">
-          <h4 className="text-md font-bold text-teal-900 mb-3 flex items-center">
+        <div className="p-4 sm:p-6 rounded-xl border border-slate-200 bg-slate-50/50">
+          <h4 className="text-sm sm:text-md font-bold text-teal-900 mb-3 sm:mb-4 flex items-center">
             Permanent Address
           </h4>
           <div className="grid grid-cols-1 gap-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
               <Input
                 label="House No./Floor"
                 name="pBlock"
@@ -180,7 +180,7 @@ const StepOne = ({
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
               <Input
                 label="City"
                 name="pCity"
@@ -216,7 +216,7 @@ const StepOne = ({
               />
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mt-4">
             <Input
               label="Pincode / Zip"
               name="pPincode"
@@ -230,9 +230,9 @@ const StepOne = ({
         </div>
 
         {/* Current Address */}
-        <div className="p-4 bg-white rounded-xl border border-slate-200">
-          <div className="flex justify-between items-center mb-3">
-            <h4 className="text-md font-bold text-teal-900 flex items-center">
+        <div className="p-4 sm:p-6 bg-white rounded-xl border border-slate-200">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 sm:mb-4 gap-2">
+            <h4 className="text-sm sm:text-md font-bold text-teal-900 flex items-center">
               <FaMapMarkerAlt className="mr-2 text-teal-600" size={14} />{" "}
               Current Address
             </h4>
@@ -242,11 +242,11 @@ const StepOne = ({
                 id="sameAsPermanent"
                 checked={isCurrentSameAsPermanent}
                 onChange={handleSameAsPermanentToggle}
-                className="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                className="h-4 w-4 sm:h-5 sm:w-5 rounded border-gray-300 text-teal-600 focus:ring-teal-500 cursor-pointer"
               />
               <label
                 htmlFor="sameAsPermanent"
-                className="ml-2 text-sm text-slate-600 font-medium"
+                className="ml-2 text-xs sm:text-sm text-slate-600 font-medium cursor-pointer"
               >
                 Same as Permanent
               </label>
@@ -257,7 +257,7 @@ const StepOne = ({
             className={isCurrentSameAsPermanent ? "opacity-60" : "opacity-100"}
           >
             <div className="flex flex-col gap-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <Input
                   label="House No./Floor"
                   name="cBlock"
@@ -290,7 +290,7 @@ const StepOne = ({
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <Input
                   label="City"
                   name="cCity"
@@ -330,7 +330,7 @@ const StepOne = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mt-4">
               <Input
                 label="Pincode / Zip"
                 name="cPincode"
@@ -346,13 +346,13 @@ const StepOne = ({
         </div>
 
         {/* Section 1.3: Emergency Contact */}
-        <div className="space-y-6 pt-4">
+        <div className="space-y-4 sm:space-y-6 pt-4">
           <SectionHeader
             title="3. Emergency Contact"
             subtitle="In case of urgent issues, who should we contact?"
             className="mt-6"
           />
-          <div className="p-6  rounded-xl border border-slate-200 space-y-4">
+          <div className="p-4 sm:p-6 rounded-xl border border-slate-200 space-y-4 bg-slate-50/50">
             <Input
               label="Full Name"
               name="eName"

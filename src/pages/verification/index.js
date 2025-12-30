@@ -11,7 +11,7 @@ export default function VerificationPage() {
             <main className="flex  flex-col items-center justify-center w-full max-w-md mx-auto px-6 py-8">
                 <div className="w-full mb-8">
                     <div
-                        className="w-full aspect-square max-h-[300px] mx-auto rounded-full shadow-lg border-4 border-primary bg-center bg-cover"
+                        className="w-[300px] h-[300px] aspect-square  mx-auto rounded-full shadow-lg border-4 border-primary bg-center bg-cover"
                         style={{
                             backgroundImage:
                                 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDQgqjp31WiOfXfcSWCQ2IWZyDDBNg-j1L0xwHw1OwchJsvuIxR1_W3I8vjHAqUxe935KOcbz4qzl6vkEMu0W6WJvHmsfbG77rhacpS8SskAeCuzUmtIPpW1ybMUHX3zRWEcdgr4q2ZqT78IAMa5jMEIsxOf0u9WLpc8Gt-hhWcPYMSuoznBVQ3pX4rrC78199lomHlX5EjURxmGCpdwNk5vuHm7NUCQsdHymkovrevC45wwOQte_K_uHdkRss0GQK0sCkxL7l1BHLX")',
@@ -36,12 +36,12 @@ export default function VerificationPage() {
             {/* Footer */}
             <footer className="w-full max-w-md mx-auto px-6 pb-8 pt-2">
                 <div className="flex flex-col gap-4">
-                    <button className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-teal-400 transition-all active:scale-[0.98] text-[#11211e] font-semibold py-4 rounded-xl shadow-md shadow-primary/20">
+                    <button className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 transition-all active:scale-[0.98] text-white font-semibold py-4 rounded-xl shadow-md shadow-primary/20">
                         <FiBell />
                         Notify me when ready
                     </button>
 
-                    <button className="text-sm text-gray-500 dark:text-gray-400 hover:text-text-main dark:hover:text-white transition-colors">
+                    <button className="text-sm text-gray-500 dark:text-gray-400 hover:text-text-main  transition-colors">
                         Questions?{" "}
                         <span className="underline underline-offset-2">
                             Contact Support

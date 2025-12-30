@@ -86,11 +86,14 @@ export const API_ENDPOINTS = {
   USER: {
     GET_USERS: (page, limit) => `/user/getAllUsers?page=${page}&limit=${limit}`,
     GET_SINGLE_USERS: (id) => `/user/getSingleUsers?id=${id}`,
+    GET_USERS_BY_ROLE: (page, limit, role) => `/user/getUserByRole?page=${page}&limit=${limit}&role=${role}`,
   },
-  
+
   ADMIN: {
     CHANGE_STATUS: `/admin/approveInstructor`,
     SHEDULE_INTERVIEW: `/admin/editScheduleLink`,
+    ADMIN_SIGNUP: `/admin/signup`,
+    GET_MANAGERS_BY_ROLE: (page, limit, role) => `/admin/getUserByRole?page=${page}&limit=${limit}&role=${role}`,
   },
 
   ONBOARDING: {

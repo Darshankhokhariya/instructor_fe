@@ -2,31 +2,10 @@ import { useState, useRef, useEffect } from 'react';
 import { FaBars } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
 import { LuLanguages } from 'react-icons/lu';
-import { MdNotifications } from 'react-icons/md';
+import { IoLogOut } from "react-icons/io5";
+import { useRouter } from 'next/router';
 
-// Dummy components to replace Redux/external dependencies
-const DummyLanguageSelector = () => (
-    <div className="text-gray-700 flex items-center gap-2">
-        <LuLanguages className="w-5 h-5" />
-        <span className="text-sm font-medium hidden md:inline">EN</span>
-    </div>
-);
 
-const DummyCreatableSelector = ({ options, value, onChange, placeholder, classNamePrefix, isClearable = true }) => (
-    <select
-        value={value?.value || ''}
-        onChange={(e) => {
-            const selected = options.find(option => option.value === e.target.value);
-            onChange(selected);
-        }}
-        className={`${classNamePrefix} block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm`}
-    >
-        {isClearable && <option value="">{placeholder || 'Select...'}</option>}
-        {options.map(option => (
-            <option key={option.value} value={option.value}>{option.label}</option>
-        ))}
-    </select>
-);
 
 const Header = ({ onToggleSidebar }) => {
     // Dummy state for selected company/workspace
@@ -34,26 +13,18 @@ const Header = ({ onToggleSidebar }) => {
         { label: 'Yogalink Studio (2024-2025)', value: '1', data: { businessName: 'Yogalink Studio', financialYear: '2024-2025' } },
         { label: 'Peaceful Practice (2023-2024)', value: '2', data: { businessName: 'Peaceful Practice', financialYear: '2023-2024' } },
     ];
-    const [selectedCompany, setSelectedCompany] = useState(dummyCompanyOptions[0].data);
     const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
     const sidebarRef = useRef(null);
+    const router = useRouter();
 
-    // Company dropdown logic
-    const companyOptions = dummyCompanyOptions;
 
-    const selectedOption = selectedCompany
-        ? {
-            label: `${selectedCompany.businessName} (${selectedCompany.financialYear || "-"})`,
-            value: selectedCompany.value,
-            data: selectedCompany,
-        }
-        : null;
 
-    const handleCompanyChange = (selectedOption) => {
-        if (selectedOption) {
-            setSelectedCompany(selectedOption.data);
-        }
-    };
+    const HandleLogout = (e) => {
+        e.preventDefault();
+        localStorage.clear();
+        console.log("Logging out...");
+        router.push("/login");
+    }
 
     // Close right sidebar when clicking outside
     useEffect(() => {
@@ -83,8 +54,8 @@ const Header = ({ onToggleSidebar }) => {
                     <div class="h-10 w-10 overflow-hidden rounded-full border-2 border-primary/20 bg-gray-200">
                         <img alt="Profile" class="h-full w-full object-cover" data-alt="Portrait of a yoga instructor smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRusvG5X2RFhmH9y_qAXcQNrK8AZ8v2ppSGDI72vLFgvdFccPR0hETCjdgma4pXr2uyJ74jvF7nyxMsXiaGapcrnorwzsLCdETGNJUV0a6_SI6I0yps7E_88SQvFiLEODzCEb9n9hFLku94XHRHIjYWhNRSocnrPM2SfUcI5mjgQMz52Rldsq645flUNeMoCxndGjNLCjKjKQEEH3Eco9X3GU6UMUt1j1T9BHpZeDOvw5hgbuYxKWH_n9hGkRCX-rndTiVHvCI23Jw" />
                     </div>
-                    <button class="flex h-10 w-10 items-center justify-center rounded-full bg-white dark:bg-card-dark shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10 transition-transform active:scale-95">
-                        <MdNotifications class="text-text-sub-light dark:text-text-sub-dark text-lg" />
+                    <button onClick={HandleLogout} class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-gray-900/5  transition-transform active:scale-95">
+                        <IoLogOut class="text-text-sub-light dark:text-text-sub-dark text-lg" />
                     </button>
                 </div>
             </div>

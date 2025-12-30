@@ -8,13 +8,6 @@ const StepThree = ({ formData, handleChange, validationErrors }) => {
   const isIndividual = formData.registerAs === "individual";
   const isBusiness = formData.registerAs === "business";
 
-  console.log("formData", formData);
-
-  console.log("isIndia", isIndia);
-  console.log("isIndividual", isIndividual);
-  console.log("isBusiness", isBusiness);
-
-  console.log("isIndia", isIndia);
   const registrationOptions = [
     {
       label: isIndia ? "Individual (PAN / Aadhaar)" : "Individual (SSN / TIN)",
@@ -26,44 +19,44 @@ const StepThree = ({ formData, handleChange, validationErrors }) => {
     },
   ];
 
-  console.log("ormData.registerAs", formData.registerAs);
-
   const renderIndianFields = () => (
     <>
-      {/* PAN */}
+      {/* PAN – Individual & Business */}
       <Input
         label="PAN Card Number"
         name="panCard"
         placeholder="ABCDE1234F"
-        value={formData.panCard}
+        value={formData.panCard || ""}
         onChange={handleChange}
         required
         error={validationErrors.panCard}
       />
 
-      {/* Aadhaar */}
-      <Input
-        label="Aadhaar Card Number"
-        name="aadharNo"
-        placeholder="1234 5678 9012"
-        value={formData.aadharNo}
-        onChange={handleChange}
-        required
-        error={validationErrors.aadharNo}
-      />
+      {/* Aadhaar – Individual only */}
+      {isIndividual && (
+        <Input
+          label="Aadhaar Card Number"
+          name="aadharNo"
+          placeholder="1234 5678 9012"
+          value={formData.aadharNo || ""}
+          onChange={handleChange}
+          required
+          error={validationErrors.aadharNo}
+        />
+      )}
 
-      {/* GSTIN only for Business */}
+      {/* GSTIN – Business only */}
       {isBusiness && (
         <Input
           label="GSTIN"
           name="GSTIN"
           placeholder="22AAAAA0000A1Z5"
-          value={formData.GSTIN}
+          value={formData.GSTIN || ""}
           onChange={handleChange}
           required
           error={validationErrors.GSTIN}
         />
-      )}
+      )}``
     </>
   );
 
@@ -74,7 +67,7 @@ const StepThree = ({ formData, handleChange, validationErrors }) => {
         subtitle="Required for compliant payouts."
       />
 
-      <div className="p-6 rounded-xl border border-orange-300 bg-orange-50">
+      <div className="p-4 sm:p-6 rounded-xl border border-orange-300 bg-orange-50">
         <div className="space-y-4">
           {/* Register As */}
           <Selector
@@ -89,7 +82,7 @@ const StepThree = ({ formData, handleChange, validationErrors }) => {
           />
 
           {/* 🇮🇳 INDIA */}
-          {isIndia && (isIndividual || isBusiness) && renderIndianFields()}
+          {isIndia && formData.registerAs && renderIndianFields()}
 
           {/* 🌍 NON-INDIA */}
           {!isIndia && (
@@ -97,7 +90,7 @@ const StepThree = ({ formData, handleChange, validationErrors }) => {
               label="Taxpayer Identification Number (TIN)"
               name="taxIdentification"
               placeholder="Enter your TIN"
-              value={formData.taxIdentification}
+              value={formData.taxIdentification || ""}
               onChange={handleChange}
               required
               error={validationErrors.taxIdentification}

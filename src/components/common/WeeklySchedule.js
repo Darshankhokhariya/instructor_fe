@@ -198,10 +198,9 @@ const WeeklySchedule = ({
                 type="button"
                 onClick={() => toggleDay(day.value)}
                 className={`h-12 w-12 rounded-full font-semibold transition
-                  ${
-                    isSelected
-                      ? "bg-teal-500 text-white"
-                      : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                  ${isSelected
+                    ? "bg-teal-500 text-white"
+                    : "bg-gray-100 text-gray-400 hover:bg-gray-200"
                   }`}
               >
                 {day.label}
@@ -245,9 +244,8 @@ const WeeklySchedule = ({
           return (
             <div
               key={dayValue}
-              className={`border rounded-lg p-4 ${
-                isEditing ? "bg-teal-50 border-teal-200" : ""
-              }`}
+              className={`border rounded-lg p-4 ${isEditing ? "bg-teal-50 border-teal-200" : ""
+                }`}
             >
               <div className="flex justify-between mb-2">
                 <h4 className="font-medium">{day.full}</h4>
@@ -271,14 +269,14 @@ const WeeklySchedule = ({
                         removeCustomTime(dayValue);
                         setEditingDay(null);
                       }}
-                      className="text-sm text-red-500 flex items-center gap-1 cursor-pointer"
+                      className="text-sm px-2 border rounded-2xl text-red-500 flex items-center gap-1 cursor-pointer"
                     >
-                      <FiX /> Reset
+                      <FiX />
                     </button>
                     <button
                       type="button"
                       onClick={() => handleSetCustomTime(dayValue)}
-                      className="text-sm text-green-500 flex items-center gap-1 cursor-pointer"
+                      className="text-sm bg-primary text-white flex px-4 rounded-2xl items-center gap-1 cursor-pointer"
                     >
                       <BiCheck /> Set
                     </button>
