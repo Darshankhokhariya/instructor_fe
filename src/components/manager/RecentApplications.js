@@ -54,14 +54,14 @@ export default function RecentApplications({ data }) {
     activeTab === "All"
       ? data
       : data?.filter((app) =>
-        activeTab === "Pending"
-          ? app.overallApprovalStatus === "pending"
-          : activeTab === "Interview"
+          activeTab === "Pending"
+            ? app.overallApprovalStatus === "pending"
+            : activeTab === "Interview"
             ? app.overallApprovalStatus === "interview_scheduled"
             : activeTab === "Approved"
-              ? app.overallApprovalStatus === "approved"
-              : false
-      );
+            ? app.overallApprovalStatus === "approved"
+            : false
+        );
 
   const validateField = (name, value) => {
     let error = "";
@@ -99,7 +99,7 @@ export default function RecentApplications({ data }) {
 
     if (!formData.status.trim()) errors.status = "Status is required";
 
-    if (!formData.reason.trim()) {
+    if (formData.status.trim() === "rejected" && !formData.reason.trim()) {
       errors.reason = "Reason is required when rejecting";
     }
 
@@ -146,11 +146,10 @@ export default function RecentApplications({ data }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
     const payload = {
-      id: user?.approvalId,
+      id: user?.id,
       status: formData?.status,
       reason: formData?.reason,
     };
@@ -240,10 +239,11 @@ export default function RecentApplications({ data }) {
           {["All", "Pending", "Interview", "Approved"].map((tab) => (
             <button
               key={tab}
-              className={`px-4 py-2 rounded-full font-medium transition ${activeTab === tab
-                ? "bg-primary text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
+              className={`px-4 py-2 rounded-full font-medium cursor-pointer transition ${
+                activeTab === tab
+                  ? "bg-primary text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
               onClick={() => setActiveTab(tab)}
             >
               {tab}
@@ -278,14 +278,15 @@ export default function RecentApplications({ data }) {
                 </td>
                 <td className="py-3 px-4 flex justify-center">
                   <span
-                    className={`px-3 py-1 text-sm font-semibold rounded-full ${row?.overallApprovalStatus === "pending"
-                      ? "bg-yellow-100 text-yellow-800"
-                      : row?.overallApprovalStatus === "interview_scheduled"
+                    className={`px-3 py-1 text-sm font-semibold rounded-full ${
+                      row?.overallApprovalStatus === "pending"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : row?.overallApprovalStatus === "interview_scheduled"
                         ? "bg-blue-100 text-blue-800"
                         : row?.overallApprovalStatus === "approved"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}
+                        ? "bg-green-100 text-green-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
                   >
                     {row?.overallApprovalStatus}
                   </span>

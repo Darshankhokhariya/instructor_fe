@@ -26,7 +26,7 @@ export default function ApproveModal({
       <div className="bg-white w-full max-w-5xl rounded-2xl shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto">
         {/* Close Button */}
         <button
-          className="absolute right-5 top-5 text-gray-400 hover:text-gray-800 transition"
+          className="absolute right-5 top-5 text-gray-400 hover:text-gray-800 transition cursor-pointer"
           onClick={onClose}
         >
           <AiOutlineClose size={24} />
@@ -356,7 +356,7 @@ function InterviewSection({
       {/* Save Button */}
       <button
         type="submit"
-        disabled={loading}
+        // disabled={loading}
         onClick={handleSubmit}
         className="w-full py-3 rounded-lg cursor-pointer font-semibold bg-primary disabled:bg-primary/50 disabled:cursor-not-allowed text-white hover:bg-primary/90 transition"
       >

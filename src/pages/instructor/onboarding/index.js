@@ -769,7 +769,6 @@ const InstructorOnboarding = () => {
   };
 
   const nextStep = (e) => {
-    console.log('e', e)
     if (validateStep()) {
       //   // Uncomment for mandatory validation
       //   document

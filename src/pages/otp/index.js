@@ -121,7 +121,6 @@ const OtpVerification = ({ phoneNumber = "+91 12345 67890" }) => {
 
     setStatus("verifying");
     setError("");
-    console.log("Verifying OTP:", fullOtp);
 
     const obj = {
       otp: fullOtp,

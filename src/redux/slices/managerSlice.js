@@ -214,7 +214,6 @@ const userSlice = createSlice({
                 state.error = null;
             })
             .addCase(getManagers.fulfilled, (state, action) => {
-                console.log("state:", state);
                 state.managers.loading = false;
                 state.managers.data = action.payload?.data?.data ?? [];
             })

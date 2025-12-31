@@ -128,7 +128,7 @@ export default function CreateManagerModal({ isOpen, onClose, onSubmit }) {
                     <p className="text-teal-50 text-sm mt-1">Add a new manager to the system</p>
                     <button
                         onClick={handleClose}
-                        className="absolute top-4 right-4 p-2 text-white hover:bg-white/20 rounded-lg transition-colors"
+                        className="absolute top-4 right-4 p-2 text-white hover:bg-white/20 rounded-lg transition-colors cursor-pointer"
                     >
                         <FaTimes size={20} />
                     </button>
@@ -201,14 +201,14 @@ export default function CreateManagerModal({ isOpen, onClose, onSubmit }) {
                             type="button"
                             onClick={handleClose}
                             disabled={isLoading}
-                            className={`flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`flex-1 cursor-pointer px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className={`flex-1 px-4 py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg hover:from-teal-600 hover:to-teal-700 transition-all shadow-lg shadow-teal-200 font-medium flex items-center justify-center gap-2 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                            className={`flex-1 px-4 cursor-pointer py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg hover:from-teal-600 hover:to-teal-700 transition-all shadow-lg shadow-teal-200 font-medium flex items-center justify-center gap-2 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                         >
                             {isLoading ? (
                                 <>
