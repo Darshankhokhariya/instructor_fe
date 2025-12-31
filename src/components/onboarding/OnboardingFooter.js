@@ -22,7 +22,7 @@ const OnboardingFooter = ({
             type="button"
             onClick={prevStep}
             disabled={step === 1}
-            className={`flex items-center justify-center min-h-[44px] px-4 sm:px-6 py-2.5 sm:py-3 border border-slate-200 rounded-xl font-medium transition-all ${step === 1
+            className={`flex items-center cursor-pointer justify-center min-h-[44px] px-4 sm:px-6 py-2.5 sm:py-3 border border-slate-200 rounded-xl font-medium transition-all ${step === 1
                 ? "opacity-0 cursor-default pointer-events-none"
                 : "text-slate-500 hover:bg-slate-50 active:bg-slate-100"
               }`}
@@ -37,13 +37,13 @@ const OnboardingFooter = ({
           <button
             type="button"
             onClick={nextStep}
-            className="flex items-center justify-center min-h-[44px] bg-teal-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-semibold shadow-md hover:bg-teal-700 active:bg-teal-800 transition-colors text-sm sm:text-base"
+            className="flex items-center cursor-pointer justify-center min-h-[44px] bg-teal-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-semibold shadow-md hover:bg-teal-700 active:bg-teal-800 transition-colors text-sm sm:text-base"
           >
             <span className="hidden sm:inline">
-              {step === totalSteps - 1 ? "Review & Sign" : "Next"}
+              {step === totalSteps  ? "Submit" : "Next"}
             </span>
             <span className="sm:hidden">
-              {step === totalSteps - 1 ? "Review" : "Next"}
+              {step === totalSteps  ? "Submit" : "Next"}
             </span>
             <BiChevronRightIcon className="w-5 h-5 sm:ml-1" size={16} />
           </button>
@@ -51,7 +51,7 @@ const OnboardingFooter = ({
           <button
             type="submit"
             onClick={handleSubmit}
-            className="flex items-center justify-center min-h-[44px] bg-teal-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-bold shadow-md hover:bg-teal-700 active:bg-teal-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+            className="flex items-center cursor-pointer justify-center min-h-[44px] bg-teal-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-bold shadow-md hover:bg-teal-700 active:bg-teal-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
             disabled={
               !formData.confirmAccurate ||
               !formData.ethicalStandards ||

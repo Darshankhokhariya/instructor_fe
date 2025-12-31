@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { FaCalendarAlt, FaCheckCircle, FaDollarSign, FaFileAlt, FaGraduationCap, FaIdCard, FaSignature, FaUser, FaVideo } from "../../../utils/icon";
+import { BiCheckBankIcon, FaCalendarAlt, FaCheckCircle, FaDollarSign, FaFileAlt, FaGraduationCap, FaIdCard, FaSignature, FaUser, FaVideo } from "../../../utils/icon";
 
 const StepIndicator = ({ currentStep, totalSteps }) => {
   // Retaining original StepIndicator implementation
@@ -12,6 +12,7 @@ const StepIndicator = ({ currentStep, totalSteps }) => {
       { id: 5, label: "Qualifications", icon: FaFileAlt },
       { id: 6, label: "Availability", icon: FaCalendarAlt },
       { id: 7, label: "Pricing", icon: FaDollarSign },
+      { id: 8, label: "Bank", icon: BiCheckBankIcon },
     ],
     []
   );

@@ -1,80 +1,111 @@
 import React from "react";
+import Input from "../common/Input";
+import Selector from "../common/Selector";
+import PhoneInput from "../common/PhoneInput";
+import SmartSelect from "../common/SmartSelect";
 import SectionHeader from "./SectionHeader";
+import { FaMapMarkerAlt, FaRoad } from "react-icons/fa";
+import { BiWorldIcon } from "../../../utils/icon";
+import { languageOptions } from "../../../utils/onboarding";
 
-const StepEight = ({ formData, handleChange, validationErrors }) => {
+const StepEight = ({
+  formData,
+  handleChange,
+  validationErrors,
+}) => {
+
   return (
-    <div className="space-y-6">
-      <SectionHeader
-        title="Service Agreements"
-        subtitle="Please read and confirm the following legal and ethical standards."
-      />
-      <div className="bg-slate-50 p-6 rounded-xl space-y-4 border border-slate-200">
-        {[
-          {
-            label: "I confirm all submitted details are accurate and truthful.",
-            name: "confirmAccurate",
-          },
-          {
-            label:
-              "I agree to uphold the platform's ethical standards and professional conduct guidelines.",
-            name: "ethicalStandards",
-          },
-          {
-            label:
-              "I accept the Yogalink service mindset, prioritizing student safety and experience.",
-            name: "serviceMindset",
-          },
-        ].map((item) => (
-          <div key={item.name} className="flex items-start">
-            <input
-              type="checkbox"
-              id={item.name}
-              name={item.name}
-              checked={formData[item.name]}
-              onChange={handleChange}
-              required
-              className={`mt-1 h-5 w-5 rounded border-gray-300 text-teal-600 focus:ring-teal-500 ${
-                validationErrors[item.name] ? "border-red-500 ring-red-500" : ""
-              }`}
-            />
-            <label
-              htmlFor={item.name}
-              className="ml-3 text-sm text-slate-600 cursor-pointer"
-            >
-              {item.label}
-            </label>
-            {validationErrors[item.name] && (
-              <span className="ml-3 text-xs text-red-500 hidden sm:block">
-                ({validationErrors[item.name]})
-              </span>
-            )}
-          </div>
-        ))}
-      </div>
-      <div className="pt-4">
-        <label className="mb-1 block text-sm font-medium text-gray-700">
-          Digital Signature <span className="text-teal-600">*</span>
-        </label>
-        <input
-          type="text"
-          name="signature"
-          value={formData.signature}
-          onChange={handleChange}
-          placeholder="Type your full legal name to sign"
-          required
-          className={`w-full border-b-2 bg-transparent py-3 text-2xl font-serif italic text-teal-900 outline-none ${
-            validationErrors.signature
-              ? "border-red-500"
-              : "border-slate-300 focus:border-teal-600"
-          }`}
+    <div className="space-y-6 sm:space-y-10">
+      <div className="space-y-4">
+        <SectionHeader
+          title="Bank Details"
+          subtitle="Required for account verification and payments."
         />
-        <p className="text-xs text-slate-400 mt-1">
-          Typing your name constitutes a legally binding electronic signature.{" "}
-          {validationErrors.signature && (
-            <span className="text-red-500">({validationErrors.signature})</span>
-          )}
-        </p>
+        <Selector
+          label="Payment Method"
+          name="payment_method"
+          options={[
+            { label: "Bank", value: "bank" },
+            { label: "Paypal", value: "paypal" },
+          ]}
+          value={formData.payment_method}
+          onChange={handleChange}
+          required
+          placeholder="Select Payment Method"
+          error={validationErrors.payment_method}
+        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+          <Input
+            label="Bank Name"
+            name="bank_name"
+            type="text"
+            value={formData.bank_name}
+            onChange={handleChange}
+            required
+            placeholder="Bank Name"
+            error={validationErrors.bank_name}
+          />
+          <Input
+            label="Bank Account Holder Name"
+            name="bank_account_holder_name"
+            type="text"
+            value={formData.bank_account_holder_name}
+            onChange={handleChange}
+            required
+            placeholder="Bank Account Holder Name"
+            error={validationErrors.bank_account_holder_name}
+          />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+          <Input
+            label="Bank Account Number"
+            name="bank_account_number"
+            min="text"
+            max={18}
+            value={formData.bank_account_number}
+            onChange={handleChange}
+            required
+            placeholder="Bank Account Number"
+            error={validationErrors.bank_account_number}
+          />
+          <Input
+            label="Branch Name"
+            name="branch_name"
+            type="text"
+            value={formData.branch_name}
+            onChange={handleChange}
+            required
+            placeholder="Branch Name"
+            error={validationErrors.branch_name}
+          />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+          <Selector
+            label="Bank Account Type"
+            name="account_type"
+            options={[
+              { label: "Current", value: "current" },
+              { label: "Saving", value: "saving" },
+            ]}
+            value={formData.account_type}
+            onChange={handleChange}
+            required
+            placeholder="Select Bank Account Type"
+            error={validationErrors.account_type}
+          />
+          <Input
+            label="Bank Account IFSC Code"
+            name="ifsc_code"
+            type="text"
+            value={formData.ifsc_code}
+            onChange={handleChange}
+            required
+            placeholder="Bank Account IFSC Code"
+            error={validationErrors.ifsc_code}
+          />
+        </div>
       </div>
+
     </div>
   );
 };

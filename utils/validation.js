@@ -55,16 +55,23 @@ export const FIELD_LABELS = {
   days: "Teaching Days",
   times: "Class Times",
   classType: "Class Type",
-  // Step 7
   group_class_rate: "Group Class Rate",
   private_class_rate: "Private Class Rate",
   single_class_rate: "Single Class Rate",
   trialMode: "Trial Policy",
-  // Step 8
+  // Step 7
   confirmAccurate: "Agreement - Accuracy",
   ethicalStandards: "Agreement - Ethics",
   serviceMindset: "Agreement - Service Mindset",
   signature: "Digital Signature",
+  // Step 8
+  payment_method: "Payment Method",
+  bank_name: "Bank Name",
+  branch_name: "Branch Name",
+  bank_account_holder_name: "Bank Account Holder Name",
+  bank_account_number: "Bank Account Number",
+  account_type: "Bank Account Type",
+  ifsc_code: "Bank IFSC Code",
 };
 
 export const STEP_FIELDS = {
@@ -104,8 +111,16 @@ export const STEP_FIELDS = {
   ],
   5: ["profileImage", "introVideo", "teaching_philosophy", "video_url"],
   6: ["startTime", "endTime", "responseTime"],
-  7: [], // handled conditionally below
-  8: ["confirmAccurate", "ethicalStandards", "serviceMindset", "signature"],
+  7: ["confirmAccurate", "ethicalStandards", "serviceMindset", "signature"],
+  8: [
+    "payment_method",
+    "bank_name",
+    "bank_account_holder_name",
+    "bank_account_number",
+    "branch_name",
+    "account_type",
+    "ifsc_code",
+  ], // handled conditionally below
 };
 
 export const REGEX = {
@@ -116,6 +131,8 @@ export const REGEX = {
   aadhar: /^\d{12}$/,
   positiveNumber: /^\d+(\.\d+)?$/,
   gstin: /^[0-3][0-9][A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i,
+  bankNumber: /^\d{9,18}$/,
+  ifsc: /^[A-Z]{4}0[A-Z0-9]{6}$/,
 };
 
 export const isEmpty = (val) =>
@@ -124,7 +141,6 @@ export const isEmpty = (val) =>
   (typeof val === "string" && !val.trim()) ||
   (Array.isArray(val) && val.length === 0);
 
-  
 export const isAdult = (dob) => {
   if (!dob) return false;
 

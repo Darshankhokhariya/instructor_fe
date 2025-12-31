@@ -8,7 +8,6 @@ import StepFour from "@/components/onboarding/StepFour";
 import StepFive from "@/components/onboarding/StepFive";
 import StepSixth from "@/components/onboarding/StepSixth";
 import StepSeven from "@/components/onboarding/StepSeven";
-import StepEight from "@/components/onboarding/StepEight";
 import {
   FIELD_LABELS,
   isAdult,
@@ -29,6 +28,7 @@ import SubmissionDialog from "@/components/onboarding/SubmissionDialog";
 import {
   getOnboardingStep,
   getOnboardingStepData,
+  onboardingStepEight,
   onboardingStepFive,
   onboardingStepFour,
   onboardingStepOne,
@@ -41,9 +41,10 @@ import {
 } from "@/redux/slices/onboardingSlice";
 import moment from "moment";
 import { useRouter } from "next/navigation";
+import StepEight from "@/components/onboarding/StepEight";
 
 const InstructorOnboarding = () => {
-  const totalSteps = 7;
+  const totalSteps = 8;
   const DRAFT_KEY = "instructorOnboardingDraft";
 
   const router = useRouter();
@@ -120,6 +121,13 @@ const InstructorOnboarding = () => {
       ethicalStandards: false,
       serviceMindset: false,
       signature: "",
+      payment_method: "",
+      bank_name: "",
+      bank_account_holder_name: "",
+      bank_account_number: "",
+      branch_name: "",
+      account_type: "",
+      ifsc_code: "",
     }),
     []
   );
@@ -168,7 +176,7 @@ const InstructorOnboarding = () => {
           stepCompleted === undefined
         ) {
           setStep(1);
-        } else if (stepCompleted === 7) {
+        } else if (stepCompleted === 8) {
           router.push("/verification");
         } else {
           setStep(stepCompleted + 1);
@@ -321,6 +329,7 @@ const InstructorOnboarding = () => {
         video_url: data?.video_url || [""],
         instructor_website: data?.instructor_website,
         teaching_philosophy: data?.teaching_philosophy,
+        certifications: [],
       }));
     }
     if (step === 6 && data) {
@@ -347,8 +356,20 @@ const InstructorOnboarding = () => {
           confirmAccurate: true,
           ethicalStandards: true,
           serviceMindset: true,
+          signature: data?.pricing_agreement?.signature,
         }));
       }
+    }
+
+    if (step === 8 && data) {
+      setFormData((prev) => ({
+        ...prev,
+        group_class_rate: data?.pricing_agreement?.group_class_rate,
+        private_class_rate: data?.pricing_agreement?.private_class_rate,
+        single_class_rate: data?.pricing_agreement?.single_class_rate,
+        trial_period_days: data?.pricing_agreement?.trial_period_days,
+        signature: data?.pricing_agreement?.signature,
+      }));
     }
   }, [step, defaultOnboardingStepData?.data]);
 
@@ -405,6 +426,37 @@ const InstructorOnboarding = () => {
       }
     }
 
+    if (name === "bank_account_number") {
+      if (!/^\d*$/.test(value)) return; // numeric only
+
+      if (value.length >= 9 && !REGEX.bankNumber.test(value)) {
+        setValidationErrors((prev) => ({
+          ...prev,
+          bank_account_number: "Account number must be 9–18 digits",
+        }));
+      } else {
+        setValidationErrors((prev) => ({
+          ...prev,
+          bank_account_number: "",
+        }));
+      }
+    }
+
+    if (name === "ifsc_code") {
+      const upperValue = value.toUpperCase();
+
+      if (upperValue.length > 0 && !REGEX.ifsc.test(upperValue)) {
+        setValidationErrors((prev) => ({
+          ...prev,
+          ifsc_code: "Invalid IFSC code",
+        }));
+      } else {
+        setValidationErrors((prev) => ({
+          ...prev,
+          ifsc_code: "",
+        }));
+      }
+    }
     // Default input handler
     setFormData((prev) => ({
       ...prev,
@@ -420,8 +472,8 @@ const InstructorOnboarding = () => {
         const updated = replaceArray
           ? value
           : current.includes(value)
-            ? current.filter((i) => i !== value)
-            : [...current, value];
+          ? current.filter((i) => i !== value)
+          : [...current, value];
 
         setValidationErrors((v) => {
           if (v[field] && updated.length > 0) {
@@ -562,9 +614,17 @@ const InstructorOnboarding = () => {
       2: ["collegeName", "qualification", "institute"],
       3: ["registerAs"],
       5: ["profileImage", "introVideo", "teaching_philosophy", "video_url"],
-      6: ["startTime", "endTime", "responseTime"],
-      7: [], // handled conditionally below
-      8: ["confirmAccurate", "ethicalStandards", "serviceMindset", "signature"],
+      6: ["responseTime"],
+      7: ["confirmAccurate", "ethicalStandards", "serviceMindset", "signature"],
+      8: [
+        "payment_method",
+        "bank_name",
+        "bank_account_holder_name",
+        "bank_account_number",
+        "branch_name",
+        "account_type",
+        "ifsc_code",
+      ], // handled conditionally below
     };
 
     let fields = requiredFields[step] || [];
@@ -700,6 +760,14 @@ const InstructorOnboarding = () => {
         (!data.trialMode || data.trialMode === "none")
       )
         errors.trialMode = "Trial Policy is required";
+    }
+
+    if (step == 8) {
+      if (!data.bank_account_number?.length) {
+        errors.bank_account_number = "Bank Account Number is required";
+      } else if (!REGEX.bankNumber.test(data.bank_account_number)) {
+        errors.bank_account_number = "Account number must be 9–18 digits";
+      }
     }
 
     return errors;
@@ -979,6 +1047,7 @@ const InstructorOnboarding = () => {
       5: onboardingStepFive,
       6: onboardingStepSixth,
       7: onboardingStepSeven,
+      8: onboardingStepEight,
     };
 
     const stepThunk = stepDispatchMap[step];
@@ -995,7 +1064,7 @@ const InstructorOnboarding = () => {
         if (step < totalSteps) {
           setStep((prev) => prev + 1); // ✅ SAFE
         }
-        if (step === 7) {
+        if (step === 8) {
           setShowSuccessDialog(true);
           toast.success(res.message || `User Onboarding successfully!`);
         }
@@ -1073,7 +1142,9 @@ const InstructorOnboarding = () => {
               <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-teal-900">
                 Yogalink Instructor
               </h1>
-              <p className="text-slate-500 text-xs sm:text-sm">Join the collective.</p>
+              <p className="text-slate-500 text-xs sm:text-sm">
+                Join the collective.
+              </p>
             </div>
             <div className="text-right">
               <span className="text-[10px] sm:text-xs font-bold text-teal-600 bg-teal-50 px-2 sm:px-3 py-1 rounded-full uppercase">
@@ -1098,8 +1169,9 @@ const InstructorOnboarding = () => {
             className="max-w-5xl mx-auto min-h-full"
           >
             <div
-              className={`transition-opacity duration-300 ease-out ${isSubmitted ? "opacity-100" : "opacity-100"
-                } pb-4`}
+              className={`transition-opacity duration-300 ease-out ${
+                isSubmitted ? "opacity-100" : "opacity-100"
+              } pb-4`}
             >
               {/* STEP 1: PERSONAL, ADDRESS, EMERGENCY CONTACT, LANGUAGES */}
               {step === 1 && (
@@ -1183,6 +1255,17 @@ const InstructorOnboarding = () => {
                   isPrivateSelected={isPrivateSelected}
                   isOnlineSelected={isOnlineSelected}
                   trialOptions={trialOptions}
+                />
+              )}
+
+              {step === 8 && (
+                <StepEight
+                  formData={formData}
+                  handleChange={handleChange}
+                  validationErrors={validationErrors}
+                  handleArrayToggle={handleArrayToggle}
+                  isCurrentSameAsPermanent={isCurrentSameAsPermanent}
+                  handleSameAsPermanentToggle={handleSameAsPermanentToggle}
                 />
               )}
 

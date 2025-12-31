@@ -134,7 +134,7 @@ const StepFive = ({
           subtitle="Upload copies of your certifications (e.g., RYT 200, 500). First one is mandatory."
         />
         <div className="space-y-4">
-          {formData.certifications.map((cert, index) => (
+          {formData?.certifications?.map((cert, index) => (
             <div
               key={index}
               className="flex flex-col sm:flex-row gap-4 items-end bg-slate-50 p-4 rounded-xl border border-slate-200"
@@ -201,7 +201,7 @@ const StepFive = ({
               {validationErrors.certifications}
             </p>
           )}
-          {formData.certifications.length < 10 && (
+          {formData?.certifications?.length < 10 && (
             <button
               type="button"
               onClick={addCertification}

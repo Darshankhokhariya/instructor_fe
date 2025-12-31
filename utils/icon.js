@@ -18,6 +18,7 @@ import {
   BiAlarm,
   BiLink,
   BiCheckCircle,
+  BiMoney,
 } from "react-icons/bi";
 
 export const FaCheckCircle = BiSave; // Using BiSave for checkmark style completion (Keeping original component's choice)
@@ -45,3 +46,4 @@ export const BiWorldIcon = BiWorld; // New icon for Languages
 export const BiAlarmIcon = BiAlarm; // New icon for Response Time
 export const BiLinkIcon = BiLink; // New icon for Website
 export const BiCheckCircleIcon = BiCheckCircle;
+export const BiCheckBankIcon = BiMoney;

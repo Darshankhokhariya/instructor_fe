@@ -12,6 +12,8 @@ const StepSeven = ({
   isOnlineSelected,
   trialOptions,
 }) => {
+
+  console.log('formData', formData)
   return (
     <div>
       <div className="space-y-6">
