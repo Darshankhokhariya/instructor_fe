@@ -97,7 +97,7 @@ export const API_ENDPOINTS = {
     ADMIN_SIGNUP: `/admin/signup`,
     GET_MANAGERS_BY_ROLE: (page, limit, role) =>
       `/admin/getUserByRole?page=${page}&limit=${limit}&role=${role}`,
-    EDIT_MANAGER: (id) => `/admin/editUser?id=${id}`,
+    EDIT_MANAGER: `/admin/editUser`,
   },
 
   ONBOARDING: {

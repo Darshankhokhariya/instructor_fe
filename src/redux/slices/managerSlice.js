@@ -111,8 +111,8 @@ export const createManager = createAsyncThunk(
 
 export const editManager = createAsyncThunk(
   "admin/editManager",
-  async ({id, fields}) => {
-    return await putRequest(API_ENDPOINTS.ADMIN.EDIT_MANAGER(id), fields);
+  async (fields) => {
+    return await putRequest(API_ENDPOINTS.ADMIN.EDIT_MANAGER, fields);
   }
 );
 

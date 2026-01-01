@@ -69,13 +69,13 @@ export default function CreateManagerModal({
       }
     }
 
-    if (!formData.password) {
+    if (!manager && !formData.password) {
       newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
+    } else if (!manager && formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
     }
 
-    if (formData.password !== formData.confirmPassword) {
+    if (!manager && formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
     }
 
@@ -88,25 +88,27 @@ export default function CreateManagerModal({
     if (validateForm()) {
       // Extract just the mobile number (without country code) for API
       const mobileNumber = formData.mobile.split(" ")[1] || formData.mobile;
+      const isEdit = Boolean(manager?.id);
 
       const managerData = {
         name: formData.name,
         email: formData.email,
         mobile: mobileNumber,
-        role: "manager",
       };
 
-      if (managerId) {
-        managerData.id = managerId;
+      if (isEdit) {
+        // 👉 EDIT
+        managerData.id = manager?.id;
+      } else {
+        // 👉 CREATE
+        managerData.role = "manager";
+        managerData.password = formData.password;
       }
-      
       try {
         let result;
-        if (managerId) {
+        if (manager?.id) {
           // 👉 EDIT MANAGER
-          result = await dispatch(
-            editManager({ id: managerId, fields: managerData })
-          ).unwrap();
+          result = await dispatch(editManager(managerData)).unwrap();
         } else {
           // 👉 CREATE MANAGER
           result = await dispatch(createManager(managerData)).unwrap();
@@ -157,6 +159,7 @@ export default function CreateManagerModal({
         ...prev,
         name: manager?.name,
         email: manager?.email,
+        mobile: manager?.mobile,
       }));
     }
   }, [manager, isOpen]);
@@ -223,29 +226,35 @@ export default function CreateManagerModal({
             <p className="text-red-500 text-xs mt-1">{errors.mobile}</p>
           )}
 
-          {/* Password Field */}
-          <Input
-            label="Password"
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="Enter password"
-            required={true}
-            error={errors.password}
-          />
+          {manager ? (
+            <></>
+          ) : (
+            <>
+              <Input
+                label="Password"
+                name="password"
+                type="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Enter password"
+                required={true}
+                error={errors.password}
+              />
 
-          {/* Confirm Password Field */}
-          <Input
-            label="Confirm Password"
-            name="confirmPassword"
-            type="password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            placeholder="Confirm password"
-            required={true}
-            error={errors.confirmPassword}
-          />
+              {/* Confirm Password Field */}
+              <Input
+                label="Confirm Password"
+                name="confirmPassword"
+                type="password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="Confirm password"
+                required={true}
+                error={errors.confirmPassword}
+              />
+            </>
+          )}
+          {/* Password Field */}
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4">
