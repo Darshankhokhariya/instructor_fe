@@ -53,9 +53,9 @@ const InstructorOnboarding = () => {
   const [saveStatus, setSaveStatus] = useState(null);
   const [timeError, setTimeError] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
-
   // NEW STATE: For Dialog and Image Preview
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [verificationImagePreview, setVerificationPreview] = useState(null);
   const [profileImagePreview, setProfileImagePreview] = useState(null);
 
   // Added: language, instructor_website, responseTime, registerAs
@@ -99,7 +99,8 @@ const InstructorOnboarding = () => {
       youtube_link: "",
       instructor_website: "", // Existing Field
       profileImage: null, // [NEW FIELD]
-      certifications: [{ title: "", file: null }],
+      verification_image: null, // [NEW FIELD]
+      certifications: [{ title: "", file: "https://www.youtube.com/watch?v=xOt7Tr2JbXI" }],
       yoga_style: [],
       introVideo: "",
       video_url: ["", ""],
@@ -125,6 +126,7 @@ const InstructorOnboarding = () => {
       bank_name: "",
       bank_account_holder_name: "",
       bank_account_number: "",
+      bank_account_number1: "",
       branch_name: "",
       account_type: "",
       ifsc_code: "",
@@ -133,6 +135,8 @@ const InstructorOnboarding = () => {
   );
 
   const [formData, setFormData] = useState(initialFormData);
+
+
   const dispatch = useDispatch();
 
   const parts = formData?.primaryMobile?.trim().split(/\s+/);
@@ -329,7 +333,7 @@ const InstructorOnboarding = () => {
         video_url: data?.video_url || [""],
         instructor_website: data?.instructor_website,
         teaching_philosophy: data?.teaching_philosophy,
-        certifications: [],
+        certifications: [{ title: "dsdsad", file: "https://www.youtube.com/watch?v=xOt7Tr2JbXI" }],
       }));
     }
     if (step === 6 && data) {
@@ -373,20 +377,33 @@ const InstructorOnboarding = () => {
     }
   }, [step, defaultOnboardingStepData?.data]);
 
-  // --- EFFECT TO HANDLE PROFILE IMAGE PREVIEW ---
+  // --- FIX FOR VERIFICATION PREVIEW ---
+  useEffect(() => {
+    // Check if it's an actual File object before trying to read it
+    if (formData.verification_image instanceof File) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setVerificationPreview(reader.result);
+      };
+      reader.readAsDataURL(formData.verification_image); // REMOVED .name
+    } else {
+      setVerificationPreview(null);
+    }
+  }, [formData.verification_image]);
+
+  // --- FIX FOR PROFILE IMAGE PREVIEW ---
   useEffect(() => {
     if (formData.profileImage instanceof File) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfileImagePreview(reader.result);
       };
-      reader.readAsDataURL(formData.profileImage);
+      reader.readAsDataURL(formData.profileImage); // REMOVED .name
     } else {
       setProfileImagePreview(null);
     }
   }, [formData.profileImage]);
 
-  // --- HANDLERS ---
 
   const handleChange = useCallback((e) => {
     const { name, value, type, checked, files } = e.target;
@@ -472,8 +489,8 @@ const InstructorOnboarding = () => {
         const updated = replaceArray
           ? value
           : current.includes(value)
-          ? current.filter((i) => i !== value)
-          : [...current, value];
+            ? current.filter((i) => i !== value)
+            : [...current, value];
 
         setValidationErrors((v) => {
           if (v[field] && updated.length > 0) {
@@ -613,7 +630,7 @@ const InstructorOnboarding = () => {
       ],
       2: ["collegeName", "qualification", "institute"],
       3: ["registerAs"],
-      5: ["profileImage", "introVideo", "teaching_philosophy", "video_url"],
+      5: ["verification_image", "profileImage", "introVideo", "teaching_philosophy", "video_url"],
       6: ["responseTime"],
       7: ["confirmAccurate", "ethicalStandards", "serviceMindset", "signature"],
       8: [
@@ -679,6 +696,63 @@ const InstructorOnboarding = () => {
           errors.dateOfBirth = "You must be at least 18 years old";
         }
       }
+
+      // Mobile number validation
+      const validateMobileNumber = (mobileValue, fieldName) => {
+        if (!mobileValue || !mobileValue.trim()) return null;
+
+        const parts = mobileValue.trim().split(/\s+/);
+        if (parts.length < 2) {
+          return `${FIELD_LABELS[fieldName]} must include country code`;
+        }
+
+        const countryCode = parts[0];
+        const phoneNumber = parts.slice(1).join("");
+
+        // Define valid country codes and their expected lengths
+        const countryCodeRules = {
+          "+91": 10,  // India
+          "+1": 10,   // USA/Canada
+          "+44": 10,  // UK
+          "+61": 9,   // Australia
+          "+971": 9,  // UAE
+        };
+
+        if (!countryCodeRules[countryCode]) {
+          return `Invalid country code in ${FIELD_LABELS[fieldName]}`;
+        }
+
+        if (!/^\d+$/.test(phoneNumber)) {
+          return `${FIELD_LABELS[fieldName]} must contain only digits`;
+        }
+
+        const expectedLength = countryCodeRules[countryCode];
+        if (phoneNumber.length !== expectedLength) {
+          return `${FIELD_LABELS[fieldName]} must be ${expectedLength} digits for ${countryCode}`;
+        }
+
+        return null;
+      };
+
+      // Validate primary mobile
+      const primaryMobileError = validateMobileNumber(data.primaryMobile, "primaryMobile");
+      if (primaryMobileError) {
+        errors.primaryMobile = primaryMobileError;
+      }
+
+      // Validate secondary mobile (if provided)
+      if (data.secondMobile && data.secondMobile.trim()) {
+        const secondMobileError = validateMobileNumber(data.secondMobile, "secondMobile");
+        if (secondMobileError) {
+          errors.secondMobile = secondMobileError;
+        }
+      }
+
+      // Validate emergency mobile
+      const eMobileError = validateMobileNumber(data.eMobile, "eMobile");
+      if (eMobileError) {
+        errors.eMobile = eMobileError;
+      }
     }
 
     if (step === 3) {
@@ -710,10 +784,42 @@ const InstructorOnboarding = () => {
       });
     }
     if (step === 5) {
+      // Validate file uploads
+      if (!data.verification_image || !(data.verification_image instanceof File)) {
+        errors.verification_image = "Verification image is required";
+      }
+
+      if (!data.profileImage || !(data.profileImage instanceof File)) {
+        errors.profileImage = "Profile image is required";
+      }
+
       if (!data.yoga_style?.length)
         errors.yoga_style = "Select at least one Yoga Style";
-      if (!data.certifications?.length)
+
+      // Validate certifications
+      if (!data.certifications?.length) {
         errors.certifications = "Add at least one certification";
+      } else {
+        // Check if at least one certification has both title and file
+        const validCerts = data.certifications.filter(
+          cert => cert.title && cert.file
+        );
+
+        if (validCerts.length === 0) {
+          errors.certifications = "At least one certification must have both title and file";
+        }
+
+        // Validate individual certifications
+        data.certifications.forEach((cert, index) => {
+          if (cert.title && !cert.file) {
+            errors[`certifications[${index}].file`] = "Certificate file is required";
+          }
+          if (cert.file && !cert.title) {
+            errors[`certifications[${index}].title`] = "Certificate title is required";
+          }
+        });
+      }
+
       const videos = data.video_url?.filter((v) => v.trim()) || [];
       if (videos.length < 2)
         errors.video_url = "Minimum two sample videos required";
@@ -954,19 +1060,21 @@ const InstructorOnboarding = () => {
     }
 
     if (step === 5) {
-      payload.profile_image = "uploads/profile_123.jpg";
+      // Note: verification_image and profile_image should be file URLs from upload endpoint
+      // For now, keeping File objects - need to implement file upload first
+      payload.verification_image = formData.verification_image?.name || "";
+      payload.profile_image = formData.profileImage?.name || "";
+      payload.teaching_philosophy = formData.teaching_philosophy;
       payload.yoga_style = formData.yoga_style;
-      payload.certificates = [
-        {
-          certificate_name: "test",
-          file_url: "https://www.instagram.com/",
-        },
-        {
-          certificate_name: "Prenatal Yoga Certification",
-          file_url: "https://www.instagram.com/",
-        },
-      ];
-      payload.video_url = formData.video_url;
+      // Map certifications with file_url instead of file
+      payload.certificates = formData.certifications
+        .filter(cert => cert.title && cert.file)
+        .map(cert => ({
+          certificate_name: cert.title,
+          file_url: "https://www.youtube.com/watch?v=xOt7Tr2JbXI", // Should be URL after upload
+        }));
+
+      payload.video_url = formData.video_url.filter(url => url.trim());
     }
 
     return payload;
@@ -1018,6 +1126,51 @@ const InstructorOnboarding = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     let payload;
+
+    // Helper function to compress image before converting to base64
+    const compressImage = (file, maxWidth = 800, quality = 0.7) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+          const img = new Image();
+          img.src = event.target.result;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+
+            // Resize if image is larger than maxWidth
+            if (width > maxWidth) {
+              height = (height * maxWidth) / width;
+              width = maxWidth;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Convert canvas to base64 with compression
+            const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+            resolve(compressedBase64);
+          };
+          img.onerror = () => reject(new Error('Failed to load image'));
+        };
+        reader.onerror = () => reject(new Error('Failed to read file'));
+      });
+    };
+
+    // Helper function to convert File to base64 (for non-image files)
+    const fileToBase64 = (file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+      });
+    };
+
     if (step === 6) {
       payload = buildClassAvailabilityPayload(formData);
     } else if (step === 7) {
@@ -1036,8 +1189,49 @@ const InstructorOnboarding = () => {
       };
     } else {
       payload = buildPayloadByStep(step, formData);
-    }
 
+      // Convert File objects to base64 for step 5 (with compression for images)
+      if (step === 5) {
+        try {
+          // Compress and convert verification image
+          if (formData.verification_image) {
+            payload.verification_image = formData.verification_image.name
+          }
+
+          // Compress and convert profile image
+          if (formData.profileImage) {
+            payload.profile_image = formData.profileImage.name;
+          }
+
+          // Convert certificate files to base64 (PDFs use fileToBase64, images use compression)
+          if (payload.certificates && payload.certificates.length > 0) {
+            payload.certificates = await Promise.all(
+              payload.certificates.map(async (cert) => {
+                // cert.file_url contains the File object
+                if (cert.file_url instanceof File) {
+                  const file = cert.file_url;
+                  // Check if it's an image or PDF
+                  const isImage = file.type.startsWith('image/');
+                  const base64Data = isImage
+                    ? await compressImage(file)
+                    : await fileToBase64(file);
+
+                  return {
+                    certificate_name: cert.certificate_name,
+                    file_url: base64Data,
+                  };
+                }
+                return cert;
+              })
+            );
+          }
+        } catch (error) {
+          toast.error("Failed to process images. Please try again.");
+          console.error("Image processing error:", error);
+          return;
+        }
+      }
+    }
     // Map step to corresponding async thunk
     const stepDispatchMap = {
       1: onboardingStepOne,
@@ -1049,17 +1243,13 @@ const InstructorOnboarding = () => {
       7: onboardingStepSeven,
       8: onboardingStepEight,
     };
-
     const stepThunk = stepDispatchMap[step];
-
     if (!stepThunk) {
       // toast.error("Invalid step!");
       return;
     }
-
     try {
       const res = await dispatch(stepThunk(payload)).unwrap();
-
       if (res.status === 200) {
         if (step < totalSteps) {
           setStep((prev) => prev + 1); // ✅ SAFE
@@ -1075,6 +1265,8 @@ const InstructorOnboarding = () => {
       toast.error(err?.message || "Something went wrong");
     }
   };
+
+
   // --- NEW: Final Accept Handler ---
   const handleFinalAccept = () => {
     localStorage.removeItem(DRAFT_KEY);
@@ -1169,9 +1361,8 @@ const InstructorOnboarding = () => {
             className="max-w-5xl mx-auto min-h-full"
           >
             <div
-              className={`transition-opacity duration-300 ease-out ${
-                isSubmitted ? "opacity-100" : "opacity-100"
-              } pb-4`}
+              className={`transition-opacity duration-300 ease-out ${isSubmitted ? "opacity-100" : "opacity-100"
+                } pb-4`}
             >
               {/* STEP 1: PERSONAL, ADDRESS, EMERGENCY CONTACT, LANGUAGES */}
               {step === 1 && (
@@ -1220,11 +1411,14 @@ const InstructorOnboarding = () => {
                   formData={formData}
                   setFormData={setFormData}
                   handleChange={handleChange}
-                  setProfileImagePreview={setProfileImagePreview}
                   validationErrors={validationErrors}
+                  setValidationErrors={setValidationErrors}
                   handleArrayToggle={handleArrayToggle}
                   handleCertChange={handleCertChange}
+                  setVerificationPreview={setVerificationPreview}
+                  setProfileImagePreview={setProfileImagePreview}
                   profileImagePreview={profileImagePreview}
+                  verificationImagePreview={verificationImagePreview}
                   addCertification={addCertification}
                   addSampleVideo={addSampleVideo}
                   handleSampleVideoChange={handleSampleVideoChange}

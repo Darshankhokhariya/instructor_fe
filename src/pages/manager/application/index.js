@@ -1,8 +1,6 @@
 'use client';
 import Layout from '@/components/layout/Layout';
 import React, { useState } from 'react';
-import { BsCheckCircle, BsXCircle } from 'react-icons/bs';
-import { FiEye } from 'react-icons/fi';
 
 const sampleApplications = [
     {
@@ -32,13 +30,6 @@ export default function SubmittedFormsPage() {
             prev.map(item =>
                 item.id === id ? { ...item, [type]: !item[type] } : item
             )
-        );
-    };
-
-    // === Change Status ===
-    const handleStatusChange = (id, status) => {
-        setData(prev =>
-            prev.map(item => (item.id === id ? { ...item, status } : item))
         );
     };
 

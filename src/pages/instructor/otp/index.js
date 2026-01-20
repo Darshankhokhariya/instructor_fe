@@ -1,4 +1,4 @@
-import { userVerifyOtp } from "@/redux/slices/userSlice";
+import { InstructorVerifyOtp } from "@/redux/slices/userSlice";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, {
@@ -18,9 +18,8 @@ import { useDispatch, useSelector } from "react-redux";
 const Input = ({ className, error, ...props }) => (
   <input
     {...props}
-    className={`w-full p-3 border rounded-xl shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500 ${
-      error ? "border-red-500 ring-red-100" : "border-slate-300"
-    } ${className}`}
+    className={`w-full p-3 border rounded-xl shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-teal-500 ${error ? "border-red-500 ring-red-100" : "border-slate-300"
+      } ${className}`}
   />
 );
 
@@ -40,9 +39,7 @@ const OtpVerification = ({ phoneNumber = "+91 12345 67890" }) => {
   const [loading, setLoading] = useState(false);
 
   const email = useSelector((state) => state.user.email);
-
   // --- Core OTP Handling Logic ---
-
   const handleChange = useCallback(
     (e, index) => {
       const value = e.target.value;
@@ -127,7 +124,7 @@ const OtpVerification = ({ phoneNumber = "+91 12345 67890" }) => {
       email,
     };
     setLoading(true);
-    await dispatch(userVerifyOtp(obj))
+    await dispatch(InstructorVerifyOtp(obj))
       .unwrap()
       .then((res) => {
         if (res.status === 200) {
@@ -205,9 +202,8 @@ const OtpVerification = ({ phoneNumber = "+91 12345 67890" }) => {
             onChange={(e) => handleChange(e, index)}
             onKeyDown={(e) => handleKeyDown(e, index)}
             ref={(el) => (inputRefs.current[index] = el)}
-            className={`text-center text-xl font-mono h-12 w-12 border-2 ${
-              error ? "border-red-500" : "focus:border-teal-600"
-            } transition-colors duration-200`}
+            className={`text-center text-xl font-mono h-12 w-12 border-2 ${error ? "border-red-500" : "focus:border-teal-600"
+              } transition-colors duration-200`}
             autoFocus={index === 0}
             required
           />
@@ -225,11 +221,10 @@ const OtpVerification = ({ phoneNumber = "+91 12345 67890" }) => {
       <button
         onClick={handleSubmit}
         disabled={isButtonDisabled}
-        className={`w-full py-3 rounded-xl font-bold transition-all duration-300 shadow-md ${
-          isButtonDisabled
-            ? "bg-primary text-white cursor-not-allowed"
-            : "bg-primary text-white hover:bg-primary/90 hover:shadow-lg"
-        }`}
+        className={`w-full py-3 rounded-xl font-bold transition-all duration-300 shadow-md ${isButtonDisabled
+          ? "bg-primary text-white cursor-not-allowed"
+          : "bg-primary text-white hover:bg-primary/90 hover:shadow-lg"
+          }`}
       >
         {loading ? "Verifying..." : "Verify OTP"}
       </button>

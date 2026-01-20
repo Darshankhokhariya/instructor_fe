@@ -1,3 +1,4 @@
+// ================= FIELD LABELS =================
 export const FIELD_LABELS = {
   // Step 1
   name: "Full Name",
@@ -5,6 +6,7 @@ export const FIELD_LABELS = {
   gender: "Gender",
   email: "Email",
   primaryMobile: "Primary Phone Number",
+  secondMobile: "Alternate Phone Number",
   language: "Language",
   pCountry: "Permanent Country",
   pState: "Permanent State",
@@ -23,28 +25,34 @@ export const FIELD_LABELS = {
   eName: "Emergency Contact Name",
   eMobile: "Emergency Phone Number",
   eRelation: "Relationship",
+
   // Step 2
   collegeName: "School/College Name",
   qualification: "Degree/Qualification",
   institute: "University/Institution",
+
   // Step 3
   registerAs: "Registration Type",
   panCard: "PAN Card Number",
   aadharNumber: "Aadhaar Card Number",
   taxIdentification: "Tax Identification",
+
   // Step 4
   instagram_link: "Instagram URL",
   facebook_link: "Facebook URL",
   linkdin_link: "LinkedIn URL",
   youtube_link: "YouTube URL",
   instructor_website: "Instructor Website",
+
   // Step 5
+  verification_image: "Current Profile Image",
   profileImage: "Profile Image",
   introVideo: "Introduction Video URL",
   teaching_philosophy: "Teaching Philosophy",
   yoga_style: "Yoga Style",
   certifications: "Certifications",
   video_url: "Sample Videos",
+
   // Step 6
   availableOneOnOne: "One-on-One Class",
   availableGroupClass: "Group Class",
@@ -59,21 +67,25 @@ export const FIELD_LABELS = {
   private_class_rate: "Private Class Rate",
   single_class_rate: "Single Class Rate",
   trialMode: "Trial Policy",
+
   // Step 7
   confirmAccurate: "Agreement - Accuracy",
   ethicalStandards: "Agreement - Ethics",
   serviceMindset: "Agreement - Service Mindset",
   signature: "Digital Signature",
+
   // Step 8
   payment_method: "Payment Method",
   bank_name: "Bank Name",
   branch_name: "Branch Name",
   bank_account_holder_name: "Bank Account Holder Name",
   bank_account_number: "Bank Account Number",
+  bank_account_number1: "Re-enter Bank Account Number",
   account_type: "Bank Account Type",
   ifsc_code: "Bank IFSC Code",
 };
 
+// ================= STEP FIELDS =================
 export const STEP_FIELDS = {
   1: [
     "name",
@@ -115,14 +127,16 @@ export const STEP_FIELDS = {
   8: [
     "payment_method",
     "bank_name",
+    "branch_name",
     "bank_account_holder_name",
     "bank_account_number",
-    "branch_name",
+    "bank_account_number1",
     "account_type",
     "ifsc_code",
-  ], // handled conditionally below
+  ],
 };
 
+// ================= REGEX =================
 export const REGEX = {
   url: /^(ftp|http|https):\/\/[^ "\s]+$/,
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
@@ -135,6 +149,7 @@ export const REGEX = {
   ifsc: /^[A-Z]{4}0[A-Z0-9]{6}$/,
 };
 
+// ================= HELPERS =================
 export const isEmpty = (val) =>
   val === undefined ||
   val === null ||
@@ -158,4 +173,55 @@ export const isAdult = (dob) => {
   }
 
   return age >= 18;
+};
+
+// ================= MAIN VALIDATION =================
+export const validateStep = (step, formData) => {
+  const errors = {};
+  const fields = STEP_FIELDS[step] || [];
+
+  fields.forEach((field) => {
+    if (isEmpty(formData[field])) {
+      errors[field] = `${FIELD_LABELS[field]} is required`;
+    }
+  });
+
+  // ===== FIELD-SPECIFIC RULES =====
+  if (formData.email && !REGEX.email.test(formData.email)) {
+    errors.email = "Invalid email address";
+  }
+
+  if (formData.dateOfBirth && !isAdult(formData.dateOfBirth)) {
+    errors.dateOfBirth = "You must be at least 18 years old";
+  }
+
+  if (formData.panCard && !REGEX.pan.test(formData.panCard)) {
+    errors.panCard = "Invalid PAN number";
+  }
+
+  if (formData.aadharNumber && !REGEX.aadhar.test(formData.aadharNumber)) {
+    errors.aadharNumber = "Invalid Aadhaar number";
+  }
+
+  if (formData.ifsc_code && !REGEX.ifsc.test(formData.ifsc_code)) {
+    errors.ifsc_code = "Invalid IFSC code";
+  }
+
+  if (
+    formData.bank_account_number &&
+    !REGEX.bankNumber.test(formData.bank_account_number)
+  ) {
+    errors.bank_account_number = "Invalid bank account number";
+  }
+
+  // ===== ACCOUNT NUMBER MATCH VALIDATION =====
+  if (
+    formData.bank_account_number &&
+    formData.bank_account_number1 &&
+    formData.bank_account_number !== formData.bank_account_number1
+  ) {
+    errors.bank_account_number1 = "Bank account numbers do not match";
+  }
+
+  return errors;
 };

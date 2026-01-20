@@ -41,28 +41,28 @@ const dashboardStats = [
   {
     id: 1,
     title: "Submitted Forms",
-    value: "12",
+    value: "0",
     icon: <FaClipboardList size={24} />,
     bgColor: "bg-gradient-to-r from-primary/50 to-primary",
   },
   {
     id: 2,
     title: "Scheduled Interviews",
-    value: "5",
+    value: "0",
     icon: <FaPhoneAlt size={24} />,
     bgColor: "bg-gradient-to-r from-primary/50 to-primary",
   },
   {
     id: 3,
     title: "Interview Recordings",
-    value: "3",
+    value: "0",
     icon: <FaVideo size={24} />,
     bgColor: "bg-gradient-to-r from-primary/50 to-primary",
   },
   {
     id: 4,
     title: "Passed Interviews",
-    value: "2",
+    value: "0",
     icon: <FaCheckCircle size={24} />,
     bgColor: "bg-gradient-to-r from-primary/50 to-primary",
   },
@@ -87,6 +87,7 @@ export default function AdminDashboard() {
   const approvedByAdmin = data.filter((d) => d.adminApproval).length;
 
   const users = useSelector(selectUsers);
+  console.log("users", users)
 
   useEffect(() => {
     dispatch(getUsers({ page, limit }));
@@ -125,7 +126,7 @@ export default function AdminDashboard() {
         </div>
 
         <div className="w-[70%] mt-6">
-          <RecentApplications data={users?.data?.data} updateField={updateField} />
+          <RecentApplications data={users?.data?.data} updateField={updateField} getUsers={getUsers} />
         </div>
       </div>
     </Layout>

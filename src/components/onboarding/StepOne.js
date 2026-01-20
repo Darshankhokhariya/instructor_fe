@@ -91,15 +91,22 @@ const StepOne = ({
             )}
           </div>
         </div>
-        <PhoneInput
-          label="Alternate Phone Number (Optional)"
-          name="secondMobile"
-          value={formData.secondMobile}
-          onChange={handleChange}
-          required={false}
-          placeholder="Optional contact number"
-          error={validationErrors.secondMobile}
-        />
+        <div>
+          <PhoneInput
+            label="Alternate Phone Number"
+            name="secondMobile"
+            value={formData.secondMobile}
+            onChange={handleChange}
+            required
+            placeholder="Optional contact number"
+            error={validationErrors.secondMobile}
+          />
+          {validationErrors.secondMobile && (
+            <p className="mt-2 text-xs text-red-500">
+              {validationErrors.secondMobile}
+            </p>
+          )}
+        </div>
 
         {/* New Field: Languages Spoken */}
         <div>

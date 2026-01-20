@@ -74,19 +74,26 @@ export const getRequest = async (url, params = {}) => {
   }
 };
 
+
+
 // API endpoints configuration
 export const API_ENDPOINTS = {
   // Auth
   AUTH: {
-    LOGIN: "/user/userLogin",
+    LOGIN: "/instructor/login",
+    SIGNUP: "/instructor/signup",
+    VERIFY_OTP: "/instructor/otpVerify",
+  },
+
+  USER_AUTH: {
+    LOGIN: "/user/login",
     SIGNUP: "/user/signup",
-    VERIFY_OTP: "/user/otpVerify",
   },
 
   USER: {
     GET_USERS: (page, limit) =>
-      `/user/getAllInstructor?page=${page}&limit=${limit}`,
-    GET_SINGLE_USERS: (id) => `/user/getSingleUsers?id=${id}`,
+      `/admin/getAllInstructor?page=${page}&limit=${limit}`,
+    GET_SINGLE_USERS: (id) => `/admin/getSingleUsers?id=${id}`,
     GET_USERS_BY_ROLE: (page, limit, role) =>
       `/user/getUserByRole?page=${page}&limit=${limit}&role=${role}`,
   },
@@ -111,5 +118,16 @@ export const API_ENDPOINTS = {
     STEP_SIXTH: `/onBoarding/step6`,
     STEP_SEVEN: `/onBoarding/step7`,
     STEP_EIGHT: `/onBoarding/step8`,
+  },
+
+  USER_ONBOARDING: {
+    GET_STEP: `/user/getOnboardingStep`,
+    GET_STEP_DATA: (step) => `/user/getStepWiseData?step=${step}`,
+    STEP_ONE: `/user/onboarding/profile`,
+    STEP_TWO: `/user/onboarding/health`,
+    STEP_THREE: `/user/onboarding/fitness`,
+    STEP_FOUR: `/user/onboarding/lifestyle`,
+    STEP_FIVE: `/user/onboarding/diet`,
+    STEP_SIX: `/user/onboarding/preferences`,
   },
 };

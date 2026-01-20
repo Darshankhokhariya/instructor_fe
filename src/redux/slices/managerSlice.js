@@ -56,7 +56,7 @@ export const changeUserStatus = createAsyncThunk(
 export const getUsers = createAsyncThunk(
   "user/getUsers",
   async ({ page, limit }) => {
-    return await getRequest(API_ENDPOINTS.USER.GET_USERS(page, limit));
+    return await getRequest(API_ENDPOINTS.USER.GET_USERS(page, limit,));
   }
 );
 

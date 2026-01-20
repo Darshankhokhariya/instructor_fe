@@ -32,15 +32,15 @@ export default function Sidebar({ isOpen, setIsOpen, userRole = "admin" }) {
             icon: <MdDashboard size={22} />,
         },
         {
-            href: "/admin/applications",
+            href: "/admin/application",
             label: "Applications",
             icon: <FaUsers size={20} />,
         },
-        {
-            href: "/admin/managers",
-            label: "Managers",
-            icon: <MdPerson size={22} />,
-        },
+        // {
+        //     href: "/admin/managers",
+        //     label: "Managers",
+        //     icon: <MdPerson size={22} />,
+        // },
     ];
 
     const managerNavItems = [

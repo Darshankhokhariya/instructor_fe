@@ -23,23 +23,38 @@ const initialState = {
   user: null,
 };
 
-export const userSignup = createAsyncThunk(
-  "user/userSignup",
+export const InstructorSignup = createAsyncThunk(
+  "instructor/instructorSignup",
   async (fields) => {
     return await postRequest(API_ENDPOINTS.AUTH.SIGNUP, fields);
   }
 );
 
-export const userLogin = createAsyncThunk("user/userLogin", async (fields) => {
+export const InstructorLogin = createAsyncThunk("instructor/instructorLogin", async (fields) => {
   return await postRequest(API_ENDPOINTS.AUTH.LOGIN, fields);
 });
 
-export const userVerifyOtp = createAsyncThunk(
-  "user/userLogin",
+export const InstructorVerifyOtp = createAsyncThunk(
+  "instructor/userLogin",
   async (fields) => {
     return await postRequest(API_ENDPOINTS.AUTH.VERIFY_OTP, fields);
   }
 );
+
+
+// user 
+
+export const UserSignup = createAsyncThunk(
+  "user/userSignup",
+  async (fields) => {
+    return await postRequest(API_ENDPOINTS.USER_AUTH.SIGNUP, fields);
+  }
+);
+
+export const UserLogin = createAsyncThunk("user/userLogin", async (fields) => {
+  return await postRequest(API_ENDPOINTS.USER_AUTH.LOGIN, fields);
+})
+
 
 export const changeUserStatus = createAsyncThunk(
   "admin/changeUserStatus",
@@ -56,7 +71,7 @@ export const getUsers = createAsyncThunk(
 );
 
 export const getSingleUser = createAsyncThunk(
-  "user/getSingleUser",
+  "user/getSingleInstructor",
   async (id) => {
     return await getRequest(API_ENDPOINTS.USER.GET_SINGLE_USERS(id));
   }
@@ -111,8 +126,8 @@ export const getManagers = createAsyncThunk(
   }
 );
 
-const userSlice = createSlice({
-  name: "user",
+const instructorSlice = createSlice({
+  name: "instructor",
   initialState,
   reducers: {
     setOtpEmail: (state, action) => {
@@ -122,14 +137,14 @@ const userSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-      .addCase(userSignup.pending, (state) => {
+      .addCase(InstructorSignup.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(userSignup.fulfilled, (state, action) => {
+      .addCase(InstructorSignup.fulfilled, (state, action) => {
         state.loading = false;
       })
-      .addCase(userSignup.rejected, (state, action) => {
+      .addCase(InstructorSignup.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
@@ -224,12 +239,13 @@ const userSlice = createSlice({
   },
 });
 
-export const { setOtpEmail, clearOtpEmail } = userSlice.actions;
+export const { setOtpEmail, clearOtpEmail } = instructorSlice.actions;
 export const selectUsers = (state) => state.user.users;
 export const selectManagers = (state) => state.user.managers;
 export const selectStatusLoading = (state) => state.user.loading.approve;
 export const selectScheduleLoading = (state) => state.user.loading.sheduleInterview;
 export const selectCreateManagerLoading = (state) => state.user.loading.createManager;
-export const selectUser = (state) => state.user.user;
+export const selectedInstructor = (state) => state.user.user;
 
-export default userSlice.reducer;
+
+export default instructorSlice.reducer;

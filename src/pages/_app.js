@@ -11,7 +11,7 @@ export default function MyApp({ Component, pageProps }) {
     //     if (typeof window !== "undefined") {
     //         const authToken = localStorage.getItem("token");
     //         if (!authToken) {
-    //             router.push("/login");
+    //             router.push("/instructor/login");
     //         }
     //         // else {
     //         //     router.push("/superadmin/dashboard");
@@ -38,10 +38,7 @@ export default function MyApp({ Component, pageProps }) {
                 <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png" />
                 <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png" />
                 {/* Fonts */}
-                <link
-                    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
-                    rel="stylesheet"
-                />
+                <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet" />
             </Head>
 
             <Provider store={store}>

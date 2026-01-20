@@ -19,7 +19,9 @@ export default function ApproveModal({
   const [managerApprove, setManagerApprove] = useState(false);
   const [adminApprove, setAdminApprove] = useState(false);
 
-  if (!data) return null;
+  console.log("data+++++", data)
+
+  // if (!data) return null;
 
   return (
     <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50 p-4">

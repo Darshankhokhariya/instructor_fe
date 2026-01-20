@@ -12,7 +12,7 @@ const PhoneInput = ({
   name,
   value = "",
   onChange,
-  required = false,
+  required,
   placeholder = "Enter phone number",
 }) => {
   // Extract country code & number

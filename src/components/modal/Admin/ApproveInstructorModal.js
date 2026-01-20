@@ -2,8 +2,6 @@
 import Modal from "@/components/common/Modal";
 import Selector from "@/components/common/Selector";
 import TextArea from "@/components/common/TextArea";
-import React, { useState } from "react";
-import { AiOutlineClose } from "react-icons/ai";
 
 export default function ApproveInstructorModal({
   formData,
@@ -59,7 +57,6 @@ export default function ApproveInstructorModal({
         >
           {loading ? "Submiting..." : "Submit"}
         </button>
-        {/* Personal Information */}
       </form>
     </Modal >
   );

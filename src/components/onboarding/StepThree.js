@@ -1,16 +1,30 @@
-import React from "react";
+import React, { useEffect } from "react";
 import SectionHeader from "./SectionHeader";
 import Selector from "../common/Selector";
 import Input from "../common/Input";
 
-const StepThree = ({ formData, handleChange, validationErrors }) => {
+const StepThree = ({ formData, handleChange, validationErrors = {} }) => {
   const isIndia = formData.pCountry === "india";
   const isIndividual = formData.registerAs === "individual";
   const isBusiness = formData.registerAs === "business";
 
+  /* 🔥 AUTO-SELECT DEFAULT REGISTER TYPE */
+  useEffect(() => {
+    if (isIndia && !formData.registerAs) {
+      handleChange({
+        target: {
+          name: "registerAs",
+          value: "individual",
+        },
+      });
+    }
+  }, [isIndia, formData.registerAs, handleChange]);
+
   const registrationOptions = [
     {
-      label: isIndia ? "Individual (PAN / Aadhaar)" : "Individual (SSN / TIN)",
+      label: isIndia
+        ? "Individual (PAN / Aadhaar)"
+        : "Individual (SSN / TIN)",
       value: "individual",
     },
     {
@@ -21,7 +35,7 @@ const StepThree = ({ formData, handleChange, validationErrors }) => {
 
   const renderIndianFields = () => (
     <>
-      {/* PAN – Individual & Business */}
+      {/* PAN */}
       <Input
         label="PAN Card Number"
         name="panCard"
@@ -32,7 +46,7 @@ const StepThree = ({ formData, handleChange, validationErrors }) => {
         error={validationErrors.panCard}
       />
 
-      {/* Aadhaar – Individual only */}
+      {/* Aadhaar – Individual */}
       {isIndividual && (
         <Input
           label="Aadhaar Card Number"
@@ -45,7 +59,7 @@ const StepThree = ({ formData, handleChange, validationErrors }) => {
         />
       )}
 
-      {/* GSTIN – Business only */}
+      {/* GSTIN – Business */}
       {isBusiness && (
         <Input
           label="GSTIN"
@@ -56,7 +70,7 @@ const StepThree = ({ formData, handleChange, validationErrors }) => {
           required
           error={validationErrors.GSTIN}
         />
-      )}``
+      )}
     </>
   );
 
@@ -74,7 +88,7 @@ const StepThree = ({ formData, handleChange, validationErrors }) => {
             label="Register As"
             name="registerAs"
             options={registrationOptions}
-            value={formData.registerAs || (isIndia ? "individual" : "individual")}
+            value={formData.registerAs || ""}
             onChange={handleChange}
             required
             error={validationErrors.registerAs}

@@ -69,6 +69,17 @@ const StepEight = ({
             error={validationErrors.bank_account_number}
           />
           <Input
+            label="Re EnterBank Account Number"
+            name="bank_account_number1"
+            min="text"
+            max={18}
+            value={formData.bank_account_number1}
+            onChange={handleChange}
+            required
+            placeholder="Bank Account Number"
+            error={validationErrors.bank_account_number1}
+          />
+          <Input
             label="Branch Name"
             name="branch_name"
             type="text"

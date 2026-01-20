@@ -14,7 +14,7 @@ const Input = ({
     <div className="flex flex-col gap-1">
         <label
             htmlFor={name}
-            className="text-sm font-medium text-gray-600"
+            className="text-sm font-semibold text-gray-600"
         >
             {label}
             {required && <span className="ml-1 text-red-500">*</span>}

@@ -23,7 +23,7 @@ const Header = ({ onToggleSidebar }) => {
         e.preventDefault();
         localStorage.clear();
         console.log("Logging out...");
-        router.push("/login");
+        router.push("/instructor/login");
     }
 
     // Close right sidebar when clicking outside
@@ -45,17 +45,17 @@ const Header = ({ onToggleSidebar }) => {
 
     return (
         <>
-            <div class="flex items-center justify-between px-6 pb-2 h-[10svh] bg-white">
-                <div class="flex flex-col">
-                    <span class="text-text-sub-light dark:text-text-sub-dark text-sm font-medium">Good Morning</span>
-                    <h2 class="text-text-main-light dark:text-text-main-dark text-xl font-bold leading-tight tracking-tight">Namaste, Priya</h2>
+            <div className="flex items-center justify-between px-6 pb-2 h-[10svh] bg-white">
+                <div className="flex flex-col">
+                    <span className="text-text-sub-light dark:text-text-sub-dark text-sm font-medium">Good Morning</span>
+                    <h2 className="text-text-main-light dark:text-text-main-dark text-xl font-bold leading-tight tracking-tight">Namaste, Priya</h2>
                 </div>
-                <div class="flex items-center gap-3">
-                    <div class="h-10 w-10 overflow-hidden rounded-full border-2 border-primary/20 bg-gray-200">
-                        <img alt="Profile" class="h-full w-full object-cover" data-alt="Portrait of a yoga instructor smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRusvG5X2RFhmH9y_qAXcQNrK8AZ8v2ppSGDI72vLFgvdFccPR0hETCjdgma4pXr2uyJ74jvF7nyxMsXiaGapcrnorwzsLCdETGNJUV0a6_SI6I0yps7E_88SQvFiLEODzCEb9n9hFLku94XHRHIjYWhNRSocnrPM2SfUcI5mjgQMz52Rldsq645flUNeMoCxndGjNLCjKjKQEEH3Eco9X3GU6UMUt1j1T9BHpZeDOvw5hgbuYxKWH_n9hGkRCX-rndTiVHvCI23Jw" />
+                <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 overflow-hidden rounded-full border-2 border-primary/20 bg-gray-200">
+                        <img alt="Profile" className="h-full w-full object-cover" data-alt="Portrait of a yoga instructor smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRusvG5X2RFhmH9y_qAXcQNrK8AZ8v2ppSGDI72vLFgvdFccPR0hETCjdgma4pXr2uyJ74jvF7nyxMsXiaGapcrnorwzsLCdETGNJUV0a6_SI6I0yps7E_88SQvFiLEODzCEb9n9hFLku94XHRHIjYWhNRSocnrPM2SfUcI5mjgQMz52Rldsq645flUNeMoCxndGjNLCjKjKQEEH3Eco9X3GU6UMUt1j1T9BHpZeDOvw5hgbuYxKWH_n9hGkRCX-rndTiVHvCI23Jw" />
                     </div>
-                    <button onClick={HandleLogout} class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-gray-900/5  transition-transform active:scale-95">
-                        <IoLogOut class="text-text-sub-light dark:text-text-sub-dark text-lg" />
+                    <button onClick={HandleLogout} className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-gray-900/5  transition-transform active:scale-95">
+                        <IoLogOut className="text-text-sub-light dark:text-text-sub-dark text-lg" />
                     </button>
                 </div>
             </div>
