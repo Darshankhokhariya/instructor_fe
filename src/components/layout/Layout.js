@@ -35,7 +35,7 @@ const Layout = ({ children }) => {
                 <div className='flex flex-col h-screen w-full'>
                     <Header onToggleSidebar={toggleSidebar} />
                     <main
-                        className={`flex-grow  transition-all duration-300 ${contentShiftClass} overflow-x-hidden  pb-20 md:pb-0 h-[90svh]`}
+                        className={`grow  transition-all duration-300 ${contentShiftClass} overflow-x-hidden  pb-20 md:pb-0 h-[90svh]`}
                     >
                         {children}
                     </main>

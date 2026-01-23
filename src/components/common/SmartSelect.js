@@ -1,7 +1,8 @@
-const SmartSelect = ({ label, options, selectedValues = [], onToggle }) => (
+const SmartSelect = ({ label, options, selectedValues = [], required = false, onToggle }) => (
     <div className="mb-2">
         <label className="mb-1 block text-sm font-medium text-gray-700">
             {label}
+            {required && <span className="ml-1 text-red-500">*</span>}
         </label>
 
         <div className="flex flex-wrap gap-2">
@@ -16,7 +17,7 @@ const SmartSelect = ({ label, options, selectedValues = [], onToggle }) => (
                         key={value}
                         type="button"
                         onClick={() => onToggle(value)}
-                        className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors border ${isSelected
+                        className={`cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium transition-colors border ${isSelected
                             ? "bg-primary text-white border-primary"
                             : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
                             }`}

@@ -60,7 +60,7 @@ export default function CameraCapture({ onCapture }) {
             />
             <button
                 onClick={capturePhoto}
-                className="px-4 py-2 bg-teal-600 text-white rounded-lg"
+                className="cursor-pointer px-4 py-2 bg-teal-600 text-white rounded-lg"
             >
                 Capture Photo
             </button>

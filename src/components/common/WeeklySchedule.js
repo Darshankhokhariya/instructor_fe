@@ -169,7 +169,7 @@ const WeeklySchedule = ({
   return (
     <div className="space-y-4">
       <label className="block text-sm font-medium text-gray-700">
-        Availability (Required)
+        Availability : <span className="text-red-600">*</span>
       </label>
 
       <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-6">
@@ -197,7 +197,7 @@ const WeeklySchedule = ({
                 key={day.value}
                 type="button"
                 onClick={() => toggleDay(day.value)}
-                className={`h-12 w-12 rounded-full font-semibold transition
+                className={`cursor-pointer h-12 w-12 rounded-full font-semibold transition
                   ${isSelected
                     ? "bg-teal-500 text-white"
                     : "bg-gray-100 text-gray-400 hover:bg-gray-200"
@@ -257,7 +257,7 @@ const WeeklySchedule = ({
                       enableCustomTime(dayValue);
                       setEditingDay(dayValue);
                     }}
-                    className="text-sm text-teal-600 flex items-center gap-1"
+                    className="cursor-pointer text-sm text-teal-600 flex items-center gap-1"
                   >
                     <FiPlus /> Customize
                   </button>

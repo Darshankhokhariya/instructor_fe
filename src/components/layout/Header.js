@@ -8,21 +8,14 @@ import { useRouter } from 'next/router';
 
 
 const Header = ({ onToggleSidebar }) => {
-    // Dummy state for selected company/workspace
-    const dummyCompanyOptions = [
-        { label: 'Yogalink Studio (2024-2025)', value: '1', data: { businessName: 'Yogalink Studio', financialYear: '2024-2025' } },
-        { label: 'Peaceful Practice (2023-2024)', value: '2', data: { businessName: 'Peaceful Practice', financialYear: '2023-2024' } },
-    ];
+
     const [isRightSidebarOpen, setRightSidebarOpen] = useState(false);
     const sidebarRef = useRef(null);
     const router = useRouter();
 
-
-
     const HandleLogout = (e) => {
         e.preventDefault();
         localStorage.clear();
-        console.log("Logging out...");
         router.push("/instructor/login");
     }
 

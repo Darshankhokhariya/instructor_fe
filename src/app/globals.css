@@ -8,6 +8,12 @@
   --font-jakarta: 'Plus Jakarta Sans', sans-serif;
 }
 
+@layer utilities {
+  .animate-spin-reverse {
+    animation: spin 0.8s linear infinite reverse;
+  }
+}
+
 /* -----------------------------
    Scrollbar (Thin)
 ----------------------------- */

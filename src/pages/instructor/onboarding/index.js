@@ -17,7 +17,7 @@ import {
 } from "../../../../utils/validation";
 import { useDispatch, useSelector } from "react-redux";
 import OnboardingFooter from "@/components/onboarding/OnboardingFooter";
-import { BiCheckCircleIcon, FaShieldAlt } from "../../../../utils/icon";
+import { FaShieldAlt } from "../../../../utils/icon";
 import StepIndicator from "@/components/onboarding/StepIndicator";
 import {
   formatDOB,
@@ -42,18 +42,17 @@ import {
 import moment from "moment";
 import { useRouter } from "next/navigation";
 import StepEight from "@/components/onboarding/StepEight";
+import Loader from "@/components/common/Loader";
 
 const InstructorOnboarding = () => {
   const totalSteps = 8;
   const DRAFT_KEY = "instructorOnboardingDraft";
 
   const router = useRouter();
-  const [isCurrentSameAsPermanent, setIsCurrentSameAsPermanent] =
-    useState(false);
+  const [isCurrentSameAsPermanent, setIsCurrentSameAsPermanent] = useState(false);
   const [saveStatus, setSaveStatus] = useState(null);
   const [timeError, setTimeError] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
-  // NEW STATE: For Dialog and Image Preview
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [verificationImagePreview, setVerificationPreview] = useState(null);
   const [profileImagePreview, setProfileImagePreview] = useState(null);
@@ -135,7 +134,7 @@ const InstructorOnboarding = () => {
   );
 
   const [formData, setFormData] = useState(initialFormData);
-
+  const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -574,6 +573,7 @@ const InstructorOnboarding = () => {
       ...prev,
       certifications: [...prev.certifications, { title: "", file: null }],
     }));
+
   const removeCertification = (index) =>
     setFormData((prev) => ({
       ...prev,
@@ -599,6 +599,7 @@ const InstructorOnboarding = () => {
       ...prev,
       video_url: [...prev.video_url, ""],
     }));
+
   const removeSampleVideo = (index) =>
     formData.video_url.length > 2 &&
     setFormData((prev) => ({
@@ -1249,8 +1250,10 @@ const InstructorOnboarding = () => {
       return;
     }
     try {
+      setLoading(true);
       const res = await dispatch(stepThunk(payload)).unwrap();
       if (res.status === 200) {
+        setLoading(false);
         if (step < totalSteps) {
           setStep((prev) => prev + 1); // ✅ SAFE
         }
@@ -1259,9 +1262,11 @@ const InstructorOnboarding = () => {
           toast.success(res.message || `User Onboarding successfully!`);
         }
       } else {
+        setLoading(false);
         toast.error(res.message || "Something went wrong");
       }
     } catch (err) {
+      setLoading(false);
       toast.error(err?.message || "Something went wrong");
     }
   };
@@ -1281,14 +1286,6 @@ const InstructorOnboarding = () => {
       .getElementById("form-content-area")
       ?.scrollTo({ top: 9999, behavior: "smooth" });
   };
-
-  const handleSaveDraft = useCallback(
-    async (e) => {
-      // setSaveStatus("saving");
-      handleSubmit(e);
-    },
-    [formData]
-  );
 
   const isSubmitted = step === totalSteps + 1;
   const isGroupSelected = formData.availableGroupClass;
@@ -1325,190 +1322,192 @@ const InstructorOnboarding = () => {
   }, [isPrivateSelected, isGroupSelected]);
 
   return (
-    <div className="min-h-screen w-full bg-slate-50 flex flex-col items-center justify-center p-0 sm:p-2 md:p-6 font-sans text-slate-800 overflow-hidden">
-      <div className="w-full max-w-6xl bg-white sm:rounded-3xl shadow-2xl border-0 sm:border border-slate-100 flex flex-col h-screen sm:max-h-screen sm:h-auto md:min-h-[650px]">
-        {/* HEADER */}
-        <div className="flex-none px-4 py-4 sm:py-6 md:px-10 border-b border-slate-100 bg-white sm:rounded-t-3xl z-10">
-          <div className="flex justify-between items-start mb-4 sm:mb-6">
-            <div>
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-teal-900">
-                Yogalink Instructor
-              </h1>
-              <p className="text-slate-500 text-xs sm:text-sm">
-                Join the collective.
-              </p>
+    <>
+      {loading && <Loader />}
+      <div className="min-h-screen w-full bg-slate-50 flex flex-col items-center justify-center p-0 sm:p-2 md:p-6 font-sans text-slate-800 overflow-hidden">
+        <div className="w-full max-w-6xl bg-white sm:rounded-3xl shadow-2xl border-0 sm:border border-slate-100 flex flex-col h-screen sm:max-h-screen sm:h-auto md:min-h-[650px]">
+          {/* HEADER */}
+          <div className="flex-none px-4 py-4 sm:py-6 md:px-10 border-b border-slate-100 bg-white sm:rounded-t-3xl z-10">
+            <div className="flex justify-between items-start mb-4 sm:mb-6">
+              <div>
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-teal-900">
+                  Yogalink Instructor
+                </h1>
+                <p className="text-slate-500 text-xs sm:text-sm">
+                  Join the collective.
+                </p>
+              </div>
+              <div className="text-right">
+                <span className="text-[10px] sm:text-xs font-bold text-teal-600 bg-teal-50 px-2 sm:px-3 py-1 rounded-full uppercase">
+                  {isSubmitted ? "Complete" : `${step}/${totalSteps}`}
+                </span>
+              </div>
             </div>
-            <div className="text-right">
-              <span className="text-[10px] sm:text-xs font-bold text-teal-600 bg-teal-50 px-2 sm:px-3 py-1 rounded-full uppercase">
-                {isSubmitted ? "Complete" : `${step}/${totalSteps}`}
-              </span>
-            </div>
+
+            {!isSubmitted && (
+              <StepIndicator currentStep={step} totalSteps={totalSteps} />
+            )}
           </div>
 
+          {/* SCROLLABLE CONTENT */}
+          <div
+            id="form-content-area"
+            className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 md:px-12 scroll-smooth custom-scrollbar touch-pan-y"
+          >
+            <form
+              id="onboarding-form"
+              onSubmit={handleSubmit}
+              className="max-w-5xl mx-auto min-h-full"
+            >
+              <div
+                className={`transition-opacity duration-300 ease-out ${isSubmitted ? "opacity-100" : "opacity-100"
+                  } pb-4`}
+              >
+                {/* STEP 1: PERSONAL, ADDRESS, EMERGENCY CONTACT, LANGUAGES */}
+                {step === 1 && (
+                  <StepOne
+                    formData={formData}
+                    handleChange={handleChange}
+                    validationErrors={validationErrors}
+                    handleArrayToggle={handleArrayToggle}
+                    isCurrentSameAsPermanent={isCurrentSameAsPermanent}
+                    handleSameAsPermanentToggle={handleSameAsPermanentToggle}
+                  />
+                )}
+
+                {/* STEP 2: EDUCATION DETAILS */}
+                {step === 2 && (
+                  <StepTwo
+                    formData={formData}
+                    handleChange={handleChange}
+                    validationErrors={validationErrors}
+                  />
+                )}
+
+                {/* STEP 3: TAXATION DETAILS (India Only) */}
+                {step === 3 && (
+                  <StepThree
+                    formData={formData}
+                    handleChange={handleChange}
+                    validationErrors={validationErrors}
+                    setFormData={setFormData}
+                    defaultOnboardingStep={defaultOnboardingStep}
+                  />
+                )}
+
+                {/* STEP 4: SOCIAL MEDIA DETAILS & INSTRUCTOR WEBSITE */}
+                {step === 4 && (
+                  <StepFour
+                    formData={formData}
+                    handleChange={handleChange}
+                    validationErrors={validationErrors}
+                  />
+                )}
+
+                {/* STEP 5: QUALIFICATIONS & EXPERTISE (Styles, Certs, Videos, Philosophy) */}
+                {step === 5 && (
+                  <StepFive
+                    formData={formData}
+                    setFormData={setFormData}
+                    handleChange={handleChange}
+                    validationErrors={validationErrors}
+                    setValidationErrors={setValidationErrors}
+                    handleArrayToggle={handleArrayToggle}
+                    handleCertChange={handleCertChange}
+                    setVerificationPreview={setVerificationPreview}
+                    setProfileImagePreview={setProfileImagePreview}
+                    profileImagePreview={profileImagePreview}
+                    verificationImagePreview={verificationImagePreview}
+                    addCertification={addCertification}
+                    addSampleVideo={addSampleVideo}
+                    handleSampleVideoChange={handleSampleVideoChange}
+                    removeCertification={removeCertification}
+                    removeSampleVideo={removeSampleVideo}
+                  />
+                )}
+
+                {/* STEP 6: AVAILABILITY (ENHANCED) */}
+                {step === 6 && (
+                  <StepSixth
+                    formData={formData}
+                    handleChange={handleChange}
+                    validationErrors={validationErrors}
+                    handleArrayToggle={handleArrayToggle}
+                    timeError={timeError}
+                    handleTimeSlotsChange={handleTimeSlotsChange}
+                  />
+                )}
+
+                {/* STEP 7: PRICING (ENHANCED) */}
+                {step === 7 && (
+                  <StepSeven
+                    formData={formData}
+                    handleChange={handleChange}
+                    validationErrors={validationErrors}
+                    isGroupSelected={isGroupSelected}
+                    isPrivateSelected={isPrivateSelected}
+                    isOnlineSelected={isOnlineSelected}
+                    trialOptions={trialOptions}
+                  />
+                )}
+
+                {step === 8 && (
+                  <StepEight
+                    formData={formData}
+                    handleChange={handleChange}
+                    validationErrors={validationErrors}
+                    handleArrayToggle={handleArrayToggle}
+                    isCurrentSameAsPermanent={isCurrentSameAsPermanent}
+                    handleSameAsPermanentToggle={handleSameAsPermanentToggle}
+                  />
+                )}
+
+                {/* FINAL STEP: VERIFICATION PENDING */}
+                {isSubmitted && (
+                  <div className="flex flex-col items-center justify-center text-center h-full py-10 animate-in zoom-in-95">
+                    <div className="w-24 h-24 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mb-6 shadow-xl">
+                      <FaShieldAlt size={40} />
+                    </div>
+                    <h2 className="text-3xl font-bold text-slate-800 mb-2">
+                      Application Submitted!
+                    </h2>
+                    <p className="text-slate-500 max-w-md mx-auto mb-4">
+                      Thank you for submitting your profile. We are now verifying
+                      your documents and qualifications.
+                    </p>
+                    <p className="text-slate-600 font-semibold mb-8">
+                      Application ID: #YGL-
+                      {Math.floor(Math.random() * 90000 + 10000)}
+                    </p>
+                    <button
+                      onClick={() => router.push("/verification")}
+                      className="text-white cursor-pointer bg-teal-600 px-6 py-3 rounded-xl font-semibold shadow-lg hover:bg-teal-700 transition-colors"
+                    >
+                      Return Home
+                    </button>
+                  </div>
+                )}
+              </div>
+            </form>
+          </div>
+
+          {/* FOOTER - NAVIGATION & DRAFT */}
           {!isSubmitted && (
-            <StepIndicator currentStep={step} totalSteps={totalSteps} />
+            <OnboardingFooter
+              prevStep={prevStep}
+              nextStep={nextStep}
+              step={step}
+              saveStatus={saveStatus}
+              saveDraft={saveDraft}
+              totalSteps={totalSteps}
+              formData={formData}
+              saveButtonText={saveButtonText}
+              handleSubmit={handleSubmit}
+            />
           )}
         </div>
-
-        {/* SCROLLABLE CONTENT */}
-        <div
-          id="form-content-area"
-          className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 md:px-12 scroll-smooth custom-scrollbar touch-pan-y"
-        >
-          <form
-            id="onboarding-form"
-            onSubmit={handleSubmit}
-            className="max-w-5xl mx-auto min-h-full"
-          >
-            <div
-              className={`transition-opacity duration-300 ease-out ${isSubmitted ? "opacity-100" : "opacity-100"
-                } pb-4`}
-            >
-              {/* STEP 1: PERSONAL, ADDRESS, EMERGENCY CONTACT, LANGUAGES */}
-              {step === 1 && (
-                <StepOne
-                  formData={formData}
-                  handleChange={handleChange}
-                  validationErrors={validationErrors}
-                  handleArrayToggle={handleArrayToggle}
-                  isCurrentSameAsPermanent={isCurrentSameAsPermanent}
-                  handleSameAsPermanentToggle={handleSameAsPermanentToggle}
-                />
-              )}
-
-              {/* STEP 2: EDUCATION DETAILS */}
-              {step === 2 && (
-                <StepTwo
-                  formData={formData}
-                  handleChange={handleChange}
-                  validationErrors={validationErrors}
-                />
-              )}
-
-              {/* STEP 3: TAXATION DETAILS (India Only) */}
-              {step === 3 && (
-                <StepThree
-                  formData={formData}
-                  handleChange={handleChange}
-                  validationErrors={validationErrors}
-                  setFormData={setFormData}
-                  defaultOnboardingStep={defaultOnboardingStep}
-                />
-              )}
-
-              {/* STEP 4: SOCIAL MEDIA DETAILS & INSTRUCTOR WEBSITE */}
-              {step === 4 && (
-                <StepFour
-                  formData={formData}
-                  handleChange={handleChange}
-                  validationErrors={validationErrors}
-                />
-              )}
-
-              {/* STEP 5: QUALIFICATIONS & EXPERTISE (Styles, Certs, Videos, Philosophy) */}
-              {step === 5 && (
-                <StepFive
-                  formData={formData}
-                  setFormData={setFormData}
-                  handleChange={handleChange}
-                  validationErrors={validationErrors}
-                  setValidationErrors={setValidationErrors}
-                  handleArrayToggle={handleArrayToggle}
-                  handleCertChange={handleCertChange}
-                  setVerificationPreview={setVerificationPreview}
-                  setProfileImagePreview={setProfileImagePreview}
-                  profileImagePreview={profileImagePreview}
-                  verificationImagePreview={verificationImagePreview}
-                  addCertification={addCertification}
-                  addSampleVideo={addSampleVideo}
-                  handleSampleVideoChange={handleSampleVideoChange}
-                  removeCertification={removeCertification}
-                  removeSampleVideo={removeSampleVideo}
-                />
-              )}
-
-              {/* STEP 6: AVAILABILITY (ENHANCED) */}
-              {step === 6 && (
-                <StepSixth
-                  formData={formData}
-                  handleChange={handleChange}
-                  validationErrors={validationErrors}
-                  handleArrayToggle={handleArrayToggle}
-                  timeError={timeError}
-                  handleTimeSlotsChange={handleTimeSlotsChange}
-                />
-              )}
-
-              {/* STEP 7: PRICING (ENHANCED) */}
-              {step === 7 && (
-                <StepSeven
-                  formData={formData}
-                  handleChange={handleChange}
-                  validationErrors={validationErrors}
-                  isGroupSelected={isGroupSelected}
-                  isPrivateSelected={isPrivateSelected}
-                  isOnlineSelected={isOnlineSelected}
-                  trialOptions={trialOptions}
-                />
-              )}
-
-              {step === 8 && (
-                <StepEight
-                  formData={formData}
-                  handleChange={handleChange}
-                  validationErrors={validationErrors}
-                  handleArrayToggle={handleArrayToggle}
-                  isCurrentSameAsPermanent={isCurrentSameAsPermanent}
-                  handleSameAsPermanentToggle={handleSameAsPermanentToggle}
-                />
-              )}
-
-              {/* FINAL STEP: VERIFICATION PENDING */}
-              {isSubmitted && (
-                <div className="flex flex-col items-center justify-center text-center h-full py-10 animate-in zoom-in-95">
-                  <div className="w-24 h-24 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mb-6 shadow-xl">
-                    <FaShieldAlt size={40} />
-                  </div>
-                  <h2 className="text-3xl font-bold text-slate-800 mb-2">
-                    Application Submitted!
-                  </h2>
-                  <p className="text-slate-500 max-w-md mx-auto mb-4">
-                    Thank you for submitting your profile. We are now verifying
-                    your documents and qualifications.
-                  </p>
-                  <p className="text-slate-600 font-semibold mb-8">
-                    Application ID: #YGL-
-                    {Math.floor(Math.random() * 90000 + 10000)}
-                  </p>
-                  <button
-                    onClick={() => router.push("/verification")}
-                    className="text-white cursor-pointer bg-teal-600 px-6 py-3 rounded-xl font-semibold shadow-lg hover:bg-teal-700 transition-colors"
-                  >
-                    Return Home
-                  </button>
-                </div>
-              )}
-            </div>
-          </form>
-        </div>
-
-        {/* FOOTER - NAVIGATION & DRAFT */}
-        {!isSubmitted && (
-          <OnboardingFooter
-            prevStep={prevStep}
-            nextStep={nextStep}
-            step={step}
-            saveStatus={saveStatus}
-            saveDraft={saveDraft}
-            totalSteps={totalSteps}
-            formData={formData}
-            saveButtonText={saveButtonText}
-            handleSubmit={handleSubmit}
-          />
-        )}
-      </div>
-      {/* Tailwind CSS scrollbar utility class */}
-      <style jsx>{`
+        {/* Tailwind CSS scrollbar utility class */}
+        <style jsx>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }
@@ -1518,14 +1517,15 @@ const InstructorOnboarding = () => {
         }
       `}</style>
 
-      {/* The new Submission Dialog component */}
-      <SubmissionDialog
-        isOpen={showSuccessDialog}
-        onClose={handleCloseDialog}
-        onAccept={handleFinalAccept}
-        profileImagePreview={profileImagePreview}
-      />
-    </div>
+        {/* The new Submission Dialog component */}
+        <SubmissionDialog
+          isOpen={showSuccessDialog}
+          onClose={handleCloseDialog}
+          onAccept={handleFinalAccept}
+          profileImagePreview={profileImagePreview}
+        />
+      </div>
+    </>
   );
 };
 

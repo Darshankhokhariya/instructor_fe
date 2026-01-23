@@ -23,7 +23,7 @@ const StepSixth = ({
 
       {/* Class Type Selection */}
       <div className="mt-4 space-y-3">
-        <Label required>Available Class Types</Label>
+        <Label required>Available Class Types :</Label>
         <CheckboxToggle
           label="Available for Group Class"
           name="availableGroupClass"

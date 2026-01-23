@@ -43,19 +43,19 @@ export default function YogaLinkLanding() {
                         {/* Dark Mode Toggle Switch */}
                         <button
                             onClick={() => setIsDarkMode(!isDarkMode)}
-                            className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
+                            className="p-2 cursor-pointer rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
                             title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
                         >
                             {isDarkMode ? <LuSun size={18} className="text-yellow-400" /> : <LuMoon size={18} className="text-slate-600" />}
                         </button>
 
                         <Link href="/instructor/login">
-                            <button className="px-6 py-2.5 bg-primary text-slate-900 font-bold rounded-full hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/25">
+                            <button className="cursor-pointer px-6 py-2.5 bg-primary text-slate-900 font-bold rounded-full hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/25">
                                 Login
                             </button>
                         </Link>
                         <Link href="/instructor/login">
-                            <button className="px-6 py-2.5 bg-primary text-slate-900 font-bold rounded-full hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/25">
+                            <button className="cursor-pointer px-6 py-2.5 bg-primary text-slate-900 font-bold rounded-full hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/25">
                                 Instructor Login
                             </button>
                         </Link>
@@ -64,7 +64,7 @@ export default function YogaLinkLanding() {
                     {/* Mobile Menu & Toggle */}
                     <div className="flex items-center gap-4 md:hidden">
                         <button
-                            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800"
+                            className="p-2 cursor-pointer rounded-lg bg-slate-100 dark:bg-slate-800"
                             onClick={() => setIsDarkMode(!isDarkMode)}
                         >
                             {isDarkMode ? <LuSun size={20} className="text-yellow-400" /> : <LuMoon size={20} />}
@@ -95,10 +95,10 @@ export default function YogaLinkLanding() {
                                 Experience a diverse global community and smart plans tailored perfectly to your body's daily needs through advanced computer vision.
                             </p>
                             <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto justify-center">
-                                <button className="w-full sm:w-auto px-10 py-5 bg-primary text-slate-900 font-bold text-lg rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/30 flex items-center justify-center gap-2">
+                                <button className="cursor-pointer w-full sm:w-auto px-10 py-5 bg-primary text-slate-900 font-bold text-lg rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/30 flex items-center justify-center gap-2">
                                     Get Started Now <LuArrowRight />
                                 </button>
-                                <button className="w-full sm:w-auto px-10 py-5 bg-white/10 backdrop-blur-md border border-white/20 text-white font-bold text-lg rounded-2xl hover:bg-white/20 active:scale-95 transition-all">
+                                <button className="cursor-pointer w-full sm:w-auto px-10 py-5 bg-white/10 backdrop-blur-md border border-white/20 text-white font-bold text-lg rounded-2xl hover:bg-white/20 active:scale-95 transition-all">
                                     Explore Plans
                                 </button>
                             </div>
@@ -220,7 +220,7 @@ export default function YogaLinkLanding() {
 
             {/* Sticky CTA */}
             <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] md:max-w-md z-50">
-                <button className="w-full bg-primary text-slate-900 font-extrabold py-5 rounded-2xl shadow-2xl shadow-primary/40 hover:scale-[1.02] active:scale-95 transition-all text-lg">
+                <button className="cursor-pointer w-full bg-primary text-slate-900 font-extrabold py-5 rounded-2xl shadow-2xl shadow-primary/40 hover:scale-[1.02] active:scale-95 transition-all text-lg">
                     Start Your Free Trial
                 </button>
             </div>

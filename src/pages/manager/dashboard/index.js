@@ -12,30 +12,6 @@ import {
 } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 
-// Sample data for applications
-const sampleApplications = [
-  {
-    id: 1,
-    name: "Ramesh Patel",
-    status: "Pending",
-    managerApproval: false,
-    adminApproval: false,
-  },
-  {
-    id: 2,
-    name: "Sita Sharma",
-    status: "Approved",
-    managerApproval: true,
-    adminApproval: false,
-  },
-  {
-    id: 3,
-    name: "Rahul Mehta",
-    status: "Pending",
-    managerApproval: true,
-    adminApproval: true,
-  },
-];
 
 const dashboardStats = [
   {
@@ -69,30 +45,15 @@ const dashboardStats = [
 ];
 
 export default function AdminDashboard() {
-  const [data, setData] = useState(sampleApplications);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const dispatch = useDispatch();
-
-  const updateField = (id, key, value) => {
-    setData((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [key]: value } : item))
-    );
-  };
-
-  // Stats
-  const total = data.length;
-  const pending = data.filter((d) => d.status === "Pending").length;
-  const approvedByManager = data.filter((d) => d.managerApproval).length;
-  const approvedByAdmin = data.filter((d) => d.adminApproval).length;
 
   const users = useSelector(selectUsers);
 
   useEffect(() => {
     dispatch(getUsers({ page, limit }));
   }, [page, limit]);
-
-
 
   return (
     <Layout>
@@ -125,7 +86,7 @@ export default function AdminDashboard() {
         </div>
 
         <div className="w-[70%] mt-6">
-          <RecentApplications data={users?.data?.data} updateField={updateField} />
+          <RecentApplications data={users?.data?.data} getUsers={getUsers} />
         </div>
       </div>
     </Layout>

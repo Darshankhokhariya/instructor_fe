@@ -44,7 +44,7 @@ const StepFive = ({
         <div className={`p-4 sm:p-6 bg-teal-50 rounded-xl border mb-6 flex flex-col sm:flex-row gap-4 ${validationErrors.verification_image ? 'border-red-500 border-2' : 'border-teal-200'
           }`}>
           <div className="flex-1">
-            <Label required>Verification Image (250px X 250px Recommended)</Label>
+            <Label required>Verification Image (250px X 250px Recommended) :</Label>
             {showCamera && (
               <CameraCapture
                 onCapture={({ file, preview }) => {
@@ -118,7 +118,7 @@ const StepFive = ({
         <div className={`p-4 sm:p-6 bg-slate-50 rounded-xl border flex flex-col sm:flex-row gap-6 ${validationErrors.profileImage ? 'border-red-500 border-2' : 'border-slate-300'
           }`}>
           <div className="flex-1">
-            <Label required>Profile Image (Public)</Label>
+            <Label required>Profile Image :</Label>
 
             <input
               type="file"
@@ -136,7 +136,7 @@ const StepFive = ({
                 // Clear validation error using actual event
                 handleChange(e);
               }}
-              className={validationErrors.profileImage ? "border-red-500 border-2" : ""}
+            // className={validationErrors.profileImage ? "border-red-500 border-2" : ""}
             />
 
             {validationErrors.profileImage && (
@@ -208,7 +208,7 @@ const StepFive = ({
                   className="mb-1 text-sm font-medium text-gray-700"
                 >
                   Upload File (PDF/Image){" "}
-                  {index === 0 && <span className="text-teal-600">*</span>}
+                  {index === 0 && <span className="text-red-600">*</span>}
                 </label>
                 <input
                   type="file"
@@ -255,7 +255,7 @@ const StepFive = ({
           <button
             type="button"
             onClick={addCertification}
-            className="flex items-center text-teal-600 font-semibold hover:text-teal-700 mt-2 min-h-[44px] text-sm sm:text-base"
+            className="flex items-center text-teal-600 font-semibold hover:text-teal-700 mt-2 min-h-11 text-sm sm:text-base"
           >
             <BiPlusCircle className="mr-2" size={14} /> Add Certificate
           </button>
@@ -264,8 +264,9 @@ const StepFive = ({
 
       {/* ================= VIDEOS ================= */}
       <Input
-        label="Introduction Video URL"
+        label="Introduction Video URL :"
         name="introVideo"
+        placeholder="Enter introduction video url"
         value={formData.introVideo || ""}
         onChange={handleChange}
         required
@@ -275,8 +276,9 @@ const StepFive = ({
       {videoUrls.map((video, index) => (
         <Input
           key={index}
-          label={`Video ${index + 1}`}
+          label={`Video ${index + 1} :`}
           value={video || ""}
+          placeholder="Enter Video url"
           onChange={(e) =>
             handleSampleVideoChange(index, e.target.value)
           }
@@ -296,7 +298,8 @@ const StepFive = ({
       )}
 
       <TextArea
-        label="Your Teaching Philosophy"
+        label="Your Teaching Philosophy :"
+        placeholder="Enter your teaching philosophy"
         name="teaching_philosophy"
         rows={5}
         value={formData.teaching_philosophy || ""}

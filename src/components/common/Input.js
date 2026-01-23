@@ -14,7 +14,7 @@ const Input = ({
     <div className="flex flex-col gap-1">
         <label
             htmlFor={name}
-            className="text-sm font-semibold text-gray-600"
+            className="text-sm font-medium text-gray-700"
         >
             {label}
             {required && <span className="ml-1 text-red-500">*</span>}
@@ -36,7 +36,6 @@ const Input = ({
         w-full rounded-lg border px-4 py-2 text-sm text-gray-800
         transition-all duration-200
         placeholder:text-gray-400
-        placeholder:capitalize
         focus:outline-none focus:ring-2
         ${error
                     ? "border-red-500 focus:border-red-500 focus:ring-red-500/40"
@@ -46,7 +45,7 @@ const Input = ({
         />
 
         {error && (
-            <span className="text-xs font-medium text-red-500">
+            <span className="text-xs text-red-500">
                 {error}
             </span>
         )}

@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import ApproveModal from "../modal/Admin/ApproveModel";
-import { BiCheckCircle } from "react-icons/bi";
 import { BiCheckCircleIcon } from "../../../utils/icon";
 import ApproveInstructorModal from "../modal/Admin/ApproveInstructorModal";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,15 +13,21 @@ import {
   selectedInstructor,
   sheduleInterview,
 } from "@/redux/slices/userSlice";
+import Loader from "../common/Loader";
 
-export default function RecentApplications({ data, updateField, getUsers }) {
+export default function RecentApplications({ data, getUsers }) {
+  const dispatch = useDispatch();
+  const loadingSchedule = useSelector(selectScheduleLoading);
+  const loading = useSelector(selectStatusLoading);
+  const userData = useSelector(selectedInstructor);
+
+  const [loader, setLoader] = useState(false);
   const [modalData, setModalData] = useState(null);
   const [interviewModal, setInterviewModal] = useState(false);
   const [user, setUser] = useState({});
   const [approveModal, setApproveModal] = useState(false);
   const [activeTab, setActiveTab] = useState("All"); // Tabs: All, Pending, Interview, Approved
   const [validationErrors, setValidationErrors] = useState({});
-  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     status: "",
     reason: "",
@@ -30,12 +35,8 @@ export default function RecentApplications({ data, updateField, getUsers }) {
   const [interviewDate, setInterviewDate] = useState("");
   const [interviewTime, setInterviewTime] = useState("");
   const [meetingLink, setMeetingLink] = useState("");
-
-  const loadingSchedule = useSelector(selectScheduleLoading);
-  const loading = useSelector(selectStatusLoading);
-
-  const userData = useSelector(selectedInstructor);
   const [errors, setErrors] = useState({});
+
   const handleCloseInterview = () => {
     setInterviewDate("");
     setInterviewTime("");
@@ -89,6 +90,7 @@ export default function RecentApplications({ data, updateField, getUsers }) {
     setApproveModal(true);
     setUser(data);
   };
+
   const validateForm = () => {
     const errors = {};
     if (!formData.status.trim()) errors.status = "Status is required";
@@ -218,6 +220,7 @@ export default function RecentApplications({ data, updateField, getUsers }) {
 
   return (
     <>
+      {loader && <Loader />}
       <div className="bg-white p-6 shadow-lg rounded-2xl w-full overflow-x-auto">
         <h2 className="text-xl font-medium mb-4 text-gray-900">
           Recent Applications
@@ -238,7 +241,7 @@ export default function RecentApplications({ data, updateField, getUsers }) {
             </button>
           ))}
         </div>
-
+        {console.log('filteredApplications :>> ', filteredApplications)}
         {/* Table */}
         <table className="w-full min-w-[700px] table-auto border-separate border-spacing-y-3">
           <thead className="rounded-4xl bg-primary/20">
@@ -252,81 +255,98 @@ export default function RecentApplications({ data, updateField, getUsers }) {
           </thead>
 
           <tbody>
-            {filteredApplications?.map((row) => (
-              <tr
-                key={row.id}
-                className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200`}
-              >
-                <td className="py-3 px-4 text-gray-800">
-                  {row?.onboardingSteps?.name}
-                </td>
-                <td className="py-3 px-4 text-gray-600">{row?.email}</td>
-                <td className="py-3 px-4 text-gray-600">
-                  {row?.onboardingSteps?.primaryMobile}
-                </td>
-                <td className="py-3 px-4 flex justify-center">
-                  <span
-                    className={`px-3 py-1 text-sm font-semibold rounded-full ${row?.overallApprovalStatus === "pending"
-                      ? "bg-yellow-100 text-yellow-800"
-                      : row?.overallApprovalStatus === "interview_scheduled"
-                        ? "bg-blue-100 text-blue-800"
-                        : row?.overallApprovalStatus === "approved"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}
+            {filteredApplications && filteredApplications.length > 0 ? (
+              filteredApplications?.map((row) => (
+                <tr
+                  key={row.id}
+                  className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200`}
+                >
+                  <td className="py-3 px-4 text-gray-800">
+                    {row?.onboardingSteps?.name || "-"}
+                  </td>
+                  <td className="py-3 px-4 text-gray-600">{row?.email || "-"}</td>
+                  <td className="py-3 px-4 text-gray-600">
+                    {row?.onboardingSteps?.primaryMobile || "-"}
+                  </td>
+                  <td className="py-3 px-4 flex justify-center">
+                    <span
+                      className={`px-3 py-1 text-sm font-semibold rounded-full ${row?.overallApprovalStatus === "pending"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : row?.overallApprovalStatus === "interview_scheduled"
+                          ? "bg-blue-100 text-blue-800"
+                          : row?.overallApprovalStatus === "approved"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-400 text-white"
+                        }`}
+                    >
+                      {row?.overallApprovalStatus}
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 text-center">
+                    <div className="flex gap-2">
+                      <button
+                        className="px-4 py-1 cursor-pointer bg-primary text-white rounded-md hover:bg-primary/90 transition"
+                        onClick={() => handleOpenInterview(row)}
+                      >
+                        View
+                      </button>
+                      <button
+                        className="px-4 py-1 cursor-pointer bg-primary text-white rounded-md hover:bg-primary/90 transition"
+                        onClick={() => handleOpenApprovelModal(row)}
+                      >
+                        <BiCheckCircleIcon />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <>
+                <tr>
+                  <td
+                    colSpan="5"
+                    className="text-center text-gray-500 py-6"
                   >
-                    {row?.overallApprovalStatus}
-                  </span>
-                </td>
-                <td className="py-3 px-4 text-center">
-                  <div className="flex gap-2">
-                    <button
-                      className="px-4 py-1 cursor-pointer bg-primary text-white rounded-md hover:bg-primary/90 transition"
-                      onClick={() => handleOpenInterview(row)}
-                    >
-                      View
-                    </button>
-                    <button
-                      className="px-4 py-1 cursor-pointer bg-primary text-white rounded-md hover:bg-primary/90 transition"
-                      onClick={() => handleOpenApprovelModal(row)}
-                    >
-                      <BiCheckCircleIcon />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+                    No applications found.
+                  </td>
+                </tr>
+              </>
+            )}
           </tbody>
         </table>
-      </div>
+      </div >
 
       {/* Modal */}
-      {interviewModal && (
-        <ApproveModal
-          data={userData}
-          onClose={handleCloseInterview}
-          interviewDate={interviewDate}
-          interviewTime={interviewTime}
-          meetingLink={meetingLink}
-          handleChangeInterview={handleChangeInterview}
-          onSubmit={handleSubmitInterview}
-          errors={errors}
-          loading={loadingSchedule}
-        />
-      )}
+      {
+        interviewModal && (
+          <ApproveModal
+            data={userData}
+            onClose={handleCloseInterview}
+            interviewDate={interviewDate}
+            interviewTime={interviewTime}
+            meetingLink={meetingLink}
+            handleChangeInterview={handleChangeInterview}
+            onSubmit={handleSubmitInterview}
+            errors={errors}
+            loading={loadingSchedule}
+          />
+        )
+      }
 
-      {approveModal && (
-        <ApproveInstructorModal
-          formData={formData}
-          onChange={handleChange}
-          onClose={handleClose}
-          validationErrors={validationErrors}
-          handleSubmit={handleSubmit}
-          loading={loading}
-          setApproveModal={setApproveModal}
-          approveModal={approveModal}
-        />
-      )}
+      {
+        approveModal && (
+          <ApproveInstructorModal
+            formData={formData}
+            onChange={handleChange}
+            onClose={handleClose}
+            validationErrors={validationErrors}
+            handleSubmit={handleSubmit}
+            loading={loading}
+            setApproveModal={setApproveModal}
+            approveModal={approveModal}
+          />
+        )
+      }
     </>
   );
 }

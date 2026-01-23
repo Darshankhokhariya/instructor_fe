@@ -9,12 +9,10 @@ import React, {
   useEffect,
 } from "react";
 import toast from "react-hot-toast";
-// Reusing icons you imported previously
 import { BiChevronLeft, BiLock, BiTime, BiCheckCircle } from "react-icons/bi";
 import { useDispatch, useSelector } from "react-redux";
 
 // Mock Component Imports (assumed from your environment)
-// const Input = ({ value, onChange, ...props }) => <input value={value} onChange={onChange} {...props} className="w-full p-2 border rounded" />;
 const Input = ({ className, error, ...props }) => (
   <input
     {...props}
@@ -127,18 +125,22 @@ const OtpVerification = ({ phoneNumber = "+91 12345 67890" }) => {
     await dispatch(InstructorVerifyOtp(obj))
       .unwrap()
       .then((res) => {
+        console.log('res :>> ', res);
         if (res.status === 200) {
           toast.success(res.message || `OTP verified successfully!`);
-          router.push("/login");
+          setStatus("success"); // mark success
           setLoading(false);
+          router.push("/instructor/login");
         } else {
           toast.error(res.message || `Something went wrong!`);
           setLoading(false);
+          setStatus("error"); // mark error to re-enable button
         }
       })
       .catch((err) => {
-        toast.error(err || "Something went wrong");
+        toast.error(err.message || "Something went wrong");
         setLoading(false);
+        setStatus("error"); // mark error to re-enable button
       });
   }, [otp, initialOtpState]);
 
@@ -178,6 +180,7 @@ const OtpVerification = ({ phoneNumber = "+91 12345 67890" }) => {
   }
 
   return (
+
     <div className="flex flex-col items-center p-6 md:p-10 w-full max-w-md mx-auto bg-white rounded-2xl shadow-xl border border-slate-100">
       {/* Header */}
       <div className="w-full mb-8 text-center">
@@ -216,14 +219,14 @@ const OtpVerification = ({ phoneNumber = "+91 12345 67890" }) => {
           {error}
         </div>
       )}
-
+      {console.log('otp :>> ', otp)}
       {/* Verification Button */}
       <button
         onClick={handleSubmit}
-        disabled={isButtonDisabled}
+        disabled={isButtonDisabled || loading}
         className={`w-full py-3 rounded-xl font-bold transition-all duration-300 shadow-md ${isButtonDisabled
           ? "bg-primary text-white cursor-not-allowed"
-          : "bg-primary text-white hover:bg-primary/90 hover:shadow-lg"
+          : "bg-primary text-white hover:bg-primary/90 hover:shadow-lg cursor-pointer"
           }`}
       >
         {loading ? "Verifying..." : "Verify OTP"}
@@ -240,7 +243,7 @@ const OtpVerification = ({ phoneNumber = "+91 12345 67890" }) => {
         ) : (
           <button
             onClick={handleResend}
-            className="text-teal-600 font-semibold hover:text-teal-700 disabled:opacity-50"
+            className="cursor-pointer text-teal-600 font-semibold hover:text-teal-700 disabled:opacity-50"
             disabled={status === "verifying"}
           >
             Resend Code

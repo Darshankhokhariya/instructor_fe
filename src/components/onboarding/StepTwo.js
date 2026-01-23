@@ -10,7 +10,7 @@ const StepTwo = ({ formData, handleChange, validationErrors }) => {
         subtitle="Your highest educational background."
       />
       <Input
-        label="School / College Name"
+        label="School / College Name :"
         name="collegeName"
         value={formData.collegeName}
         onChange={handleChange}
@@ -19,7 +19,7 @@ const StepTwo = ({ formData, handleChange, validationErrors }) => {
         error={validationErrors.collegeName}
       />
       <Input
-        label="Degree / Qualification Name"
+        label="Degree / Qualification Name :"
         name="qualification"
         value={formData.qualification}
         onChange={handleChange}
@@ -28,7 +28,7 @@ const StepTwo = ({ formData, handleChange, validationErrors }) => {
         error={validationErrors.qualification}
       />
       <Input
-        label="University / Institution Name"
+        label="University / Institution Name :"
         name="institute"
         value={formData.institute}
         onChange={handleChange}

@@ -8,8 +8,10 @@ function Application() {
 
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
+
     const dispatch = useDispatch();
     const users = useSelector(selectUsers);
+
     useEffect(() => {
         dispatch(getUsers({ page, limit }));
     }, [page, limit]);

@@ -7,6 +7,7 @@ import SectionHeader from "./SectionHeader";
 import { FaMapMarkerAlt, FaRoad } from "react-icons/fa";
 import { BiWorldIcon } from "../../../utils/icon";
 import { languageOptions } from "../../../utils/onboarding";
+import { country } from "../constant";
 
 const StepOne = ({
   formData,
@@ -24,7 +25,7 @@ const StepOne = ({
           subtitle="Required for identification and communication."
         />
         <Input
-          label="Full Name"
+          label="Full Name :"
           name="name"
           value={formData.name}
           onChange={handleChange}
@@ -34,7 +35,7 @@ const StepOne = ({
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <Input
-            label="Date of Birth"
+            label="Date of Birth :"
             name="dateOfBirth"
             type="date"
             value={formData.dateOfBirth}
@@ -64,7 +65,7 @@ const StepOne = ({
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <Input
-            label="Email"
+            label="Email :"
             name="email"
             type="email"
             value={formData.email}
@@ -76,7 +77,7 @@ const StepOne = ({
           />
           <div>
             <PhoneInput
-              label="Primary Phone Number"
+              label="Primary Phone Number :"
               name="primaryMobile"
               value={formData.primaryMobile}
               onChange={handleChange}
@@ -93,7 +94,7 @@ const StepOne = ({
         </div>
         <div>
           <PhoneInput
-            label="Alternate Phone Number"
+            label="Alternate Phone Number :"
             name="secondMobile"
             value={formData.secondMobile}
             onChange={handleChange}
@@ -111,7 +112,7 @@ const StepOne = ({
         {/* New Field: Languages Spoken */}
         <div>
           <SmartSelect
-            label="Languages Spoken (Required)"
+            label="Languages Spoken :"
             name="language"
             options={languageOptions}
             selectedValues={formData.language}
@@ -159,7 +160,7 @@ const StepOne = ({
           <div className="grid grid-cols-1 gap-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
               <Input
-                label="House No./Floor"
+                label="House No./Floor :"
                 name="pBlock"
                 value={formData.pBlock}
                 onChange={handleChange}
@@ -168,7 +169,7 @@ const StepOne = ({
                 placeholder="Enter Block / Door Number"
               />
               <Input
-                label="Building Name & Block No."
+                label="Building Name & Block No :"
                 name="pBuilding"
                 value={formData.pBuilding}
                 onChange={handleChange}
@@ -177,7 +178,7 @@ const StepOne = ({
                 placeholder="Enter Building Name"
               />
               <Input
-                label="Landmark / Area Name"
+                label="Landmark / Area Name :"
                 name="pArea"
                 value={formData.pArea}
                 onChange={handleChange}
@@ -189,7 +190,7 @@ const StepOne = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
               <Input
-                label="City"
+                label="City :"
                 name="pCity"
                 value={formData.pCity}
                 onChange={handleChange}
@@ -198,7 +199,7 @@ const StepOne = ({
                 placeholder="Enter City"
               />
               <Input
-                label="State"
+                label="State :"
                 name="pState"
                 value={formData.pState}
                 onChange={handleChange}
@@ -207,14 +208,9 @@ const StepOne = ({
                 placeholder="Enter State"
               />
               <Selector
-                label="Country"
+                label="Country :"
                 name="pCountry"
-                options={[
-                  { label: "India", value: "india" },
-                  { label: "USA", value: "usa" },
-                  { label: "UK", value: "uk" },
-                  { label: "Other", value: "other" },
-                ]}
+                options={country || []}
                 value={formData.pCountry}
                 onChange={handleChange}
                 required
@@ -225,7 +221,7 @@ const StepOne = ({
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mt-4">
             <Input
-              label="Pincode / Zip"
+              label="Pincode / Zip :"
               name="pPincode"
               value={formData.pPincode}
               onChange={handleChange}
@@ -266,7 +262,7 @@ const StepOne = ({
             <div className="flex flex-col gap-4">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <Input
-                  label="House No./Floor"
+                  label="House No./Floor :"
                   name="cBlock"
                   value={formData.cBlock}
                   onChange={handleChange}
@@ -276,7 +272,7 @@ const StepOne = ({
                   placeholder="Enter Block / Door Number"
                 />
                 <Input
-                  label="Building Name & Block No."
+                  label="Building Name & Block No :"
                   name="cBuilding"
                   value={formData.cBuilding}
                   onChange={handleChange}
@@ -286,7 +282,7 @@ const StepOne = ({
                   placeholder="Enter Building Name"
                 />
                 <Input
-                  label="Landmark / Area Name"
+                  label="Landmark / Area Name :"
                   name="cArea"
                   value={formData.cArea}
                   onChange={handleChange}
@@ -299,7 +295,7 @@ const StepOne = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <Input
-                  label="City"
+                  label="City :"
                   name="cCity"
                   value={formData.cCity}
                   onChange={handleChange}
@@ -309,7 +305,7 @@ const StepOne = ({
                   placeholder="Enter City"
                 />
                 <Input
-                  label="State"
+                  label="State :"
                   name="cState"
                   value={formData.cState}
                   onChange={handleChange}
@@ -319,14 +315,9 @@ const StepOne = ({
                   placeholder="Enter State"
                 />
                 <Selector
-                  label="Country"
+                  label="Country :"
                   name="cCountry"
-                  options={[
-                    { label: "India", value: "india" },
-                    { label: "USA", value: "usa" },
-                    { label: "UK", value: "uk" },
-                    { label: "Other", value: "other" },
-                  ]}
+                  options={country || []}
                   value={formData.cCountry}
                   onChange={handleChange}
                   required={!isCurrentSameAsPermanent}
@@ -339,7 +330,7 @@ const StepOne = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mt-4">
               <Input
-                label="Pincode / Zip"
+                label="Pincode / Zip :"
                 name="cPincode"
                 value={formData.cPincode}
                 onChange={handleChange}

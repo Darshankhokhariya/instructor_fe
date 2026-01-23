@@ -1,41 +1,16 @@
 "use client";
+import Loader from "@/components/common/Loader";
 import Layout from "@/components/layout/Layout";
 import RecentApplications from "@/components/manager/RecentApplications";
-import { getSingleUser, getUsers, selectUsers } from "@/redux/slices/userSlice";
+import { getUsers, selectUsers } from "@/redux/slices/userSlice";
 import React, { useEffect, useState } from "react";
 import {
   FaClipboardList,
   FaPhoneAlt,
   FaVideo,
-  FaCheckCircle,
-  FaUserCheck,
+  FaCheckCircle
 } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-
-// Sample data for applications
-const sampleApplications = [
-  {
-    id: 1,
-    name: "Ramesh Patel",
-    status: "Pending",
-    managerApproval: false,
-    adminApproval: false,
-  },
-  {
-    id: 2,
-    name: "Sita Sharma",
-    status: "Approved",
-    managerApproval: true,
-    adminApproval: false,
-  },
-  {
-    id: 3,
-    name: "Rahul Mehta",
-    status: "Pending",
-    managerApproval: true,
-    adminApproval: true,
-  },
-];
 
 const dashboardStats = [
   {
@@ -69,34 +44,27 @@ const dashboardStats = [
 ];
 
 export default function AdminDashboard() {
-  const [data, setData] = useState(sampleApplications);
+
+  const dispatch = useDispatch();
+  const users = useSelector(selectUsers);
+
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
 
-  const updateField = (id, key, value) => {
-    setData((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [key]: value } : item))
-    );
-  };
+  const getUserList = async () => {
+    setLoading(true);
+    await dispatch(getUsers({ page, limit }));
+    setLoading(false);
+  }
 
-  // Stats
-  const total = data.length;
-  const pending = data.filter((d) => d.status === "Pending").length;
-  const approvedByManager = data.filter((d) => d.managerApproval).length;
-  const approvedByAdmin = data.filter((d) => d.adminApproval).length;
-
-  const users = useSelector(selectUsers);
-  console.log("users", users)
-
-  useEffect(() => {
-    dispatch(getUsers({ page, limit }));
+  useEffect(async () => {
+    getUserList();
   }, [page, limit]);
-
-
 
   return (
     <Layout>
+      {loading && <Loader />}
       <div className="p-6 bg-gray-50">
         <h1 className="text-3xl font-bold text-primary mb-6">
           Admin / Manager Dashboard
@@ -126,7 +94,7 @@ export default function AdminDashboard() {
         </div>
 
         <div className="w-[70%] mt-6">
-          <RecentApplications data={users?.data?.data} updateField={updateField} getUsers={getUsers} />
+          <RecentApplications data={users?.data?.data} getUsers={getUsers} />
         </div>
       </div>
     </Layout>

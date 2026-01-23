@@ -22,7 +22,7 @@ const Selector = ({
                     className="text-sm font-medium text-gray-700"
                 >
                     {label}{" "}
-                    {required && <span className="text-red-500">*</span>}
+                    {required && <span className="ml-1 text-red-500">*</span>}
                 </label>
             )}
 
@@ -61,7 +61,7 @@ const Selector = ({
 
             {/* Error message */}
             {error && (
-                <p className="text-xs text-red-500 mt-0.5">{error}</p>
+                <p className="text-xs text-red-500">{error}</p>
             )}
         </div>
     );

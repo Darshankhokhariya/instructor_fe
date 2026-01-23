@@ -9,6 +9,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Input from "@/components/common/Input";
 import { emailRegex } from "@/components/common/constant";
 import { InstructorLogin } from "@/redux/slices/userSlice";
+import Loader from "@/components/common/Loader";
 
 const initialState = {
   email: "",
@@ -61,6 +62,10 @@ export default function Login() {
     return valid;
   };
 
+  const handleClear = () => {
+    setFields(initialState);
+  }
+
   const handleSubmit = async () => {
     setTouched(true);
 
@@ -112,7 +117,7 @@ export default function Login() {
       toast.success(res?.message || "Login successful");
 
       // optional
-      // handleClear();
+      handleClear();
 
     } catch (err) {
       toast.error(
@@ -125,121 +130,124 @@ export default function Login() {
 
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-stone-50 to-stone-200 p-4 md:p-8">
-      <div className="w-full max-w-6xl bg-white rounded-3xl border border-gray-200 shadow-2xl overflow-hidden flex flex-col md:flex-row">
+    <>
+      {loading && <Loader />}
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-stone-50 to-stone-200 p-4 md:p-8">
+        <div className="w-full max-w-6xl bg-white rounded-3xl border border-gray-200 shadow-2xl overflow-hidden flex flex-col md:flex-row">
 
-        {/* LEFT BRAND SECTION */}
-        <div
-          className="hidden md:flex md:w-1/2 p-12 text-white relative bg-cover bg-center"
-          style={{
-            backgroundImage:
-              "url('https://img.freepik.com/premium-photo/yoga-picture_1178160-721.jpg')",
-          }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-br from-[#0f766e]/90 to-[#115e59]/90" />
-
-          <div className="relative z-10">
-            <h1 className="text-3xl font-serif font-bold tracking-wide mb-10">
-              Yogalink
-            </h1>
-
-            <h2 className="text-4xl font-serif leading-tight mb-4">
-              Find your balance,
-              <br /> guide others.
-            </h2>
-
-            <p className="text-teal-100 text-lg max-w-md">
-              Manage classes, connect with students, and grow your yoga career
-              globally.
-            </p>
-          </div>
-        </div>
-
-        {/* RIGHT FORM SECTION */}
-        <div className="w-full md:w-1/2 px-8 py-12 md:px-16 lg:px-24 flex flex-col justify-center">
-          <div className="mb-10">
-            <h2 className="text-3xl font-serif font-semibold text-stone-800">
-              Welcome Back
-            </h2>
-            <p className="text-stone-500 mt-1">
-              Enter your credentials to continue
-            </p>
-          </div>
-
-          <form
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleSubmit();
-              }
+          {/* LEFT BRAND SECTION */}
+          <div
+            className="hidden md:flex md:w-1/2 p-12 text-white relative bg-cover bg-center"
+            style={{
+              backgroundImage:
+                "url('https://img.freepik.com/premium-photo/yoga-picture_1178160-721.jpg')",
             }}
-            className="space-y-6"
           >
-            {/* Email */}
-            <div>
-              <Input
-                label="Email Address"
-                name="email"
-                value={fields.email}
-                placeholder="Enter email"
-                onChange={handleChange}
-                required
-              />
-              {touched && errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-              )}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#0f766e]/90 to-[#115e59]/90" />
+
+            <div className="relative z-10">
+              <h1 className="text-3xl font-serif font-bold tracking-wide mb-10">
+                Yogalink
+              </h1>
+
+              <h2 className="text-4xl font-serif leading-tight mb-4">
+                Find your balance,
+                <br /> guide others.
+              </h2>
+
+              <p className="text-teal-100 text-lg max-w-md">
+                Manage classes, connect with students, and grow your yoga career
+                globally.
+              </p>
+            </div>
+          </div>
+
+          {/* RIGHT FORM SECTION */}
+          <div className="w-full md:w-1/2 px-8 py-12 md:px-16 lg:px-24 flex flex-col justify-center">
+            <div className="mb-10">
+              <h2 className="text-3xl font-serif font-semibold text-stone-800">
+                Welcome Back
+              </h2>
+              <p className="text-stone-500 mt-1">
+                Enter your credentials to continue
+              </p>
             </div>
 
-            {/* Password */}
-            <div className="relative">
-              <Input
-                type={showPassword ? "text" : "password"}
-                label="Password"
-                name="password"
-                value={fields.password}
-                placeholder="Enter password"
-                onChange={handleChange}
-                required
-              />
+            <form
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleSubmit();
+                }
+              }}
+              className="space-y-6"
+            >
+              {/* Email */}
+              <div>
+                <Input
+                  label="Email Address :"
+                  name="email"
+                  value={fields.email}
+                  placeholder="Enter email"
+                  onChange={handleChange}
+                  required
+                />
+                {touched && errors.email && (
+                  <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                )}
+              </div>
+
+              {/* Password */}
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  label="Password :"
+                  name="password"
+                  value={fields.password}
+                  placeholder="Enter password"
+                  onChange={handleChange}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-9 cursor-pointer text-stone-400 hover:text-teal-600"
+                >
+                  {showPassword ? <FaEye /> : <FaEyeSlash />}
+                </button>
+                {touched && errors.password && (
+                  <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                )}
+              </div>
+
+              {/* Button */}
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-[38px] text-stone-400 hover:text-teal-600"
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
-              {touched && errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-              )}
-            </div>
-
-            {/* Button */}
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={loading}
-              className={`w-full py-3.5 rounded-xl font-semibold text-lg text-white transition-all
+                onClick={handleSubmit}
+                disabled={loading}
+                className={`cursor-pointer w-full py-3.5 rounded-xl font-semibold text-lg text-white transition-all
                 ${loading
-                  ? "bg-primary/70 cursor-not-allowed"
-                  : "bg-primary hover:bg-primary/90 hover:-translate-y-0.5"
-                }`}
-            >
-              {loading ? "Signing in..." : "Sign In"}
-            </button>
-          </form>
+                    ? "bg-primary/70 cursor-not-allowed"
+                    : "bg-primary hover:bg-primary/90 hover:-translate-y-0.5"
+                  }`}
+              >
+                {loading ? "Signing in..." : "Sign In"}
+              </button>
+            </form>
 
-          {/* Footer */}
-          <div className="text-center mt-10 text-stone-500">
-            Don’t have an account?
-            <Link
-              href="/instructor/signup"
-              className="block mt-1 font-semibold text-primary hover:underline"
-            >
-              Create an account
-            </Link>
+            {/* Footer */}
+            <div className="text-center cursor-pointer mt-10 text-stone-500">
+              Don’t have an account?
+              <Link
+                href="/instructor/signup"
+                className="block mt-1 font-semibold text-primary hover:underline"
+              >
+                Create an account
+              </Link>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
